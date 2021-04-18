@@ -9,6 +9,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@spree/storefront-api-v2-sdk": "^4.5.0",
     "aos": "^2.3.4",
     "core-js": "^3.7.0",
     "nuxt": "^2.14.6"

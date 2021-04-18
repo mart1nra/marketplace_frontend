@@ -180,7 +180,7 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item @click="signedIn = false">
+              <v-list-item @click="handleLogout">
                 <v-list-item-icon>
                   <v-icon color="red darken-2">mdi-exit-to-app</v-icon>
                 </v-list-item-icon>
@@ -264,6 +264,13 @@ export default {
       ],
     }
   },
+  methods: {
+    handleLogout() {
+      this.$store.commit('account/setAccountInfo', null);
+      this.$store.dispatch('auth/setAuthStatus', false);
+      this.$router.push('/');
+    }
+  }
 }
 </script>
 

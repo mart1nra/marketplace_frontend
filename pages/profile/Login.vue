@@ -1,12 +1,18 @@
 <template>
-	<v-container fluid fill-height>
+	<v-container fluid>
+    <v-row justify="center" class="mt-15">
+      <v-col cols="10" xs="10" md="6" sm="8" lg="4">
+        <h2 class="primary--text">Para ingresar escriba su usuario y contraseña</h2>
+        <v-divider class="my-3"></v-divider>
+      </v-col>
+    </v-row>
 	  <v-layout flex align-center justify-center>
-	    <v-flex xs12 sm4 elevation-cs>
-	      <v-toolbar class="px-5" color="primary">
-	        <v-toolbar-title class="white--text"><h4>Para ingresar escriba su usuario y contraseña</h4></v-toolbar-title>
-	      </v-toolbar>
-	      <v-card flat>
+	    <v-flex xs10 sm8 md6 lg4 elevation-cs>
+	      <v-card class="elevation-cs ml-0 d-flex align-center pa-6 justify-center justify-md-space-between rounded-lg">
 	        <v-card-text class="pt-4">
+            <v-alert v-if="loginError" type="error">
+              E-mail o contraseña incorrecta. Por favor verificar.
+            </v-alert>
 	          <div>
               <v-form v-model="valid" ref="form">
                 <v-text-field
@@ -46,6 +52,7 @@ export default {
   data () {
     return {
       valid: false,
+      loginError: false,
       password: '',
       passwordRules: [
         (v) => !!v || 'Contraseña es obligatoria',
@@ -61,12 +68,12 @@ export default {
     async handleSubmit() {
       const response = await this.$store.dispatch('account/getAccountInfo', { username: this.email, password: this.password });
       if (response) {
-          /*const cartItems = await this.$store.dispatch('cart/getCartInfo');
-          this.$store.dispatch('product/getCartProducts', cartItems);
+          //const cartItems = await this.$store.dispatch('cart/getCartInfo');
+          //this.$store.dispatch('product/getCartProducts', cartItems);
           this.$store.dispatch('auth/setAuthStatus', true);
-          this.$router.push('/');*/
+          this.$router.push('/');
       } else {
-          //this.loginError = true;
+          this.loginError = true;
       }
     }
   }
