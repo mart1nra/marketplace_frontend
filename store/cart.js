@@ -97,7 +97,7 @@ export const actions = {
         return response;
 
     },*/
-    /*async removeProductFromCart({ commit, state }, payload) {
+    async removeProductFromCart({ commit, state }, payload) {
         const account = this.$cookies.get('account', { parseJSON: true });
         const response = await client.cart.removeItem({ bearerToken: account.token }, payload.id, { include: 'line_items,variants,variants.images,variants.option_values' })
             .then(response => {
@@ -107,7 +107,7 @@ export const actions = {
             })
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
-    },*/
+    },
     /*increaseCartItemQuantity({ commit, state }, payload) {
         commit('increaseItemQuantity', payload);
         const cookieParams = {

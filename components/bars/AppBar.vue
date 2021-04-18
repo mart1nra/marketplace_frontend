@@ -36,6 +36,8 @@
               v-bind="attrs"
               v-on="on"
               to="/order"
+              exact
+              nuxt
             >
               <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
             </v-btn>
@@ -66,14 +68,17 @@
 
               <v-list-item-action>
                 <v-btn icon>
-                  <v-icon color="red lighten-1">mdi-close</v-icon>
+                  <v-icon
+                    color="red lighten-1"
+                    @click.prevent="handleRemoveProductFromCart(product)"
+                  >mdi-close</v-icon>
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
             <v-divider class="my-3"></v-divider>
             <div class="d-flex justify-space-between align-center">
               <h4>Subtotal</h4>
-              <div>{{ cartAmount }}</div>
+              <div class="font-weight-bold" v-html="displayPrice(cartAmount)"></div>
             </div>
             <v-btn
               class="mx-auto w-100 pa-0 ma-0 mt-4 white--text"
@@ -91,6 +96,8 @@
         v-else
         icon
         to="/order"
+        exact
+        nuxt
       >
         <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
       </v-btn>
@@ -115,13 +122,13 @@
         <v-icon size="25">mdi-magnify</v-icon>
       </v-btn>
 
-      <!--v-btn
+      <v-btn
         icon
         class="ml-2"
         @click="$vuetify.theme.dark = !$vuetify.theme.dark"
       >
         <v-icon size="25">mdi-theme-light-dark</v-icon>
-      </v-btn-->
+      </v-btn>
 
       <v-btn
         v-if="!signedIn"
@@ -129,6 +136,7 @@
         class="mx-4"
         color="primary"
         to="/profile/login"
+        exact
         nuxt
       >
         <v-icon left>mdi-account-circle-outline</v-icon> Ingresar
@@ -169,7 +177,7 @@
             <v-divider></v-divider>
 
             <div v-if="user" class="pt-0">
-              <v-list-item link to="/profile" exact>
+              <v-list-item link to="/profile" exact nuxt>
                 <v-list-item-icon>
                   <v-icon>mdi-account</v-icon>
                 </v-list-item-icon>
@@ -181,7 +189,7 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item link to="/profile/orders" exact>
+              <v-list-item link to="/profile/orders" exact nuxt>
                 <v-list-item-icon>
                   <v-icon>mdi-view-list</v-icon>
                 </v-list-item-icon>
@@ -190,7 +198,7 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item link to="/profile/data" exact>
+              <v-list-item link to="/profile/data" exact nuxt>
                 <v-list-item-icon>
                   <v-icon>mdi-cog</v-icon>
                 </v-list-item-icon>
@@ -275,18 +283,6 @@ export default {
         orders_placed: 12,
         image: require('~/assets/img/person_1.jpg'),
       },*/
-      /*products: [
-        {
-          id: 1,
-          title: 'Apple MacBook Air (2020)',
-          amount: 1,
-        },
-        {
-          id: 2,
-          title: 'iPhone 12 Pro Max (2020)',
-          amount: 3,
-        },
-      ],*/
     }
   },
   methods: {
@@ -307,6 +303,18 @@ export default {
         var price = p;
         var dec_pos = price.indexOf('.');
         return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+    },
+    async handleRemoveProductFromCart(product) {
+      const cartItem = this.cart.find(
+        item => item.id === product.lineItemId
+      );
+      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
+      this.$store.dispatch('product/getCartProducts', cartItems);
+      /*this.$notify({
+        group: 'addCartSuccess',
+        title: 'Borrar de Carrito',
+        text: `${product.title} fue borrado del carrito de compras!`
+      });*/
     },
     handleLogout() {
       this.$store.commit('account/setAccountInfo', null);
