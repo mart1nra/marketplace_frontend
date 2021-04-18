@@ -11,13 +11,13 @@ export const mutations = {
 export const actions = {
     setAuthStatus({ commit, state }, payload) {
         commit('setSignedIn', payload);
-        /*const cookieParams = {
+        const cookieParams = {
             signedIn: state.signedIn
         };
 
         this.$cookies.set('auth', cookieParams, {
             path: '/',
             maxAge: 60 * 60 * 24 * 7
-        });*/
+        });
     }
 };

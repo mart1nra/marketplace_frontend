@@ -94,7 +94,7 @@ export default {
   async fetch() {
     this.loading = true
 
-    const res = await fetch(`/data.json`)
+    const res = await fetch(`http://localhost:8000/data.json`)
       .then((res) => res.json())
       .finally(() => (this.loading = false))
       .catch((error) => {
