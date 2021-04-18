@@ -9,6 +9,7 @@ export const state = () => ({
 
 export const mutations = {
   setAccountInfo(state, payload) {
+    if (payload) payload.data.name = payload.data.email.slice(0, payload.data.email.lastIndexOf('@'));
     state.accountInfo = payload;
   },
   setCartInfo(state, payload) {

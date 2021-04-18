@@ -12,7 +12,7 @@
               class="title-top primary--text display-1 font-weight-black"
               :class="!$vuetify.theme.dark ? 'text--darken-4' : ''"
             >
-              Hello Alex,
+              Hello {{ user.name }},
             </h1>
             <div
               class="title-bottom display-1 font-weight-light primary--text text--darken-3"
@@ -134,8 +134,15 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
-  middleware: 'authentication'
+  middleware: 'authentication',
+  computed: {
+      ...mapState({
+          user: state => state.account.accountInfo.data
+      })
+  }
 }
 </script>
 

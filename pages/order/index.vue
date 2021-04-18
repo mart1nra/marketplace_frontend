@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="12" lg="12" xl="10">
-        <h2 class="primary--text">My Order</h2>
+        <h2 class="primary--text">Mi Carrito</h2>
         <v-divider class="my-3"></v-divider>
         <v-row>
           <v-col cols="12">

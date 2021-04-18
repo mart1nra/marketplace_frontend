@@ -2,25 +2,33 @@
   <v-container class="ml-md-16">
     <v-row justify="center">
       <v-col cols="12" md="12" lg="12" xl="10">
-        <h2 class="primary--text">My Data</h2>
+        <h2 class="primary--text">Mis Datos</h2>
         <v-divider class="my-3"></v-divider>
         <v-row>
           <v-col cols="12" sm="4" md="2" lg="2" xl="2">
             <div class="d-flex flex-column align-center">
               <v-avatar size="120">
-                <v-img :src="user.image" contain></v-img>
+                <v-icon size="120">mdi-account-outline</v-icon>
+                <!--v-img :src="user.image" contain></v-img-->
               </v-avatar>
-              <v-btn color="primary" text class="my-2">Change Avatar</v-btn>
+              <!--v-btn color="primary" text class="my-2">Change Avatar</v-btn-->
             </div>
           </v-col>
           <v-col cols="12" sm="8" md="10" lg="10" xl="10">
             <v-text-field
               v-model="user.name"
               label="Display name"
+              readonly
+              filled
             ></v-text-field>
-            <v-text-field v-model="user.email" label="Email"></v-text-field>
             <v-text-field
-              v-model="user.password"
+              v-model="user.email"
+              label="Email"
+              readonly
+              filled
+            ></v-text-field>
+            <v-text-field
+              v-model="password"
               label="Password"
               type="password"
             ></v-text-field>
@@ -50,19 +58,27 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'Data',
   middleware: 'authentication',
+  computed: {
+      ...mapState({
+          user: state => state.account.accountInfo.data
+      })
+  },
   data() {
     return {
-      user: {
+      password: '********'
+      /*user: {
         name: 'Alex',
         password: 'coolpassword123',
         email: 'alex@vuetifyjs.com',
         verified: true,
         orders_placed: 12,
         image: require('~/assets/img/person_1.jpg'),
-      },
+      },*/
     }
   },
 }

@@ -124,7 +124,8 @@
             v-on="on"
           >
             <v-avatar color="primary" size="35">
-              <v-img v-if="user && user.image" :src="user.image"></v-img>
+              <v-icon>mdi-account-outline</v-icon>
+              <!--v-img v-if="user && user.image" :src="user.image"></v-img-->
             </v-avatar>
             <span class="text-none font-weight-regular ml-3 hidden-sm-and-down"
               >Hola, {{ user.name }}</span
@@ -136,13 +137,14 @@
           <v-list color="primary--text">
             <v-list-item>
               <v-list-item-avatar>
-                <v-img v-if="user.image" :src="user.image"></v-img>
+                <v-icon size="35">mdi-account-outline</v-icon>
+                <!--v-img v-if="user.image" :src="user.image"></v-img-->
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title>{{ user.name }}</v-list-item-title>
+                <v-list-item-title>{{ user.email }}</v-list-item-title>
                 <v-list-item-subtitle>Looking good today!</v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action>🔥</v-list-item-action>
+              <!--v-list-item-action>🔥</v-list-item-action-->
             </v-list-item>
             <v-divider></v-divider>
 
@@ -168,15 +170,12 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item link disabled>
+              <v-list-item link to="/profile/data" exact>
                 <v-list-item-icon>
                   <v-icon>mdi-cog</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>Settings</v-list-item-title>
-                  <v-list-item-subtitle class="caption"
-                    >(Disabled)</v-list-item-subtitle
-                  >
                 </v-list-item-content>
               </v-list-item>
 
@@ -236,20 +235,21 @@ import { mapState } from 'vuex';
 export default {
   computed: {
       ...mapState({
-          signedIn: state => state.auth.signedIn
+          signedIn: state => state.auth.signedIn,
+          user: state => state.account.accountInfo.data
       })
   },
   data() {
     return {
       model: 0,
       favItems: null,
-      user: {
+      /*user: {
         name: 'Martin',
         email: 'martinra@vgmail.com',
         verified: true,
         orders_placed: 12,
         image: require('~/assets/img/person_1.jpg'),
-      },
+      },*/
       products: [
         {
           id: 1,
