@@ -52,6 +52,7 @@
 <script>
 export default {
   name: 'Data',
+  middleware: 'authentication',
   data() {
     return {
       user: {

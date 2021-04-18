@@ -9,7 +9,7 @@
     <NuxtLink to="/" class="d-flex align-center">
       <v-img alt="Vuetify Logo" src="/v.png" max-width="60" contain />
       <span class="title ml-3 mr-5 hidden-xs-only"
-        >ENDTECH&nbsp;<span class="font-weight-light">Ecommerce</span></span
+        >Vidriera<span class="font-weight-light">Libre</span></span
       >
     </NuxtLink>
     <v-spacer></v-spacer>
@@ -95,22 +95,23 @@
         <v-icon size="25">mdi-magnify</v-icon>
       </v-btn>
 
-      <v-btn
+      <!--v-btn
         icon
         class="ml-2"
         @click="$vuetify.theme.dark = !$vuetify.theme.dark"
       >
         <v-icon size="25">mdi-theme-light-dark</v-icon>
-      </v-btn>
+      </v-btn-->
 
       <v-btn
         v-if="!signedIn"
         outlined
         class="mx-4"
         color="primary"
-        @click="signedIn = true"
+        to="/profile/login"
+        nuxt
       >
-        <v-icon left>mdi-account-circle-outline</v-icon> Sign in
+        <v-icon left>mdi-account-circle-outline</v-icon> Ingresar
       </v-btn>
 
       <v-menu v-if="signedIn">
@@ -126,7 +127,7 @@
               <v-img v-if="user && user.image" :src="user.image"></v-img>
             </v-avatar>
             <span class="text-none font-weight-regular ml-3 hidden-sm-and-down"
-              >Welcome, {{ user.name }}</span
+              >Hola, {{ user.name }}</span
             >
             <v-icon>mdi-chevron-down</v-icon>
           </v-btn>
@@ -230,19 +231,25 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
+  computed: {
+      ...mapState({
+          signedIn: state => state.auth.signedIn
+      })
+  },
   data() {
     return {
       model: 0,
       favItems: null,
       user: {
-        name: 'Alex',
-        email: 'alex@vuetifyjs.com',
+        name: 'Martin',
+        email: 'martinra@vgmail.com',
         verified: true,
         orders_placed: 12,
         image: require('~/assets/img/person_1.jpg'),
       },
-      signedIn: true,
       products: [
         {
           id: 1,

@@ -11,10 +11,9 @@
               class="mb-6"
             ></v-img>
             <p>
-              Unfortunately the page you are looking for does not exist, or an
-              error occurred.
+              La página que estás buscando no existe.
             </p>
-            <v-btn outlined color="primary" to="/">Go to Homepage</v-btn>
+            <v-btn outlined color="primary" to="/">Ir a la página principal</v-btn>
           </div>
         </v-col>
       </v-row>

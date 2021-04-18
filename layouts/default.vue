@@ -5,21 +5,26 @@
     <AppBar></AppBar>
     <FabHelpCard v-if="!isProfile"></FabHelpCard>
     <v-main>
-      <ProfileDrawer v-if="isProfile"></ProfileDrawer>
+      <ProfileDrawer v-if="isProfile && signedIn"></ProfileDrawer>
       <nuxt />
     </v-main>
 
-    <BottomNavigation v-if="isProfile"></BottomNavigation>
+    <BottomNavigation v-if="isProfile && signedIn"></BottomNavigation>
   </v-app>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   computed: {
     isProfile() {
       var profile = this.$route.path.includes('/profile')
       return profile
     },
+    ...mapState({
+        signedIn: state => state.auth.signedIn
+    })
   },
 }
 </script>

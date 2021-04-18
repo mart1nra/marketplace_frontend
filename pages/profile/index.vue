@@ -134,7 +134,9 @@
 </template>
 
 <script>
-export default {}
+export default {
+  middleware: 'authentication'
+}
 </script>
 
 <style></style>

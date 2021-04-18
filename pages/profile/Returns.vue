@@ -70,6 +70,7 @@
 
 <script>
 export default {
+  middleware: 'authentication',
   data() {
     return {
       loading: false,
