@@ -58,8 +58,16 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
-
+    async handleSubmit() {
+      const response = await this.$store.dispatch('account/getAccountInfo', { username: this.email, password: this.password });
+      if (response) {
+          /*const cartItems = await this.$store.dispatch('cart/getCartInfo');
+          this.$store.dispatch('product/getCartProducts', cartItems);
+          this.$store.dispatch('auth/setAuthStatus', true);
+          this.$router.push('/');*/
+      } else {
+          //this.loginError = true;
+      }
     }
   }
 }
