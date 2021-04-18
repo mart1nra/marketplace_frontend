@@ -116,6 +116,7 @@
 
 <script>
 export default {
+  middleware: 'authentication',
   data() {
     return {
       quantity: 1,

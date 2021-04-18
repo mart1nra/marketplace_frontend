@@ -22,38 +22,46 @@
     ></v-text-field>
     <v-spacer></v-spacer>
     <div class="toolbar-icons d-flex align-center">
-      <v-menu open-on-hover offset-y left close-delay="3000">
+      <v-menu v-if="signedIn && cartTotal > 0" open-on-hover offset-y left>
         <template #activator="{ on, attrs }">
           <v-badge
             overlap
-            content="2"
+            :content="cartTotal"
             offset-x="18"
             offset-y="18"
             color="primary"
           >
-            <v-btn icon v-bind="attrs" v-on="on">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              to="/order"
+            >
               <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
             </v-btn>
           </v-badge>
         </template>
-        <v-card class="pa-4">
+        <v-card class="pa-4" max-width="450">
           <v-list two-line class="pb-0">
             <v-list-item v-for="(product, i) in products" :key="i" class="mb-2">
               <v-img
-                :src="require(`assets/img/categories/${product.id}.png`)"
+                :src="`${baseUrl}${product.image.url}`"
                 contain
-                style="max-width: 60px; max-height: 40px; margin: 10px"
+                style="max-width: 80px; max-height: 80px;"
               ></v-img>
 
               <v-list-item-content>
                 <v-list-item-title v-text="product.title"></v-list-item-title>
-
+                <v-list-item-subtitle>
+                  Color <v-icon v-if="product.options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
+                       <v-avatar v-else size="16" :color="product.options.color.presentation"></v-avatar>
+                  Talle<v-chip class="ma-1" x-small>{{ product.options.size.presentation }}</v-chip>
+                  Largo<v-chip class="ma-1" x-small>{{ product.options.length.presentation }}</v-chip>
+                </v-list-item-subtitle>
                 <v-list-item-subtitle
-                  >Amount:
-                  <span class="font-weight-bold"
-                    >{{ product.amount }}x</span
-                  ></v-list-item-subtitle
-                >
+                  >Cantidad: {{ quantity(product) }} x
+                  <span class="font-weight-bold" v-html="displayPrice(product.price)"></span>
+                </v-list-item-subtitle>
               </v-list-item-content>
 
               <v-list-item-action>
@@ -62,8 +70,13 @@
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
+            <v-divider class="my-3"></v-divider>
+            <div class="d-flex justify-space-between align-center">
+              <h4>Subtotal</h4>
+              <div>{{ cartAmount }}</div>
+            </div>
             <v-btn
-              class="mx-auto w-100 pa-0 ma-0 mt-auto white--text"
+              class="mx-auto w-100 pa-0 ma-0 mt-4 white--text"
               tile
               color="primary"
               to="/order"
@@ -74,6 +87,13 @@
           </v-list>
         </v-card>
       </v-menu>
+      <v-btn
+        v-else
+        icon
+        to="/order"
+      >
+        <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
+      </v-btn>
 
       <v-badge
         v-if="favItems > 0"
@@ -124,7 +144,7 @@
             v-on="on"
           >
             <v-avatar color="primary" size="35">
-              <v-icon>mdi-account-outline</v-icon>
+              <v-icon dark>mdi-account-circle</v-icon>
               <!--v-img v-if="user && user.image" :src="user.image"></v-img-->
             </v-avatar>
             <span class="text-none font-weight-regular ml-3 hidden-sm-and-down"
@@ -236,13 +256,18 @@ export default {
   computed: {
       ...mapState({
           signedIn: state => state.auth.signedIn,
-          user: state => state.account.accountInfo.data
+          user: state => state.account.accountInfo.data,
+          products: state => state.product.cartProducts,
+          cart: state => state.cart.cartItems,
+          cartTotal: state => state.cart.total,
+          cartAmount: state => state.cart.amount,
+          baseUrl: state => state.repository.baseUrl
       })
   },
   data() {
     return {
       model: 0,
-      favItems: null,
+      favItems: null
       /*user: {
         name: 'Martin',
         email: 'martinra@vgmail.com',
@@ -250,7 +275,7 @@ export default {
         orders_placed: 12,
         image: require('~/assets/img/person_1.jpg'),
       },*/
-      products: [
+      /*products: [
         {
           id: 1,
           title: 'Apple MacBook Air (2020)',
@@ -261,10 +286,28 @@ export default {
           title: 'iPhone 12 Pro Max (2020)',
           amount: 3,
         },
-      ],
+      ],*/
     }
   },
   methods: {
+    colorPresentation(color) {
+        return color.name === 'Blanco' ? '' : '';
+    },
+    quantity(product) {
+        if (this.cart !== null) {
+            const cartItem = this.cart.find(
+                item => item.id === product.lineItemId
+            );
+            return cartItem ? cartItem.quantity : null;
+        } else {
+            return null;
+        }
+    },
+    displayPrice(p) {
+        var price = p;
+        var dec_pos = price.indexOf('.');
+        return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+    },
     handleLogout() {
       this.$store.commit('account/setAccountInfo', null);
       this.$store.dispatch('auth/setAuthStatus', false);
