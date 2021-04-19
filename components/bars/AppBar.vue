@@ -287,22 +287,22 @@ export default {
   },
   methods: {
     colorPresentation(color) {
-        return color.name === 'Blanco' ? '' : '';
+      return color.name === 'Blanco' ? '' : '';
     },
     quantity(product) {
-        if (this.cart !== null) {
-            const cartItem = this.cart.find(
-                item => item.id === product.lineItemId
-            );
-            return cartItem ? cartItem.quantity : null;
-        } else {
-            return null;
-        }
+      if (this.cart !== null) {
+          const cartItem = this.cart.find(
+              item => item.id === product.lineItemId
+          );
+          return cartItem ? cartItem.quantity : null;
+      } else {
+          return null;
+      }
     },
     displayPrice(p) {
-        var price = p;
-        var dec_pos = price.indexOf('.');
-        return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      var price = p;
+      var dec_pos = price.indexOf('.');
+      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
     async handleRemoveProductFromCart(product) {
       const cartItem = this.cart.find(

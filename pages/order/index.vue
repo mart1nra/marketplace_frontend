@@ -4,7 +4,7 @@
       <v-col cols="12" md="12" lg="12" xl="10">
         <h2 class="primary--text">Mi Carrito</h2>
         <v-divider class="my-3"></v-divider>
-        <v-row>
+        <v-row v-if="cartTotal > 0">
           <v-col cols="12">
             <v-stepper non-linear class="elevation-cs">
               <v-stepper-header>
@@ -25,7 +25,7 @@
             </v-stepper>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="cartTotal > 0">
           <v-col cols="12" sm="12" md="8" lg="8" xl="8">
             <v-card class="pa-6 elevation-cs">
               <v-col cols="12" lass="px-0">
@@ -119,6 +119,40 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row v-else>
+          <v-sheet
+            width="100%"
+            :color="!$vuetify.theme.dark ? 'accent lighten-4' : ''"
+            class="pa-5 pa-md-12 d-flex flex-column flex-md-row align-center elevation-cs-2"
+          >
+            <div>
+              <h1
+                class="title-top primary--text display-1 font-weight-black"
+                :class="!$vuetify.theme.dark ? 'text--darken-4' : ''"
+              >
+                Su carrito está vacío.
+              </h1>
+              <div class="align-self-center flex-column mt-5">
+                <v-btn
+                  color="primary"
+                  class="white--text rounded-pill"
+                  style="width: max-content"
+                  to="/categories"
+                  ><span>Ir a comprar</span>
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </div>
+            </div>
+            <v-spacer></v-spacer>
+
+            <v-icon
+              :size="$vuetify.breakpoint.mobile ? 60 : 90"
+              color="primary darken-4"
+            >
+              mdi-shopping</v-icon
+            >
+          </v-sheet>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -133,20 +167,21 @@ export default {
       ...mapState({
         products: state => state.product.cartProducts,
         cart: state => state.cart.cartItems,
+        cartTotal: state => state.cart.total,
         cartAmount: state => state.cart.amount,
         baseUrl: state => state.repository.baseUrl
       })
   },
   data() {
     return {
-      quantity: 1,
+      quantity: 1
     }
   },
   methods: {
     displayPrice(p) {
-        var price = p;
-        var dec_pos = price.indexOf('.');
-        return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      var price = p;
+      var dec_pos = price.indexOf('.');
+      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
     async handleRemoveProductFromCart(product) {
       const cartItem = this.cart.find(
