@@ -29,20 +29,20 @@
           <v-col cols="12" sm="12" md="8" lg="8" xl="8">
             <v-card class="pa-6 elevation-cs">
               <v-col cols="12" lass="px-0">
-                <v-card
+                <v-card v-for="(product, i) in products" :key="i"
                   flat
-                  class="elevation-cs ml-0 d-flex align-center pa-6 justify-center justify-lg-space-between rounded-lg"
+                  class="elevation-cs mb-3 d-flex align-center pa-6 justify-center justify-lg-space-between rounded-lg"
                 >
                   <v-btn icon absolute top left>
                     <v-icon color="red">mdi-heart-outline</v-icon>
                   </v-btn>
                   <div
-                    class="align-center align-lg-center d-flex flex-column flex-lg-row justify-center mx-0 mx-lg-12"
+                    class="align-left align-lg-left d-flex flex-column flex-lg-row justify-center mx-0 mx-lg-12"
                   >
                     <v-img
                       contain
-                      width="200"
-                      :src="require(`~/assets/img/laptop/2.jpg`)"
+                      width="80"
+                      :src="`${baseUrl}${product.image.url}`"
                       class="mb-6 mb-lg-0"
                     ></v-img>
 
@@ -51,10 +51,15 @@
                         class="align-baseline align-center d-flex flex-column flex-column-reverse flex-lg-row"
                       >
                         <h3 class="font-weight-bold primary--text">
-                          Apple MacBook Air (2020)
+                          {{ product.title }}
                         </h3>
                       </div>
-                      <p>Lorem ipsum dolor, sit amet.</p>
+                      <p>
+                        Color <v-icon v-if="product.options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
+                             <v-avatar v-else size="16" :color="product.options.color.presentation"></v-avatar>
+                        Talle<v-chip class="ma-1" x-small>{{ product.options.size.presentation }}</v-chip>
+                        Largo<v-chip class="ma-1" x-small>{{ product.options.length.presentation }}</v-chip>
+                      </p>
 
                       <v-text-field
                         v-model="quantity"
@@ -86,12 +91,17 @@
                       </v-text-field>
                     </div>
                   </div>
-                  <v-btn absolute right top icon>
+                  <v-btn 
+                    absolute
+                    right 
+                    top 
+                    icon
+                    @click.prevent="handleRemoveProductFromCart(product)"
+                  >
                     <v-icon color="grey">mdi-close-circle</v-icon>
                   </v-btn>
+                  <h4 v-html="displayPrice(product.price)" absolute right bottom class="text-right my-3"></h4>
                 </v-card>
-                <v-spacer></v-spacer>
-                <h4 class="text-right my-3">Subtotal: $799.00</h4>
               </v-col>
             </v-card>
           </v-col>
@@ -101,7 +111,7 @@
               <v-divider class="my-3"></v-divider>
               <div class="d-flex justify-space-between align-center">
                 <h4>Subtotal</h4>
-                <div>$799.00</div>
+                <div v-html="displayPrice(cartAmount)"></div>
               </div>
               <v-btn color="success" block tile class="my-4">
                 <v-icon left>mdi-cart-arrow-right</v-icon> Checkout
@@ -115,12 +125,41 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   middleware: 'authentication',
+  computed: {
+      ...mapState({
+        products: state => state.product.cartProducts,
+        cart: state => state.cart.cartItems,
+        cartAmount: state => state.cart.amount,
+        baseUrl: state => state.repository.baseUrl
+      })
+  },
   data() {
     return {
       quantity: 1,
     }
   },
+  methods: {
+    displayPrice(p) {
+        var price = p;
+        var dec_pos = price.indexOf('.');
+        return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+    },
+    async handleRemoveProductFromCart(product) {
+      const cartItem = this.cart.find(
+        item => item.id === product.lineItemId
+      );
+      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
+      this.$store.dispatch('product/getCartProducts', cartItems);
+      /*this.$notify({
+        group: 'addCartSuccess',
+        title: 'Borrar de Carrito',
+        text: `${product.title} fue borrado del carrito de compras!`
+      });*/
+    }
+  }
 }
 </script>
