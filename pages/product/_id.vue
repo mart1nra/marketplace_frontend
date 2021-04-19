@@ -3,117 +3,10 @@
     <v-row align="center" justify="center">
       <v-col cols="12" md="10" lg="10" xl="10">
         <v-container class="py-12">
-          <v-row :justify="$vuetify.breakpoint.smAndDown ? 'center' : ''">
-            <v-col cols="12" md="12" lg="7" xl="6">
-              <div
-                class="d-flex flex-column-reverse flex-lg-column-reverse flex-md-row flex-xl-row"
-              >
-                <div
-                  class="d-flex flex-lg-row flex-md-column flex-xl-column justify-center justify-md-space-around"
-                >
-                  <div v-for="(image, i) in 5" :key="i" class="ma-3">
-                    <v-img
-                      :src="require(`~/assets/img/laptop/${i}.jpg`)"
-                      height="50"
-                      width="50"
-                      contain
-                      class="rounded mx-auto cursor-pointer"
-                      @mouseenter="selectedImage = i"
-                    ></v-img>
-                  </div>
-                </div>
-
-                <v-img
-                  max-height="390px"
-                  max-width="580px"
-                  :src="require(`~/assets/img/laptop/${selectedImage}.jpg`)"
-                  class="rounded mx-4"
-                  :class="$vuetify.breakpoint.smOnly ? 'mx-auto' : ''"
-                  contain
-                />
-              </div>
-            </v-col>
-            <v-col cols="12" md="12" lg="5" xl="6">
-              <h2>{{ product.title }}</h2>
-              <Stars :size="20" />
-              <h2 class="font-weight-bold">{{ product.price }}$</h2>
-              <p class="font-weight-light mt-3 mb-8">
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Dolorem deleniti maiores repudiandae possimus eos explicabo quam
-                accusantium saepe magni qui enim eaque, suscipit sed quos quo
-                accusamus ducimus iusto impedit alias doloremque eius
-                voluptatum, nulla veritatis? In sint nemo rem!
-              </p>
-              <v-text-field
-                v-model="quantity"
-                outlined
-                dense
-                label="Quantity"
-                :style="$vuetify.breakpoint.smAndUp ? 'max-width: 150px' : ''"
-              >
-                <template #prepend>
-                  <v-icon
-                    color="primary"
-                    class="cursor-pointer"
-                    @click="quantity--"
-                    >mdi-minus</v-icon
-                  >
-                </template>
-
-                <template #append-outer>
-                  <v-icon
-                    color="primary"
-                    class="cursor-pointer"
-                    @click="quantity++"
-                    >mdi-plus</v-icon
-                  >
-                </template>
-              </v-text-field>
-
-              <v-row align="center">
-                <v-col cols="12" sm="8" md="8" lg="6" xl="6">
-                  <v-btn color="primary" block
-                    >Add to Cart <v-icon right small>mdi-cart</v-icon>
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" sm="4" md="4" lg="6" xl="6">
-                  <v-btn
-                    color="grey lighten-1"
-                    outlined
-                    block
-                    @click="wishlist = !wishlist"
-                    ><span class="grey--text">Add to Wishlist</span>
-                    <v-icon
-                      right
-                      color="red"
-                      v-text="wishlist ? 'mdi-heart' : 'mdi-heart-outline'"
-                    ></v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
-              <!-- add to cart - wishlist -->
-              <v-divider class="mt-4 py-1"></v-divider>
-              <div
-                class="d-flex flex-column flex-sm-row justify-sm-space-between"
-              >
-                <v-chip-group show-arrows>
-                  <v-chip
-                    v-for="tag in product.tags"
-                    :key="tag"
-                    active
-                    active-class="primary--text"
-                    small
-                  >
-                    {{ tag }}
-                  </v-chip>
-                </v-chip-group>
-                <div class="d-flex align-center justify-start">
-                  Share:
-                  <Socials />
-                </div>
-              </div>
-            </v-col>
-          </v-row>
+          <ProductDetail
+              v-if="product !== null"
+              :product="product"
+          />
           <v-row align="center" justify="center" class="my-12">
             <v-col cols="12" class="elevation-cs-2 no-gutters">
               <v-card flat>
@@ -199,19 +92,26 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
+  computed: {
+      ...mapState({
+        product: state => state.product.product
+        //cart: state => state.cart.cartItems,
+        //cartTotal: state => state.cart.total,
+        //cartAmount: state => state.cart.amount,
+        //baseUrl: state => state.repository.baseUrl
+      })
+  },
   data() {
     return {
-      tabs: 'tabs-2',
-      wishlist: false,
-      quantity: 1,
-      selectedImage: 0,
-      product: {
-        title: 'Apple MacBook Air (2020)',
-        price: 799,
-        tags: ['Laptop', 'Electronics', 'Popular'],
-      },
+      productId: this.$route.params.id,
+      tabs: 'tabs-1'
     }
+  },
+  async created() {
+    await this.$store.dispatch('product/getProductsById', this.productId);
   },
   watch: {
     quantity(val) {

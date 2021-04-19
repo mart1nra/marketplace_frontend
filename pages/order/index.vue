@@ -39,20 +39,24 @@
                   <div
                     class="align-left align-lg-left d-flex flex-column flex-lg-row justify-center mx-0 mx-lg-12"
                   >
-                    <v-img
-                      contain
-                      width="80"
-                      :src="`${baseUrl}${product.image.url}`"
-                      class="mb-6 mb-lg-0"
-                    ></v-img>
+                    <NuxtLink :to="`/product/${product.id}`">
+                      <v-img
+                        contain
+                        width="80"
+                        :src="`${baseUrl}${product.image.url}`"
+                        class="mb-6 mb-lg-0"
+                      ></v-img>
+                    </NuxtLink>
 
                     <div class="mx-0 mx-lg-12">
                       <div
                         class="align-baseline align-center d-flex flex-column flex-column-reverse flex-lg-row"
                       >
-                        <h3 class="font-weight-bold primary--text">
-                          {{ product.title }}
-                        </h3>
+                        <NuxtLink :to="`/product/${product.id}`">
+                          <h3 class="font-weight-bold primary--text">
+                            {{ product.title }}
+                          </h3>
+                        </NuxtLink>
                       </div>
                       <p>
                         Color <v-icon v-if="product.options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
@@ -64,7 +68,7 @@
                       <v-text-field
                         v-model="quantity"
                         outlined
-                        label="Quantity"
+                        label="Cantidad"
                         dense
                         :style="
                           $vuetify.breakpoint.smAndUp ? 'max-width: 150px' : ''
@@ -181,7 +185,7 @@ export default {
     displayPrice(p) {
       var price = p;
       var dec_pos = price.indexOf('.');
-      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
     async handleRemoveProductFromCart(product) {
       const cartItem = this.cart.find(

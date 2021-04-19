@@ -1,8 +1,11 @@
 //import Repository, { serializeQuery } from '~/repositories/Repository.js';
 //import { baseUrl } from '~/repositories/Repository';
+import { makeClient } from '@spree/storefront-api-v2-sdk'
+
+const client = makeClient({ host: 'http://localhost:3000' });
 
 export const state = () => ({
-    //product: null,
+    product: null,
     //products: null,
     //searchResults: null,
     cartProducts: null
@@ -38,11 +41,11 @@ export const mutations = {
     },*/
     /*setCompareItems(state, payload) {
         state.compareItems = payload;
-    },
+    },*/
     setProduct(state, payload) {
         state.product = payload;
     },
-    setBrands(state, payload) {
+    /*setBrands(state, payload) {
         state.brands = payload;
     },
     setCategories(state, payload) {
@@ -89,16 +92,17 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return reponse;
     },*/
-    /*async getProductsById({ commit }, payload) {
-        const reponse = await Repository.get(`${baseUrl}/api/v2/storefront/products/${payload}?include=variants.images,variants.option_values`)
+    async getProductsById({ commit }, payload) {
+        const account = this.$cookies.get('account', { parseJSON: true });
+        const response = await client.products.show(payload, { include: 'variants.images,variants.option_values' })
             .then(response => {
-                const product = response.data.data;
+                const product = response.success().data;
 
                 product.title = product.attributes.name;
                 product.price = product.attributes.price;
                 product.description = product.attributes.description;
                 product['variants'] = [];
-                response.data.included.forEach(item => {
+                response.success().included.forEach(item => {
                     if (item.type === 'variant') {
                         item['images'] = [];
                         item['options'] = {};
@@ -111,7 +115,7 @@ export const actions = {
                 product['colors'] = [];
                 product['sizes'] = [];
                 product['lengths'] = [];
-                response.data.included.forEach(item => {
+                response.success().included.forEach(item => {
                     if (item.type === 'image') {
                         product.variants.forEach(variant => {
                             if (item.attributes.viewable_id.toString() === variant.id) variant.images.push(item);
@@ -162,8 +166,8 @@ export const actions = {
                 return product;
             })
             .catch(error => ({ error: JSON.stringify(error) }));
-        return reponse;
-    },*/
+        return response;
+    },
     /*async getProductByKeyword({ commit }, payload) {
         const reponse = await Repository.get(
             `${baseUrl}/products?${serializeQuery(payload)}`

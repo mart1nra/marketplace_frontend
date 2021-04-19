@@ -46,11 +46,13 @@
         <v-card class="pa-4" max-width="450">
           <v-list two-line class="pb-0">
             <v-list-item v-for="(product, i) in products" :key="i" class="mb-2">
-              <v-img
-                :src="`${baseUrl}${product.image.url}`"
-                contain
-                style="max-width: 80px; max-height: 80px;"
-              ></v-img>
+              <NuxtLink :to="`/product/${product.id}`">
+                <v-img
+                  :src="`${baseUrl}${product.image.url}`"
+                  contain
+                  style="max-width: 80px; max-height: 80px;"
+                ></v-img>
+              </NuxtLink>
 
               <v-list-item-content>
                 <v-list-item-title v-text="product.title"></v-list-item-title>
@@ -262,15 +264,15 @@ import { mapState } from 'vuex';
 
 export default {
   computed: {
-      ...mapState({
-          signedIn: state => state.auth.signedIn,
-          user: state => state.account.accountInfo.data,
-          products: state => state.product.cartProducts,
-          cart: state => state.cart.cartItems,
-          cartTotal: state => state.cart.total,
-          cartAmount: state => state.cart.amount,
-          baseUrl: state => state.repository.baseUrl
-      })
+    ...mapState({
+      signedIn: state => state.auth.signedIn,
+      user: state => state.account.accountInfo.data,
+      products: state => state.product.cartProducts,
+      cart: state => state.cart.cartItems,
+      cartTotal: state => state.cart.total,
+      cartAmount: state => state.cart.amount,
+      baseUrl: state => state.repository.baseUrl
+    })
   },
   data() {
     return {
@@ -291,10 +293,10 @@ export default {
     },
     quantity(product) {
       if (this.cart !== null) {
-          const cartItem = this.cart.find(
-              item => item.id === product.lineItemId
-          );
-          return cartItem ? cartItem.quantity : null;
+        const cartItem = this.cart.find(
+            item => item.id === product.lineItemId
+        );
+        return cartItem ? cartItem.quantity : null;
       } else {
           return null;
       }
@@ -302,7 +304,7 @@ export default {
     displayPrice(p) {
       var price = p;
       var dec_pos = price.indexOf('.');
-      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$' + price.substring(0, dec_pos) : '$' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
     async handleRemoveProductFromCart(product) {
       const cartItem = this.cart.find(
