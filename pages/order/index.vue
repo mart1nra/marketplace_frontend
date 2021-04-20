@@ -66,7 +66,7 @@
                       </p>
 
                       <v-text-field
-                        v-model="quantity"
+                        v-model="quant"
                         outlined
                         label="Cantidad"
                         dense
@@ -79,7 +79,7 @@
                           <v-icon
                             color="primary"
                             class="cursor-pointer"
-                            @click.stop="quantity--"
+                            @click.stop="quant--"
                             >mdi-minus</v-icon
                           >
                         </template>
@@ -88,7 +88,7 @@
                           <v-icon
                             color="primary"
                             class="cursor-pointer"
-                            @click.stop="quantity++"
+                            @click.stop="quant++"
                             >mdi-plus</v-icon
                           >
                         </template>
@@ -180,7 +180,7 @@ export default {
   },
   data() {
     return {
-      quantity: 1,
+      quant: 1,
       snackbar: {
         visible: false,
         color: '',
@@ -196,17 +196,33 @@ export default {
       var dec_pos = price.indexOf('.');
       return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
+    quantity(product) {
+      if (this.cart !== null) {
+        const cartItem = this.cart.find(
+            item => item.id === product.lineItemId
+        );
+        return cartItem ? cartItem.quantity : null;
+      } else {
+          return null;
+      }
+    },
+    notification(visible, color, icon, title, text) {
+      this.snackbar.visible = visible;
+      this.snackbar.color = color;
+      this.snackbar.icon = icon;
+      this.snackbar.title = title;
+      this.snackbar.text = text;
+    },
     async handleRemoveProductFromCart(product) {
+      const q = this.quantity(product)
       const cartItem = this.cart.find(
         item => item.id === product.lineItemId
       );
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
-      this.$store.dispatch('product/getCartProducts', cartItems);
-      this.snackbar.visible = true;
-      this.snackbar.color = 'success';
-      this.snackbar.title = product.title;
-      this.snackbar.text = 'Fue borrado del carrito de compras!';
-      this.snackbar.icon = 'mdi-check-circle';
+      if (cartItems) {
+        this.$store.dispatch('product/getCartProducts', cartItems);
+        this.notification(true, 'success', 'mdi-check-circle', `${q} ${product.title}`, 'Fue borrado del carrito de compras!');
+      }
     }
   }
 }

@@ -250,6 +250,13 @@ export default {
         return null;
       }
     },
+    notification(visible, color, icon, title, text) {
+      this.snackbar.visible = visible;
+      this.snackbar.color = color;
+      this.snackbar.icon = icon;
+      this.snackbar.title = title;
+      this.snackbar.text = text;
+    },
     handleAddToCart(isBuyNow) {
       if (this.signedIn) {
         const variantId = this.product.variants.find(variant =>
@@ -324,18 +331,9 @@ export default {
       const cartItems = await this.$store.dispatch('cart/addProductToCart', payload);
       if (!cartItems.error) {
         this.$store.dispatch('product/getCartProducts', cartItems);
-        this.snackbar.visible = true;
-        this.snackbar.color = 'success';
-        this.snackbar.title = this.product.title;
-        this.snackbar.text = 'Fue agregado al carrito de compras!';
-        this.snackbar.icon = 'mdi-check-circle';
+        this.notification(true, 'success', 'mdi-check-circle', `${this.quantity} ${this.product.title}`, 'Fue agregado al carrito de compras!');
       } else {
-        this.snackbar.visible = true;
-        this.snackbar.color = 'warning';
-        this.snackbar.title = this.product.title;
-        this.snackbar.text = 'No hay stock disponible';
-        this.snackbar.icon = 'warning';
-        this.snackbar.icon = 'mdi-alert';
+        this.notification(true, 'warning', 'mdi-alert', `${this.quantity} ${this.product.title}`, 'No hay stock disponible!');
       }
     }
   }
