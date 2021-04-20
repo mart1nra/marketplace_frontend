@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="12" md="12" lg="7" xl="6">
+      <v-col cols="12" md="12" lg="6" xl="6">
         <div
           class="d-flex flex-column-reverse flex-lg-column-reverse flex-md-row flex-xl-row"
         >
@@ -21,8 +21,8 @@
           </div>
 
           <v-img
-            max-height="390px"
-            max-width="580px"
+            max-height="430px"
+            max-width="500px"
             :src="`${baseUrl}${images[selectedImage].attributes.styles[4].url}`"
             class="rounded mx-4"
             :class="$vuetify.breakpoint.smOnly ? 'mx-auto' : ''"
@@ -30,19 +30,67 @@
           />
         </div>
       </v-col>
-      <v-col cols="12" md="12" lg="5" xl="6">
+      <v-col cols="12" md="12" lg="6" xl="6">
         <h2>{{ product.title.toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</h2>
         <Stars :size="20" />
         <h2 class="font-weight-bold" v-html="displayPrice()"></h2>
-        <p class="font-weight-light mt-3 mb-8">
-          Color
-        </p>
-        <p class="font-weight-light mt-3 mb-8">
-          Talle
-        </p>
-        <p class="font-weight-light mt-3 mb-8">
-          Largo
-        </p>
+        <h5 class="mt-3 mb-1">Color: <span class="font-weight-light">{{ product.colors[selectedColor].name }}</span></h5>
+        <v-btn-toggle
+          v-model="selectedColor"
+          mandatory
+        >
+          <span v-for="color in product.colors">
+            <v-btn v-if="color.presentation === '#FFFFFF'"
+              class="mx-1"
+              fab
+              outlined
+              x-small
+              :color="color.presentation"
+              @click="selectColor(color)"
+            >
+            </v-btn>
+            <v-btn v-else
+              class="mx-1"
+              fab
+              dark
+              depressed
+              x-small
+              :color="color.presentation"
+              @click="selectColor(color)"
+            >
+            </v-btn>
+          </span>
+        </v-btn-toggle>
+        <h5 class="mt-3 mb-1">Talle: <span class="font-weight-light">{{ selectedSize || selectedSize === 0 ? product.sizes[selectedSize].name : '' }}</span></h5>
+        <v-btn-toggle
+          v-model="selectedSize"
+        >
+          <span v-for="size in product.sizes">
+            <v-btn
+              class="mx-1"
+              text
+              small
+              outlined
+              :disabled="checkSize(size) !== product.colors[selectedColor].id"
+              @click="selectSize()"
+            >{{ size.presentation }}</v-btn>
+          </span>
+        </v-btn-toggle>
+        <h5 class="mt-3 mb-1">Largo: <span class="font-weight-light">{{ selectedLength || selectedLength === 0 ? product.lengths[selectedLength].name : '' }}</span></h5>
+        <v-btn-toggle
+          v-model="selectedLength"
+        >
+          <span v-for="length in product.lengths">
+            <v-btn
+              class="mx-1"
+              text
+              small
+              outlined
+              :disabled="selectedSize || selectedSize === 0 ? checkLength(length) !== product.sizes[selectedSize].id : true"
+            >{{ length.presentation }}</v-btn>
+          </span>
+        </v-btn-toggle>
+        <v-divider class="mt-5 mb-3 py-1"></v-divider>
         <v-text-field
           v-model="quantity"
           outlined
@@ -71,8 +119,12 @@
 
         <v-row align="center">
           <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-            <v-btn color="primary" block
-              >Agregar al Carrito <v-icon right small>mdi-cart</v-icon>
+            <v-btn
+              color="primary"
+              block
+              :disabled="disableAddToCart"
+              @click.prevent="handleAddToCart"
+            >Agregar al Carrito <v-icon right small>mdi-cart</v-icon>
             </v-btn>
           </v-col>
           <v-col cols="12" sm="4" md="4" lg="4" xl="4">
@@ -81,8 +133,7 @@
               outlined
               block
               @click="wishlist = !wishlist"
-              ><span class="grey--text">Favorito</span>
-              <v-icon
+            >Favorito <v-icon
                 right
                 color="red"
                 v-text="wishlist ? 'mdi-heart' : 'mdi-heart-outline'"
@@ -107,12 +158,13 @@
             </v-chip>
           </v-chip-group>
           <div class="d-flex align-center justify-start">
-            Share:
             <Socials />
           </div>
         </div>
       </v-col>
     </v-row>
+
+    <Notification :snackbar="snackbar" />
   </v-container>
 </template>
 
@@ -120,7 +172,6 @@
 import { mapState } from 'vuex';
 
 export default {
-  name: 'ProductDetail',
   props: {
     title: {
       default: true,
@@ -132,13 +183,17 @@ export default {
   },
   computed: {
     ...mapState({
-      baseUrl: state => state.repository.baseUrl
+      baseUrl: state => state.repository.baseUrl,
+      signedIn: state => state.auth.signedIn
     }),
     variantId() {
       return this.$store.state.product.product.currentVariant;
     },
     images() {
       return this.product.variants.find(variant => variant.id === this.variantId).images;
+    },
+    disableAddToCart() {
+      return this.selectedSize === null || this.selectedLength === null || this.selectedLength === undefined;
     }
   },
   data() {
@@ -146,8 +201,18 @@ export default {
       wishlist: false,
       quantity: 1,
       selectedImage: 0,
+      selectedColor: 0,
+      selectedSize: null,
+      selectedLength: null,
       pro: {
-        tags: ['Laptop', 'Electronics', 'Popular']
+        tags: ['Mujer', 'Popular', 'Novedad']
+      },
+      snackbar: {
+        visible: false,
+        color: '',
+        title: '',
+        text: '',
+        icon: ''
       }
     }
   },
@@ -156,6 +221,122 @@ export default {
       var price = this.product.price
       var dec_pos = price.indexOf('.')
       return price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>'
+    },
+    selectColor(color) {
+      const item = this.product.variants.find(variant => variant.options.color.id === color.id)
+      this.$store.commit('product/setProductCurrentVariant', item.id);
+      this.selectedSize = null;
+      this.selectedLength = null;
+    },
+    selectSize() {
+      this.selectedLength = null;
+    },
+    checkSize(size) {
+      const item = this.product.variants.find(variant =>
+        variant.options.color.id === this.product.colors[this.selectedColor].id &&
+        variant.options.size.id === size.id)
+
+      return item ? item.options.color.id : null;
+    },
+    checkLength(length) {
+      if (this.selectedSize || this.selectedSize === 0) {
+        const item = this.product.variants.find(variant =>
+          variant.options.color.id === this.product.colors[this.selectedColor].id &&
+          variant.options.size.id === this.product.sizes[this.selectedSize].id &&
+          variant.options.length.id === length.id)
+
+        return item ? item.options.size.id : null;
+      } else {
+        return null;
+      }
+    },
+    handleAddToCart(isBuyNow) {
+      if (this.signedIn) {
+        const variantId = this.product.variants.find(variant =>
+          variant.options.color.id === this.product.colors[this.selectedColor].id &&
+          variant.options.size.id === this.product.sizes[this.selectedSize].id &&
+          variant.options.length.id === this.product.lengths[this.selectedLength].id
+        ).id
+
+        let item = {
+          variant_id: variantId,
+          quantity: this.quantity
+        };
+
+        this.addItemToCart(item);
+        if (isBuyNow && isBuyNow === true) {
+          setTimeout(
+            function() {
+              this.$router.push('/profile/checkout');
+            }.bind(this),
+            500
+          );
+        }
+        /*const cartItemsOnCookie = this.$cookies.get('cart', {
+          parseJSON: true
+        });
+        let existItem;
+        if (cartItemsOnCookie) {
+          existItem = cartItemsOnCookie.cartItems.find(
+            item => item.id === this.product.id
+          );
+        }
+
+        let item = {
+          id: this.product.id,
+          quantity: this.quantity,
+          price: this.product.price
+        };
+        if (existItem !== undefined) {
+          if (this.quantity + existItem.quantity > 10) {
+            this.$notify({
+              group: 'addCartSuccess',
+              title: 'Agregar al Carrito',
+              text: 'No se pueden agregar más de 10 del mismo producto.'
+            });
+          } else {
+            this.addItemToCart(item);
+            if (isBuyNow && isBuyNow === true) {
+              setTimeout(
+                function() {
+                  this.$router.push('/account/checkout');
+                }.bind(this),
+                500
+              );
+            }
+          }
+        } else {
+          this.addItemToCart(item);
+          if (isBuyNow && isBuyNow === true) {
+            setTimeout(
+              function() {
+                this.$router.push('/account/checkout');
+              }.bind(this),
+              500
+            );
+          }
+        }*/
+      } else {
+        this.$router.push('/profile/login');
+      }
+    },
+    async addItemToCart(payload) {
+      const cartItems = await this.$store.dispatch('cart/addProductToCart', payload);
+      if (!cartItems.error) {
+        this.$store.dispatch('product/getCartProducts', cartItems);
+        this.snackbar.visible = true;
+        this.snackbar.color = 'success';
+        this.snackbar.title = this.product.title;
+        this.snackbar.text = 'Fue agregado al carrito de compras!';
+        this.snackbar.icon = 'mdi-check-circle';
+      } else {
+        this.snackbar.visible = true;
+        this.snackbar.color = 'warning';
+        this.snackbar.title = this.product.title;
+        this.snackbar.text = 'No hay stock disponible';
+        this.snackbar.icon = 'warning';
+        this.snackbar.icon = 'mdi-alert';
+      }
     }
   }
 }

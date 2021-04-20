@@ -159,6 +159,8 @@
         </v-row>
       </v-col>
     </v-row>
+
+    <Notification :snackbar="snackbar" />
   </v-container>
 </template>
 
@@ -178,7 +180,14 @@ export default {
   },
   data() {
     return {
-      quantity: 1
+      quantity: 1,
+      snackbar: {
+        visible: false,
+        color: '',
+        title: '',
+        text: '',
+        icon: ''
+      }
     }
   },
   methods: {
@@ -193,11 +202,11 @@ export default {
       );
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
       this.$store.dispatch('product/getCartProducts', cartItems);
-      /*this.$notify({
-        group: 'addCartSuccess',
-        title: 'Borrar de Carrito',
-        text: `${product.title} fue borrado del carrito de compras!`
-      });*/
+      this.snackbar.visible = true;
+      this.snackbar.color = 'success';
+      this.snackbar.title = product.title;
+      this.snackbar.text = 'Fue borrado del carrito de compras!';
+      this.snackbar.icon = 'mdi-check-circle';
     }
   }
 }

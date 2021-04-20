@@ -56,10 +56,10 @@ export const mutations = {
     },
     setTotal(state, payload) {
         state.total = payload;
-    },
+    },*/
     setProductCurrentVariant(state, payload) {
         state.product.currentVariant = payload;
-    },*/
+    }
     /*setProductCurrentVariantColor(state, payload) {
         state.product.currentVariantColor = payload;
     },*/

@@ -256,6 +256,8 @@
         </v-menu>
       </v-tabs>
     </template>
+
+    <Notification :snackbar="snackbar" />
   </v-app-bar>
 </template>
 
@@ -277,7 +279,14 @@ export default {
   data() {
     return {
       model: 0,
-      favItems: null
+      favItems: null,
+      snackbar: {
+        visible: false,
+        color: '',
+        title: '',
+        text: '',
+        icon: ''
+      }
       /*user: {
         name: 'Martin',
         email: 'martinra@vgmail.com',
@@ -312,11 +321,11 @@ export default {
       );
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
       this.$store.dispatch('product/getCartProducts', cartItems);
-      /*this.$notify({
-        group: 'addCartSuccess',
-        title: 'Borrar de Carrito',
-        text: `${product.title} fue borrado del carrito de compras!`
-      });*/
+      this.snackbar.visible = true;
+      this.snackbar.color = 'success';
+      this.snackbar.title = product.title;
+      this.snackbar.text = 'Fue borrado del carrito de compras!';
+      this.snackbar.icon = 'mdi-check-circle';
     },
     handleLogout() {
       this.$store.commit('account/setAccountInfo', null);

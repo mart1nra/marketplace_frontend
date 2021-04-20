@@ -85,7 +85,7 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
     },
-    /*async addProductToCart({ commit, state }, payload) {
+    async addProductToCart({ commit, state }, payload) {
         const account = this.$cookies.get('account', { parseJSON: true });
         const response = await client.cart.addItem({ bearerToken: account.token }, { variant_id: payload.variant_id, quantity: payload.quantity, include: 'line_items,variants,variants.images,variants.option_values' })
             .then(response => {
@@ -96,7 +96,7 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
 
-    },*/
+    },
     async removeProductFromCart({ commit, state }, payload) {
         const account = this.$cookies.get('account', { parseJSON: true });
         const response = await client.cart.removeItem({ bearerToken: account.token }, payload.id, { include: 'line_items,variants,variants.images,variants.option_values' })
