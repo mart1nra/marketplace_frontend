@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-row justify="center">
+  <v-container v-if="!signedIn">
+    <v-row justify="center" class="py-12">
       <v-col cols="12" xs="10" sm="8" md="8" lg="6" xl="6">
         <h2 class="primary--text">Ingrese su Usuario y Contraseña</h2>
         <v-divider class="my-3"></v-divider>
@@ -51,7 +51,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
+  computed: {
+    ...mapState({
+      signedIn: state => state.auth.signedIn
+    })
+  },
   data () {
     return {
       valid: false,
@@ -66,6 +73,9 @@ export default {
         (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail debe ser válido'
       ],
     }
+  },
+  created() {
+    if (this.signedIn) this.$router.push('/');
   },
   methods: {
     async handleSubmit() {

@@ -29,7 +29,7 @@
           <v-col cols="12" sm="12" md="8" lg="8" xl="8">
             <v-card class="pa-6 elevation-cs">
               <v-col cols="12" lass="px-0">
-                <v-card v-for="(product, i) in products" :key="i"
+                <v-card v-for="(lineItem, i) in cart" :key="i"
                   flat
                   class="elevation-cs mb-3 d-flex align-center pa-6 justify-center justify-lg-space-between rounded-lg"
                 >
@@ -39,11 +39,11 @@
                   <div
                     class="align-left align-lg-left d-flex flex-column flex-lg-row justify-center mx-0 mx-lg-12"
                   >
-                    <NuxtLink :to="`/product/${product.id}`">
+                    <NuxtLink :to="`/product/${products[i].id}`">
                       <v-img
                         contain
                         width="80"
-                        :src="`${baseUrl}${product.image.url}`"
+                        :src="`${baseUrl}${products[i].image.url}`"
                         class="mb-6 mb-lg-0"
                       ></v-img>
                     </NuxtLink>
@@ -52,21 +52,21 @@
                       <div
                         class="align-baseline align-center d-flex flex-column flex-column-reverse flex-lg-row"
                       >
-                        <NuxtLink :to="`/product/${product.id}`">
+                        <NuxtLink :to="`/product/${products[i].id}`">
                           <h3 class="font-weight-bold primary--text">
-                            {{ product.title }}
+                            {{ products[i].title }}
                           </h3>
                         </NuxtLink>
                       </div>
                       <p>
-                        Color <v-icon v-if="product.options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
-                             <v-avatar v-else size="16" :color="product.options.color.presentation"></v-avatar>
-                        Talle<v-chip class="ma-1" x-small>{{ product.options.size.presentation }}</v-chip>
-                        Largo<v-chip class="ma-1" x-small>{{ product.options.length.presentation }}</v-chip>
+                        Color <v-icon v-if="products[i].options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
+                             <v-avatar v-else size="16" :color="products[i].options.color.presentation"></v-avatar>
+                        Talle<v-chip class="ma-1" x-small>{{ products[i].options.size.presentation }}</v-chip>
+                        Largo<v-chip class="ma-1" x-small>{{ products[i].options.length.presentation }}</v-chip>
                       </p>
 
                       <v-text-field
-                        v-model="quant"
+                        v-model="lineItem.quantity"
                         outlined
                         label="Cantidad"
                         dense
@@ -100,11 +100,11 @@
                     right 
                     top 
                     icon
-                    @click.prevent="handleRemoveProductFromCart(product)"
+                    @click.prevent="handleRemoveProductFromCart(lineItem, products[i])"
                   >
                     <v-icon color="grey">mdi-close-circle</v-icon>
                   </v-btn>
-                  <h4 v-html="displayPrice(product.price)" absolute right bottom class="text-right my-3"></h4>
+                  <h4 v-html="displayPrice(products[i].price)" absolute right bottom class="text-right my-3"></h4>
                 </v-card>
               </v-col>
             </v-card>
@@ -196,16 +196,6 @@ export default {
       var dec_pos = price.indexOf('.');
       return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
-    quantity(product) {
-      if (this.cart !== null) {
-        const cartItem = this.cart.find(
-            item => item.id === product.lineItemId
-        );
-        return cartItem ? cartItem.quantity : null;
-      } else {
-          return null;
-      }
-    },
     notification(visible, color, icon, title, text) {
       this.snackbar.visible = visible;
       this.snackbar.color = color;
@@ -213,15 +203,11 @@ export default {
       this.snackbar.title = title;
       this.snackbar.text = text;
     },
-    async handleRemoveProductFromCart(product) {
-      const q = this.quantity(product)
-      const cartItem = this.cart.find(
-        item => item.id === product.lineItemId
-      );
-      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
+    async handleRemoveProductFromCart(lineItem, product) {
+      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
-        this.notification(true, 'success', 'mdi-check-circle', `${q} ${product.title}`, 'Fue borrado del carrito de compras!');
+        this.notification(true, 'success', 'mdi-check-circle', `${lineItem.quantity} ${product.title}`, 'Fue borrado del carrito de compras!');
       }
     }
   }

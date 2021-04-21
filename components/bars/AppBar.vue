@@ -22,87 +22,8 @@
     ></v-text-field>
     <v-spacer></v-spacer>
     <div class="toolbar-icons d-flex align-center">
-      <v-menu v-if="signedIn && cartTotal > 0" open-on-hover offset-y left>
-        <template #activator="{ on, attrs }">
-          <v-badge
-            overlap
-            :content="cartTotal"
-            offset-x="18"
-            offset-y="18"
-            color="primary"
-          >
-            <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-              to="/order"
-              exact
-              nuxt
-            >
-              <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
-            </v-btn>
-          </v-badge>
-        </template>
-        <v-card class="pa-4" max-width="450">
-          <v-list two-line class="pb-0">
-            <v-list-item v-for="(product, i) in products" :key="i" class="mb-2">
-              <NuxtLink :to="`/product/${product.id}`">
-                <v-img
-                  :src="`${baseUrl}${product.image.url}`"
-                  contain
-                  style="max-width: 80px; max-height: 80px;"
-                ></v-img>
-              </NuxtLink>
 
-              <v-list-item-content>
-                <v-list-item-title v-text="product.title"></v-list-item-title>
-                <v-list-item-subtitle>
-                  Color <v-icon v-if="product.options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
-                       <v-avatar v-else size="16" :color="product.options.color.presentation"></v-avatar>
-                  Talle<v-chip class="ma-1" x-small>{{ product.options.size.presentation }}</v-chip>
-                  Largo<v-chip class="ma-1" x-small>{{ product.options.length.presentation }}</v-chip>
-                </v-list-item-subtitle>
-                <v-list-item-subtitle
-                  >Cantidad: {{ quantity(product) }} x
-                  <span class="font-weight-bold" v-html="displayPrice(product.price)"></span>
-                </v-list-item-subtitle>
-              </v-list-item-content>
-
-              <v-list-item-action>
-                <v-btn icon>
-                  <v-icon
-                    color="red lighten-1"
-                    @click.prevent="handleRemoveProductFromCart(product)"
-                  >mdi-close</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-            <v-divider class="my-3"></v-divider>
-            <div class="d-flex justify-space-between align-center">
-              <h4>Subtotal</h4>
-              <div class="font-weight-bold" v-html="displayPrice(cartAmount)"></div>
-            </div>
-            <v-btn
-              class="mx-auto w-100 pa-0 ma-0 mt-4 white--text"
-              tile
-              color="primary"
-              to="/order"
-              exact
-              nuxt
-              >View order details</v-btn
-            >
-          </v-list>
-        </v-card>
-      </v-menu>
-      <v-btn
-        v-else
-        icon
-        to="/order"
-        exact
-        nuxt
-      >
-        <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
-      </v-btn>
+      <MiniCart />
 
       <v-badge
         v-if="favItems > 0"
@@ -256,8 +177,6 @@
         </v-menu>
       </v-tabs>
     </template>
-
-    <Notification :snackbar="snackbar" />
   </v-app-bar>
 </template>
 
@@ -269,24 +188,12 @@ export default {
     ...mapState({
       signedIn: state => state.auth.signedIn,
       user: state => state.account.accountInfo.data,
-      products: state => state.product.cartProducts,
-      cart: state => state.cart.cartItems,
-      cartTotal: state => state.cart.total,
-      cartAmount: state => state.cart.amount,
-      baseUrl: state => state.repository.baseUrl
     })
   },
   data() {
     return {
       model: 0,
-      favItems: null,
-      snackbar: {
-        visible: false,
-        color: '',
-        title: '',
-        text: '',
-        icon: ''
-      }
+      favItems: null
       /*user: {
         name: 'Martin',
         email: 'martinra@vgmail.com',
@@ -297,42 +204,6 @@ export default {
     }
   },
   methods: {
-    colorPresentation(color) {
-      return color.name === 'Blanco' ? '' : '';
-    },
-    quantity(product) {
-      if (this.cart !== null) {
-        const cartItem = this.cart.find(
-            item => item.id === product.lineItemId
-        );
-        return cartItem ? cartItem.quantity : null;
-      } else {
-          return null;
-      }
-    },
-    displayPrice(p) {
-      var price = p;
-      var dec_pos = price.indexOf('.');
-      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
-    },
-    notification(visible, color, icon, title, text) {
-      this.snackbar.visible = visible;
-      this.snackbar.color = color;
-      this.snackbar.icon = icon;
-      this.snackbar.title = title;
-      this.snackbar.text = text;
-    },
-    async handleRemoveProductFromCart(product) {
-      const q = this.quantity(product)
-      const cartItem = this.cart.find(
-        item => item.id === product.lineItemId
-      );
-      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', cartItem);
-      if (cartItems) {
-        this.$store.dispatch('product/getCartProducts', cartItems);
-        this.notification(true, 'success', 'mdi-check-circle', `${q} ${product.title}`, 'Fue borrado del carrito de compras!');
-      }
-    },
     handleLogout() {
       this.$store.commit('account/setAccountInfo', null);
       this.$store.dispatch('auth/setAuthStatus', false);
