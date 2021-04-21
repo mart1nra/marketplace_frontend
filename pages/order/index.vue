@@ -8,19 +8,19 @@
           <v-col cols="12">
             <v-stepper non-linear class="elevation-cs">
               <v-stepper-header>
-                <v-stepper-step step="1"> Products </v-stepper-step>
+                <v-stepper-step step="1"> Productos </v-stepper-step>
 
                 <v-divider></v-divider>
 
-                <v-stepper-step step="2"> Payment </v-stepper-step>
+                <v-stepper-step step="2"> Envío </v-stepper-step>
 
                 <v-divider></v-divider>
 
-                <v-stepper-step step="3"> Shipping </v-stepper-step>
+                <v-stepper-step step="3"> Pago </v-stepper-step>
 
                 <v-divider></v-divider>
 
-                <v-stepper-step step="4"> Delivery </v-stepper-step>
+                <v-stepper-step step="4"> Completar </v-stepper-step>
               </v-stepper-header>
             </v-stepper>
           </v-col>
@@ -79,7 +79,8 @@
                           <v-icon
                             color="primary"
                             class="cursor-pointer"
-                            @click.stop="quant--"
+                            :disabled="lineItem.quantity === 1"
+                            @click.prevent="handleDescreaseQuantity(lineItem, products[i])"
                             >mdi-minus</v-icon
                           >
                         </template>
@@ -88,7 +89,7 @@
                           <v-icon
                             color="primary"
                             class="cursor-pointer"
-                            @click.stop="quant++"
+                            @click.prevent="handleIncreaseQuantity(lineItem, products[i])"
                             >mdi-plus</v-icon
                           >
                         </template>
@@ -104,7 +105,7 @@
                   >
                     <v-icon color="grey">mdi-close-circle</v-icon>
                   </v-btn>
-                  <h4 v-html="displayPrice(products[i].price)" absolute right bottom class="text-right my-3"></h4>
+                  <h4 v-if="lineItem.total" v-html="displayPrice(lineItem.total)" absolute right bottom class="text-right my-3"></h4>
                 </v-card>
               </v-col>
             </v-card>
@@ -118,7 +119,7 @@
                 <div v-html="displayPrice(cartAmount)"></div>
               </div>
               <v-btn color="success" block tile class="my-4">
-                <v-icon left>mdi-cart-arrow-right</v-icon> Checkout
+                <v-icon left>mdi-cart-arrow-right</v-icon> Continuar Compra
               </v-btn>
             </v-card>
           </v-col>
@@ -180,7 +181,6 @@ export default {
   },
   data() {
     return {
-      quant: 1,
       snackbar: {
         visible: false,
         color: '',
@@ -202,6 +202,15 @@ export default {
       this.snackbar.icon = icon;
       this.snackbar.title = title;
       this.snackbar.text = text;
+    },
+    async handleDescreaseQuantity(lineItem) {
+      await this.$store.dispatch('cart/setCartItemQuantity', { line_item_id: lineItem.id, quantity: lineItem.quantity - 1 });
+    },
+    async handleIncreaseQuantity(lineItem, product) {
+      const response = await this.$store.dispatch('cart/setCartItemQuantity', { line_item_id: lineItem.id, quantity: lineItem.quantity + 1 });
+      if (response === 'Error') {
+        this.notification(true, 'warning', 'mdi-alert', `${lineItem.quantity + 1} ${product.title}`, 'No hay stock disponible!');
+      }
     },
     async handleRemoveProductFromCart(lineItem, product) {
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);

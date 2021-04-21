@@ -13,9 +13,6 @@
             icon
             v-bind="attrs"
             v-on="on"
-            to="/order"
-            exact
-            nuxt
           >
             <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
           </v-btn>
@@ -67,7 +64,7 @@
             to="/order"
             exact
             nuxt
-            >View order details</v-btn
+            >Ver Carrito</v-btn
           >
         </v-list>
       </v-card>

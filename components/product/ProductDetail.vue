@@ -102,6 +102,7 @@
             <v-icon
               color="primary"
               class="cursor-pointer"
+              :disabled="quantity === 1"
               @click="quantity--"
               >mdi-minus</v-icon
             >

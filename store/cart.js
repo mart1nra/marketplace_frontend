@@ -2,10 +2,10 @@ import { makeClient } from '@spree/storefront-api-v2-sdk'
 
 const client = makeClient({ host: 'http://localhost:3000' });
 
-/*const calculateAmount = obj =>
+const calculateAmount = obj =>
     Object.values(obj)
         .reduce((acc, { quantity, price }) => acc + quantity * price, 0)
-        .toFixed(2);*/
+        .toFixed(2);
 
 export const state = () => ({
     total: 0,
@@ -29,6 +29,7 @@ export const mutations = {
                 item.id = i.id;
                 item.quantity = i.attributes.quantity;
                 item.price = i.attributes.price;
+                item.total = i.attributes.total;
                 item.variant_id = i.relationships.variant.data.id;
                 items.push(item);
             }
@@ -54,22 +55,6 @@ export const mutations = {
     /*setLoading(state, payload) {
         state.loading = payload;
     },*/
-    /*increaseItemQuantity(state, payload) {
-        let selectedItem = state.cartItems.find(item => item.id === payload.id);
-        if (selectedItem) {
-            selectedItem.quantity++;
-            state.total++;
-            state.amount = calculateAmount(state.cartItems);
-        }
-    },*/
-    /*decreaseItemQuantity(state, payload) {
-        let selectedItem = state.cartItems.find(item => item.id === payload.id);
-        if (selectedItem && selectedItem.quantity > 1) {
-            selectedItem.quantity--;
-            state.total--;
-            state.amount = calculateAmount(state.cartItems);
-        }
-    }*/
 };
 
 export const actions = {
@@ -108,32 +93,19 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
     },
-    /*increaseCartItemQuantity({ commit, state }, payload) {
-        commit('increaseItemQuantity', payload);
-        const cookieParams = {
-            total: state.total,
-            amount: state.amount,
-            cartItems: state.cartItems
-        };
-
-        this.$cookies.set('cart', cookieParams, {
-            path: '/',
-            maxAge: 60 * 60 * 24 * 7
-        });
-    },*/
-    /*decreaseCartItemQuantity({ commit, state }, payload) {
-        commit('decreaseItemQuantity', payload)
-        const cookieParams = {
-            total: state.total,
-            amount: state.amount,
-            cartItems: state.cartItems
-        };
-
-        this.$cookies.set('cart', cookieParams, {
-            path: '/',
-            maxAge: 60 * 60 * 24 * 7
-        });
-    },*/
+    async setCartItemQuantity({ commit, state }, payload) {
+        const account = this.$cookies.get('account', { parseJSON: true });
+        const response = await client.cart.setQuantity({ bearerToken: account.token }, { line_item_id: payload.line_item_id, quantity: payload.quantity, include: 'line_items,variants,variants.images,variants.option_values' })
+            .then(response => {
+                const cartInfo = response.success();
+                commit('setCart', cartInfo);
+                return 'Ok';
+            })
+            .catch(error => {
+                return 'Error';
+            });
+        return response;
+    }
     /*async checkoutOrder({ commit, state }, payload) {
         const account = this.$cookies.get('account', { parseJSON: true });
         await client.checkout.orderUpdate({ bearerToken: account.token }, {
