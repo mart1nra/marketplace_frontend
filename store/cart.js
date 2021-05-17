@@ -105,40 +105,107 @@ export const actions = {
                 return 'Error';
             });
         return response;
-    }
-    /*async checkoutOrder({ commit, state }, payload) {
+    },
+    async processCart({ commit, state }, payload) {
         const account = this.$cookies.get('account', { parseJSON: true });
-        await client.checkout.orderUpdate({ bearerToken: account.token }, {
-          order: {
-            ship_address_attributes: {
-                firstname: 'Sung Hil',
-                lastname: 'Ra',
-                address1: 'Av. Varala 165 6B',
-                city: 'CABA',
-                phone: '1162683203',
-                zipcode: '1406',
-                state_name: 'C',
-                country_iso: 'AR'
-            }
-          }
-        })
-        const shipping = (await client.checkout.shippingMethods(
-            { bearerToken: account.token },
-            { include: 'shipping_rates,stock_location' }
-        )).success();
-        const payment = (await client.checkout.paymentMethods({ bearerToken: account.token })).success()
-        console.log(shipping);
-        console.log(payment);
-    },*/
-    /*async continueCheckout({ commit, state }, payload) {
-        const account = this.$cookies.get('account', { parseJSON: true });
-        const response = await client.checkout.orderNext({ bearerToken: account.token })
+        /*const response = await client.checkout.orderNext({ bearerToken: account.token })
             .then(response => {
                 const cartState = response.success().data.attributes.state;
                 commit('setState', cartState)
                 return cartState;
             })
             .catch(error => ({ error: JSON.stringify(error) }));
-        return response;       
-    }*/
+        return response;*/
+        console.log('gg')
+        if (state.state === 'cart') {
+            await client.checkout.orderNext({ bearerToken: account.token });
+            commit('setState', 'address');
+        }
+    },
+    async processShipping({ commit, state }, payload) {
+        const account = this.$cookies.get('account', { parseJSON: true });
+        //const response = await client.account.addressesList({ bearerToken: account.token })
+        /*const response = await client.account.createAddress({ bearerToken: account.token }, {
+          address: {
+            firstname: payload.firstname,
+            lastname: payload.lastname,
+            address1: payload.address1,
+            address2: payload.address2,
+            city: payload.city,
+            phone: payload.phone,
+            zipcode: payload.zipcode,
+            state_name: payload.state_name,
+            country_iso: 'AR'
+          }
+        })*/
+        const response = await client.checkout.orderUpdate({ bearerToken: account.token }, {
+          order: {
+            bill_address_attributes: {
+                firstname: payload.firstname,
+                lastname: payload.lastname,
+                address1: payload.address1,
+                address2: payload.address2,
+                city: payload.city,
+                phone: payload.phone,
+                zipcode: payload.zipcode,
+                state_name: payload.state_name,
+                country_iso: 'AR'
+            },
+            ship_address_attributes: {
+                firstname: payload.firstname,
+                lastname: payload.lastname,
+                address1: payload.address1,
+                address2: payload.address2,
+                city: payload.city,
+                phone: payload.phone,
+                zipcode: payload.zipcode,
+                state_name: payload.state_name,
+                country_iso: 'AR'
+            }
+          }
+        });
+
+        const shipping = (await client.checkout.shippingMethods({ bearerToken: account.token })).success();
+        if (state.state === 'address') {
+            await client.checkout.orderNext({ bearerToken: account.token });
+            commit('setState', 'delivery');
+        }
+    },
+    async processPayment({ commit, state }, payload) {
+        const account = this.$cookies.get('account', { parseJSON: true });
+        /*const response = await client.checkout.orderNext({ bearerToken: account.token })
+            .then(response => {
+                const cartState = response.success().data.attributes.state;
+                commit('setState', cartState)
+                return cartState;
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;*/
+        const payment = (await client.checkout.paymentMethods({ bearerToken: account.token })).success();
+        await client.checkout.orderUpdate({ bearerToken: account.token }, {
+          order: {
+            payments_attributes: [{
+              payment_method_id: payment.data[0].id
+            }]
+          }
+        })
+        if (state.state === 'delivery') {
+            await client.checkout.orderNext({ bearerToken: account.token });
+            commit('setState', 'payment');
+        }
+    },
+    async processCheckout({ commit, state }, payload) {
+        const account = this.$cookies.get('account', { parseJSON: true });
+        /*const response = await client.checkout.orderNext({ bearerToken: account.token })
+            .then(response => {
+                const cartState = response.success().data.attributes.state;
+                commit('setState', cartState)
+                return cartState;
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;*/
+        if (state.state === 'payment') {
+            await client.checkout.orderNext({ bearerToken: account.token });
+        }
+    }
 };

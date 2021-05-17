@@ -226,6 +226,7 @@ export default {
     selectColor(color) {
       const item = this.product.variants.find(variant => variant.options.color.id === color.id)
       this.$store.commit('product/setProductCurrentVariant', item.id);
+      this.selectedImage = 0;
       this.selectedSize = null;
       this.selectedLength = null;
     },

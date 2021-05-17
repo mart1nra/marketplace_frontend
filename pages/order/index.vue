@@ -6,124 +6,59 @@
         <v-divider class="my-3"></v-divider>
         <v-row v-if="cartTotal > 0">
           <v-col cols="12">
-            <v-stepper non-linear class="elevation-cs">
+            <v-stepper
+              v-model="e1"
+              non-linear
+              class="elevation-cs"
+            >
               <v-stepper-header>
-                <v-stepper-step step="1"> Productos </v-stepper-step>
+                <v-stepper-step :complete="e1 > 1" step="1"> Productos </v-stepper-step>
 
                 <v-divider></v-divider>
 
-                <v-stepper-step step="2"> Envío </v-stepper-step>
+                <v-stepper-step :complete="e1 > 2" step="2"> Envío </v-stepper-step>
 
                 <v-divider></v-divider>
 
-                <v-stepper-step step="3"> Pago </v-stepper-step>
+                <v-stepper-step :complete="e1 > 3" step="3"> Pago </v-stepper-step>
 
                 <v-divider></v-divider>
 
-                <v-stepper-step step="4"> Completar </v-stepper-step>
+                <v-stepper-step step="4"> Revisar </v-stepper-step>
               </v-stepper-header>
+
+              <v-stepper-items>
+                <v-stepper-content step="1">
+                  <Cart
+                    :cart-amount="cartAmount"
+                    @continueClicked="e1 = 2"
+                  />
+                </v-stepper-content>
+
+                <v-stepper-content step="2">
+                  <Shipping
+                    :cart-amount="cartAmount"
+                    @continueClicked="e1 = 3"
+                  />
+                </v-stepper-content>
+
+                <v-stepper-content step="3">
+                  <Payment
+                    :cart-amount="cartAmount"
+                    @continueClicked="e1 = 4"
+                  />
+                </v-stepper-content>
+
+                <v-stepper-content step="4">
+                  <Confirm
+                    :cart-amount="cartAmount"
+                  />
+                </v-stepper-content>
+              </v-stepper-items>
             </v-stepper>
           </v-col>
         </v-row>
-        <v-row v-if="cartTotal > 0">
-          <v-col cols="12" sm="12" md="8" lg="8" xl="8">
-            <v-card class="pa-6 elevation-cs">
-              <v-col cols="12" lass="px-0">
-                <v-card v-for="(lineItem, i) in cart" :key="i"
-                  flat
-                  class="elevation-cs mb-3 d-flex align-center pa-6 justify-center justify-lg-space-between rounded-lg"
-                >
-                  <v-btn icon absolute top left>
-                    <v-icon color="red">mdi-heart-outline</v-icon>
-                  </v-btn>
-                  <div
-                    class="align-left align-lg-left d-flex flex-column flex-lg-row justify-center mx-0 mx-lg-12"
-                  >
-                    <NuxtLink :to="`/product/${products[i].id}`">
-                      <v-img
-                        contain
-                        width="80"
-                        :src="`${baseUrl}${products[i].image.url}`"
-                        class="mb-6 mb-lg-0"
-                      ></v-img>
-                    </NuxtLink>
 
-                    <div class="mx-0 mx-lg-12">
-                      <div
-                        class="align-baseline align-center d-flex flex-column flex-column-reverse flex-lg-row"
-                      >
-                        <NuxtLink :to="`/product/${products[i].id}`">
-                          <h3 class="font-weight-bold primary--text">
-                            {{ products[i].title }}
-                          </h3>
-                        </NuxtLink>
-                      </div>
-                      <p>
-                        Color <v-icon v-if="products[i].options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
-                             <v-avatar v-else size="16" :color="products[i].options.color.presentation"></v-avatar>
-                        Talle<v-chip class="ma-1" x-small>{{ products[i].options.size.presentation }}</v-chip>
-                        Largo<v-chip class="ma-1" x-small>{{ products[i].options.length.presentation }}</v-chip>
-                      </p>
-
-                      <v-text-field
-                        v-model="lineItem.quantity"
-                        outlined
-                        label="Cantidad"
-                        dense
-                        :style="
-                          $vuetify.breakpoint.smAndUp ? 'max-width: 150px' : ''
-                        "
-                        hide-details
-                      >
-                        <template #prepend>
-                          <v-icon
-                            color="primary"
-                            class="cursor-pointer"
-                            :disabled="lineItem.quantity === 1"
-                            @click.prevent="handleDescreaseQuantity(lineItem, products[i])"
-                            >mdi-minus</v-icon
-                          >
-                        </template>
-
-                        <template #append-outer>
-                          <v-icon
-                            color="primary"
-                            class="cursor-pointer"
-                            @click.prevent="handleIncreaseQuantity(lineItem, products[i])"
-                            >mdi-plus</v-icon
-                          >
-                        </template>
-                      </v-text-field>
-                    </div>
-                  </div>
-                  <v-btn 
-                    absolute
-                    right 
-                    top 
-                    icon
-                    @click.prevent="handleRemoveProductFromCart(lineItem, products[i])"
-                  >
-                    <v-icon color="grey">mdi-close-circle</v-icon>
-                  </v-btn>
-                  <h4 v-if="lineItem.total" v-html="displayPrice(lineItem.total)" absolute right bottom class="text-right my-3"></h4>
-                </v-card>
-              </v-col>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="12" md="4" lg="4" xl="4">
-            <v-card class="pa-0 pa-md-6 elevation-cs">
-              <h3 class="text-uppercase font-weight-black">Total</h3>
-              <v-divider class="my-3"></v-divider>
-              <div class="d-flex justify-space-between align-center">
-                <h4>Subtotal</h4>
-                <div v-html="displayPrice(cartAmount)"></div>
-              </div>
-              <v-btn color="success" block tile class="my-4">
-                <v-icon left>mdi-cart-arrow-right</v-icon> Continuar Compra
-              </v-btn>
-            </v-card>
-          </v-col>
-        </v-row>
         <v-row v-else>
           <v-sheet
             width="100%"
@@ -160,8 +95,6 @@
         </v-row>
       </v-col>
     </v-row>
-
-    <Notification :snackbar="snackbar" />
   </v-container>
 </template>
 
@@ -172,52 +105,13 @@ export default {
   middleware: 'authentication',
   computed: {
       ...mapState({
-        products: state => state.product.cartProducts,
-        cart: state => state.cart.cartItems,
         cartTotal: state => state.cart.total,
-        cartAmount: state => state.cart.amount,
-        baseUrl: state => state.repository.baseUrl
+        cartAmount: state => state.cart.amount
       })
   },
   data() {
     return {
-      snackbar: {
-        visible: false,
-        color: '',
-        title: '',
-        text: '',
-        icon: ''
-      }
-    }
-  },
-  methods: {
-    displayPrice(p) {
-      var price = p;
-      var dec_pos = price.indexOf('.');
-      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
-    },
-    notification(visible, color, icon, title, text) {
-      this.snackbar.visible = visible;
-      this.snackbar.color = color;
-      this.snackbar.icon = icon;
-      this.snackbar.title = title;
-      this.snackbar.text = text;
-    },
-    async handleDescreaseQuantity(lineItem) {
-      await this.$store.dispatch('cart/setCartItemQuantity', { line_item_id: lineItem.id, quantity: lineItem.quantity - 1 });
-    },
-    async handleIncreaseQuantity(lineItem, product) {
-      const response = await this.$store.dispatch('cart/setCartItemQuantity', { line_item_id: lineItem.id, quantity: lineItem.quantity + 1 });
-      if (response === 'Error') {
-        this.notification(true, 'warning', 'mdi-alert', `${lineItem.quantity + 1} ${product.title}`, 'No hay stock disponible!');
-      }
-    },
-    async handleRemoveProductFromCart(lineItem, product) {
-      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);
-      if (cartItems) {
-        this.$store.dispatch('product/getCartProducts', cartItems);
-        this.notification(true, 'success', 'mdi-check-circle', `${lineItem.quantity} ${product.title}`, 'Fue borrado del carrito de compras!');
-      }
+      e1: 1
     }
   }
 }

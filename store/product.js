@@ -186,11 +186,12 @@ export const actions = {
             products = [];
             payload.forEach(item => {
                 if (item.type === 'variant') {
+                    const lineItem = payload.find(i => i.type === 'line_item' && i.relationships.variant.data.id === item.id);
                     item['image'] = payload.find(i => i.type === 'image' && i.attributes.viewable_id.toString() === item.id ).attributes.styles[2];
-                    item['lineItemId'] = payload.find(i => i.type === 'line_item' && i.relationships.variant.data.id === item.id).id;
+                    item['lineItemId'] = lineItem.id;
                     item['id'] = item.relationships.product.data.id;
-                    item['title'] = item.attributes.name;
-                    item['price'] = item.attributes.price;
+                    item['title'] = lineItem.attributes.name;
+                    item['price'] = lineItem.attributes.price;
                     item['options'] = {};
                     item['options']['color'] = {};
                     item['options']['size'] = {};
