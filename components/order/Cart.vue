@@ -164,8 +164,10 @@ export default {
       }
     },
     async continueToShipping() {
+      this.$nuxt.$loading.start();
       await this.$store.dispatch('cart/processCart', '');
       this.$emit('continueClicked');
+      this.$nuxt.$loading.finish();
     }
   }
 }

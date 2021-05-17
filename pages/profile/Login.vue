@@ -79,6 +79,7 @@ export default {
   },
   methods: {
     async handleSubmit() {
+      this.$nuxt.$loading.start();
       const response = await this.$store.dispatch('account/getAccountInfo', { username: this.email, password: this.password });
       if (response) {
           const cartItems = await this.$store.dispatch('cart/getCartInfo');
@@ -88,6 +89,7 @@ export default {
       } else {
           this.loginError = true;
       }
+      this.$nuxt.$loading.finish();
     }
   }
 }

@@ -116,7 +116,6 @@ export const actions = {
             })
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;*/
-        console.log('gg')
         if (state.state === 'cart') {
             await client.checkout.orderNext({ bearerToken: account.token });
             commit('setState', 'address');

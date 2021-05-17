@@ -122,8 +122,10 @@ export default {
       return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
     async continueToPayment() {
+    	this.$nuxt.$loading.start();
     	await this.$store.dispatch('cart/processShipping', this.shipAddress);
       this.$emit('continueClicked');
+      this.$nuxt.$loading.finish();
     }
   }
 }

@@ -71,6 +71,8 @@ export default {
     extractCSS: true,
   },
 
+  loading: '~/components/other/Loading.vue',
+
   server: {
     port: 8000, // default: 3000
     host: '0.0.0.0', // default: localhost,

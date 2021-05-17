@@ -59,9 +59,11 @@ export default {
       return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
     },
     async confirmCheckout() {
+    	this.$nuxt.$loading.start();
     	await this.$store.dispatch('cart/processCheckout', '');
     	const cartItems = await this.$store.dispatch('cart/getCartInfo');
       this.$store.dispatch('product/getCartProducts', cartItems);
+      this.$nuxt.$loading.finish();
     }
   }
 }
