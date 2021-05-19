@@ -3,8 +3,17 @@
     <v-row align="center" justify="center">
       <v-col cols="12" md="10" lg="10" xl="10">
         <v-container class="py-12">
+
+          <v-progress-circular
+            v-if="loading"
+            class="w-100 text-center my-12"
+            indeterminate
+            color="primary"
+          >
+          </v-progress-circular>
+
           <ProductDetail
-              v-if="product !== null"
+              v-if="!loading && product !== null"
               :product="product"
           />
           <v-row align="center" justify="center" class="my-12">
@@ -98,20 +107,28 @@ export default {
   computed: {
       ...mapState({
         product: state => state.product.product
-        //cart: state => state.cart.cartItems,
-        //cartTotal: state => state.cart.total,
-        //cartAmount: state => state.cart.amount,
-        //baseUrl: state => state.repository.baseUrl
       })
   },
   data() {
     return {
       productId: this.$route.params.id,
-      tabs: 'tabs-1'
+      tabs: 'tabs-1',
+      loading: false
     }
   },
   async created() {
-    await this.$store.dispatch('product/getProductsById', this.productId);
+    this.loading = true;
+
+    const response = await this.$store.dispatch('product/getProductsById', this.productId)
+      .then((response) => {
+        if (response.error) {
+          this.$router.push('/');
+        }
+      })
+      .finally(() => (this.loading = false))
+      .catch((error) => {
+        console.log(error)
+      })
   },
   watch: {
     quantity(val) {
