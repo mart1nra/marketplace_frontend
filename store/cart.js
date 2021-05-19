@@ -87,6 +87,11 @@ export const actions = {
         const response = await client.cart.removeItem({ bearerToken: account.token }, payload.id, { include: 'line_items,variants,variants.images,variants.option_values' })
             .then(response => {
                 const cartInfo = response.success();
+
+                // Returned cart after remove an item includes removed item, so it needs to be removed from the cart
+                var removeIndex = cartInfo.included.map(function(item) { return item.id; }).indexOf(payload.id);
+                cartInfo.included.splice(removeIndex, 1);
+
                 commit('setCart', cartInfo);
                 return cartInfo.included;
             })

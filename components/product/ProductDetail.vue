@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="12" lg="6" xl="6">
-        <div
+        <div v-if="images.length > 0"
           class="d-flex flex-column-reverse flex-lg-column-reverse flex-md-row flex-xl-row"
         >
           <div
@@ -34,7 +34,9 @@
         <h2>{{ product.title.toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</h2>
         <Stars :size="20" />
         <h2 class="font-weight-bold" v-html="displayPrice()"></h2>
-        <h5 class="mt-3 mb-1">Color: <span class="font-weight-light">{{ product.colors[selectedColor].name }}</span></h5>
+        <h5 v-if="product.colors.length > 0" class="mt-3 mb-1">Color: 
+          <span class="font-weight-light">{{ product.colors[selectedColor].name }}</span>
+        </h5>
         <v-btn-toggle
           v-model="selectedColor"
           mandatory
@@ -61,7 +63,9 @@
             </v-btn>
           </span>
         </v-btn-toggle>
-        <h5 class="mt-3 mb-1">Talle: <span class="font-weight-light">{{ selectedSize || selectedSize === 0 ? product.sizes[selectedSize].name : '' }}</span></h5>
+        <h5 v-if="product.sizes.length > 0" class="mt-3 mb-1">Talle: 
+          <span class="font-weight-light">{{ selectedSize || selectedSize === 0 ? product.sizes[selectedSize].name : '' }}</span>
+        </h5>
         <v-btn-toggle
           v-model="selectedSize"
         >
@@ -76,7 +80,9 @@
             >{{ size.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
-        <h5 class="mt-3 mb-1">Largo: <span class="font-weight-light">{{ selectedLength || selectedLength === 0 ? product.lengths[selectedLength].name : '' }}</span></h5>
+        <h5 v-if="product.lengths.length > 0" class="mt-3 mb-1">Largo: 
+          <span class="font-weight-light">{{ selectedLength || selectedLength === 0 ? product.lengths[selectedLength].name : '' }}</span>
+        </h5>
         <v-btn-toggle
           v-model="selectedLength"
         >
@@ -86,7 +92,7 @@
               text
               small
               outlined
-              :disabled="selectedSize || selectedSize === 0 ? checkLength(length) !== product.sizes[selectedSize].id : true"
+              :disabled="selectedSize || selectedSize === 0 || product.sizes.length === 0 ? product.sizes.length > 0 && checkLength(length) !== product.sizes[selectedSize].id : true"
             >{{ length.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
@@ -191,10 +197,13 @@ export default {
       return this.$store.state.product.product.currentVariant;
     },
     images() {
-      return this.product.variants.find(variant => variant.id === this.variantId).images;
+      const variant = this.product.variants.find(variant => variant.id === this.variantId);
+      return variant ? this.product.variants.find(variant => variant.id === this.variantId).images : [];
     },
     disableAddToCart() {
-      return this.selectedSize === null || this.selectedLength === null || this.selectedLength === undefined;
+      return (this.product.sizes.length > 0 && this.selectedSize === null) || 
+             (this.product.lengths.length > 0 && this.selectedLength === null) || 
+             (this.product.lengths.length > 0 && this.selectedLength === undefined);
     }
   },
   data() {
@@ -221,7 +230,7 @@ export default {
     displayPrice() {
       var price = this.product.price
       var dec_pos = price.indexOf('.')
-      return price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>'
+      return price.substring(dec_pos + 1) === '00' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>'
     },
     selectColor(color) {
       const item = this.product.variants.find(variant => variant.options.color.id === color.id)
@@ -262,9 +271,9 @@ export default {
     handleAddToCart(isBuyNow) {
       if (this.signedIn) {
         const variantId = this.product.variants.find(variant =>
-          variant.options.color.id === this.product.colors[this.selectedColor].id &&
-          variant.options.size.id === this.product.sizes[this.selectedSize].id &&
-          variant.options.length.id === this.product.lengths[this.selectedLength].id
+          (this.product.colors.length === 0 || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
+          (this.product.sizes.length === 0 || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&
+          (this.product.lengths.length === 0 || variant.options.length.id === this.product.lengths[this.selectedLength].id)
         ).id
 
         let item = {

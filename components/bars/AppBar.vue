@@ -148,6 +148,7 @@
         <v-tab to="/" nuxt exact>Home</v-tab>
         <v-tab to="/product/1" nuxt exact>Product Page</v-tab>
         <v-tab to="/categories" nuxt exact>Categories</v-tab>
+        <v-tab to="/stores" nuxt exact>Tiendas</v-tab>
         <v-menu offset-y open-on-hover close-delay="500">
           <template #activator="{ on, attrs }">
             <v-tab v-bind="attrs" class="primary--text" v-on="on">

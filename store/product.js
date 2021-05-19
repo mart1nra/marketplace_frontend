@@ -120,48 +120,35 @@ export const actions = {
                         product.variants.forEach(variant => {
                             if (item.attributes.viewable_id.toString() === variant.id) variant.images.push(item);
                         });
-                    } else if (item.type === 'option_value') {
+                    }
+                });
+                response.success().included.forEach(item => {
+                    if (item.type === 'option_value') {
                         product.variants.forEach(variant => {
-                            variant.relationships.option_values.data.forEach(option_value => {
-                                if (item.id === option_value.id) {
-                                    var option = item.attributes;
-                                    option.id = item.id;
-                                    if (item.relationships.option_type.data.id === '1') {
-                                        variant.options.color = option;
-                                        if (!product.colors.includes(option)) product.colors.push(option);
-                                    } else if (item.relationships.option_type.data.id === '2') {
-                                        variant.options.length = option;
-                                        if (!product.lengths.includes(option)) product.lengths.push(option);
-                                    } else if (item.relationships.option_type.data.id === '3') {
-                                        variant.options.size = option;
-                                        if (!product.sizes.includes(option)) product.sizes.push(option);
+                            // Variants with no images will not display options therefore unable to be added to cart
+                            if (variant.images.length) {
+                                variant.relationships.option_values.data.forEach(option_value => {
+                                    if (item.id === option_value.id) {
+                                        var option = item.attributes;
+                                        option.id = item.id;
+                                        if (item.relationships.option_type.data.id === '1') {
+                                            variant.options.color = option;
+                                            if (!product.colors.includes(option)) product.colors.push(option);
+                                        } else if (item.relationships.option_type.data.id === '2') {
+                                            variant.options.length = option;
+                                            if (!product.lengths.includes(option)) product.lengths.push(option);
+                                        } else if (item.relationships.option_type.data.id === '3') {
+                                            variant.options.size = option;
+                                            if (!product.sizes.includes(option)) product.sizes.push(option);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         });
                     }
                 });
 
-                product.currentVariant = product.variants[0].id;
-                //product.currentVariantColor = product.variants[0].options.color;
-
-                var sizes = [];
-                product.variants.forEach(variant => {
-                    if (variant.options.color.id === product.variants[0].options.color.id) {
-                        if (!sizes.includes(variant.options.size)) sizes.push(variant.options.size);
-                    }
-                });
-                //product.currentVariantSizes = sizes;
-
-                var lengths = [];
-                product.variants.forEach(variant => {
-                    if (variant.options.color.id === product.variants[0].options.color.id && 
-                        variant.options.size.id === product.variants[0].options.size.id) {
-                        if (!lengths.includes(variant.options.length)) lengths.push(variant.options.length);
-                    }
-                });
-                //product.currentVariantLengths = lengths;
-
+                product.currentVariant = product.relationships.default_variant.data.id;
                 commit('setProduct', product);
                 return product;
             })
@@ -187,7 +174,8 @@ export const actions = {
             payload.forEach(item => {
                 if (item.type === 'variant') {
                     const lineItem = payload.find(i => i.type === 'line_item' && i.relationships.variant.data.id === item.id);
-                    item['image'] = payload.find(i => i.type === 'image' && i.attributes.viewable_id.toString() === item.id ).attributes.styles[2];
+                    const image = payload.find(i => i.type === 'image' && i.attributes.viewable_id.toString() === item.id )
+                    item['image'] = image ? image.attributes.styles[2] : '';
                     item['lineItemId'] = lineItem.id;
                     item['id'] = item.relationships.product.data.id;
                     item['title'] = lineItem.attributes.name;

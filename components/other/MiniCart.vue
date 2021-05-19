@@ -34,8 +34,8 @@
               <v-list-item-subtitle>
                 Color <v-icon v-if="products[i].options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
                      <v-avatar v-else size="16" :color="products[i].options.color.presentation"></v-avatar>
-                Talle<v-chip class="ma-1" x-small>{{ products[i].options.size.presentation }}</v-chip>
-                Largo<v-chip class="ma-1" x-small>{{ products[i].options.length.presentation }}</v-chip>
+                <span v-if="Object.keys(products[i].options.size).length">Talle<v-chip class="ma-1" x-small>{{ products[i].options.size.presentation }}</v-chip></span>
+                <span v-if="Object.keys(products[i].options.length).length">Largo<v-chip class="ma-1" x-small>{{ products[i].options.length.presentation }}</v-chip></span>
               </v-list-item-subtitle>
               <v-list-item-subtitle
                 >Cantidad: {{ lineItem.quantity }} x
