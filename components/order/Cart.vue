@@ -6,10 +6,17 @@
           flat
           class="elevation-cs mb-3 d-flex align-center pa-6 justify-center justify-lg-space-between rounded-lg"
         >
-          <v-btn icon absolute top left>
+          <v-progress-circular
+            v-if="loading && lineItem.id === deletedLineItemId"
+            class="w-100 text-center my-12"
+            indeterminate
+            color="primary"
+          >
+          </v-progress-circular>
+          <v-btn v-if="!loading || lineItem.id !== deletedLineItemId" icon absolute top left>
             <v-icon color="red">mdi-heart-outline</v-icon>
           </v-btn>
-          <div
+          <div v-if="!loading || lineItem.id !== deletedLineItemId"
             class="align-left align-lg-left d-flex flex-column flex-lg-row justify-center mx-0 mx-lg-12"
           >
             <NuxtLink :to="`/product/${products[i].id}`">
@@ -69,7 +76,7 @@
               </v-text-field>
             </div>
           </div>
-          <v-btn 
+          <v-btn v-if="!loading || lineItem.id !== deletedLineItemId"
             absolute
             right 
             top 
@@ -78,7 +85,7 @@
           >
             <v-icon color="grey">mdi-close-circle</v-icon>
           </v-btn>
-          <h4 v-if="lineItem.total" v-html="displayPrice(lineItem.total)" absolute right bottom class="text-right my-3"></h4>
+          <h4 v-if="lineItem.total && (!loading || lineItem.id !== deletedLineItemId)" v-html="displayPrice(lineItem.total)" absolute right bottom class="text-right my-3"></h4>
         </v-card>
       </v-col>
     </v-col>
@@ -131,7 +138,9 @@ export default {
         title: '',
         text: '',
         icon: ''
-      }
+      },
+      loading: false,
+      deletedLineItemId: null
     }
   },
   methods: {
@@ -157,11 +166,15 @@ export default {
       }
     },
     async handleRemoveProductFromCart(lineItem, product) {
+      this.loading = true;
+      this.deletedLineItemId = lineItem.id;
+
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
         this.notification(true, 'success', 'mdi-check-circle', `${lineItem.quantity} ${product.title}`, 'Fue borrado del carrito de compras!');
       }
+      this.loading = false;
     },
     async continueToShipping() {
       this.$nuxt.$loading.start();

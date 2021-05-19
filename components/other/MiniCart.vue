@@ -1,6 +1,11 @@
 <template>
 	<div>
-    <v-menu v-if="signedIn && products && products.length > 0" open-on-hover offset-y left>
+    <v-menu v-if="signedIn && products && products.length > 0"
+      open-on-hover
+      :close-on-content-click="false"
+      offset-y
+      left
+    >
       <template #activator="{ on, attrs }">
         <v-badge
           overlap
@@ -18,10 +23,20 @@
           </v-btn>
         </v-badge>
       </template>
-      <v-card class="pa-4" max-width="450">
+      <v-card class="pa-4" width="450">
         <v-list two-line class="pb-0">
           <v-list-item v-for="(lineItem, i) in cart" :key="i" class="mb-2">
-            <NuxtLink v-if="products[i]" :to="`/product/${products[i].id}`">
+            <v-progress-circular
+              v-if="loading && lineItem.id === deletedLineItemId"
+              class="w-100 text-center"
+              indeterminate
+              color="primary"
+            >
+            </v-progress-circular>
+
+            <NuxtLink v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
+              :to="`/product/${products[i].id}`"
+            >
               <v-img
                 :src="`${baseUrl}${products[i].image.url}`"
                 contain
@@ -29,7 +44,7 @@
               ></v-img>
             </NuxtLink>
 
-            <v-list-item-content v-if="products[i]">
+            <v-list-item-content v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)">
               <v-list-item-title v-text="products[i].title"></v-list-item-title>
               <v-list-item-subtitle>
                 Color <v-icon v-if="products[i].options.color.name === 'Blanco'" size="20" color="gray">mdi-circle-outline</v-icon>
@@ -43,7 +58,7 @@
               </v-list-item-subtitle>
             </v-list-item-content>
 
-            <v-list-item-action v-if="products[i]">
+            <v-list-item-action v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)">
               <v-btn icon>
                 <v-icon
                   color="red lighten-1"
@@ -99,6 +114,8 @@ export default {
   },
   data() {
     return {
+      loading: false,
+      deletedLineItemId: null,
       snackbar: {
         visible: false,
         color: '',
@@ -129,11 +146,15 @@ export default {
       this.snackbar.text = text;
     },
     async handleRemoveProductFromCart(lineItem, product) {
+      this.loading = true;
+      this.deletedLineItemId = lineItem.id;
+
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
         this.notification(true, 'success', 'mdi-check-circle', `${lineItem.quantity} ${product.title}`, 'Fue borrado del carrito de compras!');
       }
+      this.loading = false;
     }
   }
 }

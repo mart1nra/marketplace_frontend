@@ -130,6 +130,7 @@
               color="primary"
               block
               :disabled="disableAddToCart"
+              :loading="loading"
               @click.prevent="handleAddToCart"
             >Agregar al Carrito <v-icon right small>mdi-cart</v-icon>
             </v-btn>
@@ -208,6 +209,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       wishlist: false,
       quantity: 1,
       selectedImage: 0,
@@ -270,6 +272,8 @@ export default {
     },
     handleAddToCart(isBuyNow) {
       if (this.signedIn) {
+        this.loading = !this.loading;
+
         const variantId = this.product.variants.find(variant =>
           (this.product.colors.length === 0 || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
           (this.product.sizes.length === 0 || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&
@@ -346,6 +350,7 @@ export default {
       } else {
         this.notification(true, 'warning', 'mdi-alert', `${this.quantity} ${this.product.title}`, 'No hay stock disponible!');
       }
+      this.loading = !this.loading;
     }
   }
 }
