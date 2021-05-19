@@ -202,8 +202,9 @@ export default {
       return variant ? this.product.variants.find(variant => variant.id === this.variantId).images : [];
     },
     disableAddToCart() {
-      return (this.product.sizes.length > 0 && this.selectedSize === null) || 
-             (this.product.lengths.length > 0 && this.selectedLength === null) || 
+      return (!this.product.colors.length) ||
+             (this.product.sizes.length > 0 && this.selectedSize === null) ||
+             (this.product.lengths.length > 0 && this.selectedLength === null) ||
              (this.product.lengths.length > 0 && this.selectedLength === undefined);
     }
   },
@@ -343,12 +344,17 @@ export default {
       }
     },
     async addItemToCart(payload) {
+      var variant = this.product.variants.find(variant => variant.id === payload.variant_id);
+      var itemOptions = variant.options.color.name;
+      if (Object.keys(variant.options.size).length) itemOptions = itemOptions + '/' + variant.options.size.name;
+      if (Object.keys(variant.options.length).length) itemOptions = itemOptions + '/' + variant.options.length.name;
+
       const cartItems = await this.$store.dispatch('cart/addProductToCart', payload);
       if (!cartItems.error) {
         this.$store.dispatch('product/getCartProducts', cartItems);
-        this.notification(true, 'success', 'mdi-check-circle', `${this.quantity} ${this.product.title}`, 'Fue agregado al carrito de compras!');
+        this.notification(true, 'success', 'mdi-check-circle', `${this.quantity} ${this.product.title} (${itemOptions})`, 'Fue agregado al carrito de compras!');
       } else {
-        this.notification(true, 'warning', 'mdi-alert', `${this.quantity} ${this.product.title}`, 'No hay stock disponible!');
+        this.notification(true, 'warning', 'mdi-alert', `${this.quantity} ${this.product.title} (${itemOptions})`, 'No hay stock disponible!');
       }
       this.loading = !this.loading;
     }
