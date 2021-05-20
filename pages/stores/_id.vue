@@ -95,7 +95,7 @@
             ></v-switch>
 
             <small class="hidden-sm-and-down"
-              >Showing 1-15 of 20 Products</small
+              >{{ pluralize(totalCount, 'producto') }} </small
             >
             <v-select
               v-model="select"
@@ -232,8 +232,9 @@ export default {
         'Mayor precio'
       ],
       page: 1,
-      totalPages: 0,
       currentPage: 1,
+      totalPages: 0,
+      totalCount: 0,
       prevPageUrl: '',
       selfPageUrl: '',
       nextPageUrl: '',
@@ -329,12 +330,17 @@ export default {
             })
           }
         });
+        this.currentPage = this.page;
         this.totalPages = response.meta.total_pages;
+        this.totalCount = response.meta.total_count;
         this.prevPageUrl = response.links.prev;
         this.selfPageUrl = response.links.self;
         this.nextPageUrl = response.links.next;
-        this.currentPage = this.page;
       }
+    },
+    pluralize(c, n) {
+      const _pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
+      return _pluralize(c, n);
     },
     onResize() {
       var x = window.innerWidth < 960
