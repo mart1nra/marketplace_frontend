@@ -33,7 +33,7 @@
       <v-col cols="12" md="12" lg="6" xl="6">
         <h2>{{ product.title.toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</h2>
         <Stars :size="20" />
-        <h2 class="font-weight-bold" v-html="displayPrice()"></h2>
+        <h2 class="font-weight-bold" v-html="displayPrice(product.price)"></h2>
         <h5 v-if="product.colors.length > 0" class="mt-3 mb-1">Color: 
           <span class="font-weight-light">{{ product.colors[selectedColor].name }}</span>
         </h5>
@@ -230,10 +230,11 @@ export default {
     }
   },
   methods: {
-    displayPrice() {
-      var price = this.product.price
-      var dec_pos = price.indexOf('.')
-      return price.substring(dec_pos + 1) === '00' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>'
+    displayPrice(p) {
+      var price = p;
+      var dec_pos = price.indexOf('.');
+      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     selectColor(color) {
       const item = this.product.variants.find(variant => variant.options.color.id === color.id)

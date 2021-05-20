@@ -174,9 +174,10 @@
                       <div class="rating d-flex">
                         <Stars />
                       </div>
-                      <span class="caption font-weight-medium fs-13"
-                        >$ {{ product.attributes.price }}</span
-                      >
+                      <span
+                        class="caption font-weight-medium fs-13"
+                        v-html="displayPrice(product.attributes.price)"
+                      ></span>
                     </div>
                   </NuxtLink>
                 </v-card>
@@ -299,6 +300,16 @@ export default {
     addToFavorite() {
       console.log('Add to favorite')
     },
+    displayPrice(p) {
+      var price = p;
+      var dec_pos = price.indexOf('.');
+      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    pluralize(c, n) {
+      const _pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
+      return _pluralize(c, n);
+    },
     async goPreviousPage() {
       await this.getProducts(this.prevPageUrl);
     },
@@ -337,10 +348,6 @@ export default {
         this.selfPageUrl = response.links.self;
         this.nextPageUrl = response.links.next;
       }
-    },
-    pluralize(c, n) {
-      const _pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
-      return _pluralize(c, n);
     },
     onResize() {
       var x = window.innerWidth < 960
