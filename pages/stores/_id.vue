@@ -348,6 +348,7 @@ export default {
         this.selfPageUrl = response.links.self;
         this.nextPageUrl = response.links.next;
       }
+      window.scrollTo(0, 0);
     },
     onResize() {
       var x = window.innerWidth < 960
