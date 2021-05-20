@@ -173,8 +173,8 @@ export default {
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
         var itemOptions = product.options.color.name;
-        if (Object.keys(product.options.size).length) itemOptions = itemOptions + '/' + product.options.size.name;
-        if (Object.keys(product.options.length).length) itemOptions = itemOptions + '/' + product.options.length.name;
+        if (Object.keys(product.options.size).length) itemOptions = itemOptions + '/' + product.options.size.presentation;
+        if (Object.keys(product.options.length).length) itemOptions = itemOptions + '/' + product.options.length.presentation;
         this.notification(true, 'success', 'mdi-check-circle', `${lineItem.quantity} ${product.title} (${itemOptions})`, 'Fue borrado del carrito de compras!');
       }
       this.loading = false;

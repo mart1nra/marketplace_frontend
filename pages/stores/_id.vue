@@ -184,14 +184,20 @@
             </v-col>
           </v-row>
           <v-row class="row text-center"> </v-row>
-          <div class="my-12 d-flex justify-space-between">
-            <v-btn text color="primary">
+          <div class="my-12 text-center">
+            <!--v-btn text color="primary">
               <v-icon left>mdi-arrow-left</v-icon> Previous Page
-            </v-btn>
-
-            <v-btn text color="primary"
+            </v-btn-->
+            <v-pagination
+              v-model="page"
+              :length="totalPages"
+              @previous="goPreviousPage()"
+              @input="goPage(page)"
+              @next="goNextPage()"
+            ></v-pagination>
+            <!--v-btn text color="primary"
               >Next Page<v-icon right>mdi-arrow-right</v-icon>
-            </v-btn>
+            </v-btn-->
           </div>
         </v-col>
       </v-row>
@@ -219,16 +225,18 @@ export default {
       loading: false,
       range: [90, 230],
       rating: 4.5,
-      select: 'Popularity',
+      select: 'Más relevantes',
       filter: [
-        'Popularity',
-        'Relevance',
-        'Price: Low to High',
-        'Price: High to Low',
-        'Rating: Low to High',
-        'Rating: High to Low',
+        'Más relevantes',
+        'Menor precio',
+        'Mayor precio'
       ],
       page: 1,
+      totalPages: 0,
+      currentPage: 1,
+      prevPageUrl: '',
+      selfPageUrl: '',
+      nextPageUrl: '',
       min: 0,
       max: 300,
       tags: ['Laptop', 'Electronics', 'Popular'],
@@ -279,26 +287,7 @@ export default {
     }
   },
   async fetch() {
-    this.loading = true
-
-    const response = await fetch(`http://localhost:3000/api/v2/storefront/products?filter[vendor_ids]=${this.vendorId}&include=images`)
-      .then((response) => response.json())
-      .finally(() => (this.loading = false))
-      .catch((error) => {
-        console.log(error)
-      })
-
-    if (response) {
-      this.allProducts = response.data
-      this.allProducts.forEach(product => {
-        product.images = [];
-        if (product.relationships.images.data.length > 0) {
-          product.relationships.images.data.forEach(image => {
-            product.images.push(this.baseUrl + response.included.find(i => i.id === image.id).attributes.styles[4].url);
-          })
-        }
-      });
-    }
+    await this.getProducts(`http://localhost:3000/api/v2/storefront/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images`);
   },
   mounted() {
     window.addEventListener('resize', this.onResize, {
@@ -308,6 +297,44 @@ export default {
   methods: {
     addToFavorite() {
       console.log('Add to favorite')
+    },
+    async goPreviousPage() {
+      await this.getProducts(this.prevPageUrl);
+    },
+    async goPage(pageNumber) {
+      if (this.currentPage !== this.page) {
+        await this.getProducts(`${this.selfPageUrl}&page=${pageNumber}`);
+      }
+    },
+    async goNextPage() {
+      await this.getProducts(this.nextPageUrl);
+    },
+    async getProducts(url) {
+      this.loading = true
+
+      const response = await fetch(url)
+        .then((response) => response.json())
+        .finally(() => (this.loading = false))
+        .catch((error) => {
+          console.log(error)
+        })
+
+      if (response) {
+        this.allProducts = response.data
+        this.allProducts.forEach(product => {
+          product.images = [];
+          if (product.relationships.images.data.length > 0) {
+            product.relationships.images.data.forEach(image => {
+              product.images.push(this.baseUrl + response.included.find(i => i.id === image.id).attributes.styles[4].url);
+            })
+          }
+        });
+        this.totalPages = response.meta.total_pages;
+        this.prevPageUrl = response.links.prev;
+        this.selfPageUrl = response.links.self;
+        this.nextPageUrl = response.links.next;
+        this.currentPage = this.page;
+      }
     },
     onResize() {
       var x = window.innerWidth < 960

@@ -346,8 +346,8 @@ export default {
     async addItemToCart(payload) {
       var variant = this.product.variants.find(variant => variant.id === payload.variant_id);
       var itemOptions = variant.options.color.name;
-      if (Object.keys(variant.options.size).length) itemOptions = itemOptions + '/' + variant.options.size.name;
-      if (Object.keys(variant.options.length).length) itemOptions = itemOptions + '/' + variant.options.length.name;
+      if (Object.keys(variant.options.size).length) itemOptions = itemOptions + '/' + variant.options.size.presentation;
+      if (Object.keys(variant.options.length).length) itemOptions = itemOptions + '/' + variant.options.length.presentation;
 
       const cartItems = await this.$store.dispatch('cart/addProductToCart', payload);
       if (!cartItems.error) {
