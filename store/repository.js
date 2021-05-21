@@ -2,7 +2,8 @@
 //import axios from 'axios';
 
 export const state = () => ({
-    baseUrl: 'http://localhost:3000'
+    baseUrl: 'http://localhost:3000',
+    apiUrl:  'http://localhost:3000/api/v2/storefront'
 });
 
 //const token = Cookies.get('id_token');

@@ -106,6 +106,7 @@
               solo
               hide-details
               dense
+              @change="sortProducts()"
             >
               <template #prepend>
                 <v-icon color="primary">mdi-sort</v-icon>
@@ -211,7 +212,8 @@ import { mapState } from 'vuex';
 export default {
   computed: {
     ...mapState({
-      baseUrl: state => state.repository.baseUrl
+      baseUrl: state => state.repository.baseUrl,
+      apiUrl: state => state.repository.apiUrl
     })
   },
   data() {
@@ -288,8 +290,8 @@ export default {
       ],
     }
   },
-  async fetch() {
-    await this.getProducts(`http://localhost:3000/api/v2/storefront/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images`);
+  fetch() {
+    this.getProducts(`${this.apiUrl}/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images`);
   },
   mounted() {
     window.addEventListener('resize', this.onResize, {
@@ -310,16 +312,33 @@ export default {
       const _pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
       return _pluralize(c, n);
     },
-    async goPreviousPage() {
-      await this.getProducts(this.prevPageUrl);
+    goPreviousPage() {
+      this.getProducts(this.prevPageUrl);
     },
-    async goPage(pageNumber) {
+    goPage(pageNumber) {
       if (this.currentPage !== this.page) {
-        await this.getProducts(`${this.selfPageUrl}&page=${pageNumber}`);
+        this.getProducts(`${this.selfPageUrl}&page=${pageNumber}`);
       }
     },
-    async goNextPage() {
-      await this.getProducts(this.nextPageUrl);
+    goNextPage() {
+      this.getProducts(this.nextPageUrl);
+    },
+    setProducts(products) {
+        this.allProducts = products.data;
+        this.allProducts.forEach(product => {
+          product.images = [];
+          if (product.relationships.images.data.length > 0) {
+            product.relationships.images.data.forEach(image => {
+              product.images.push(this.baseUrl + products.included.find(i => i.id === image.id).attributes.styles[4].url);
+            })
+          }
+        });
+        this.currentPage = this.page;
+        this.totalPages = products.meta.total_pages;
+        this.totalCount = products.meta.total_count;
+        this.prevPageUrl = products.links.prev;
+        this.selfPageUrl = products.links.self;
+        this.nextPageUrl = products.links.next;
     },
     async getProducts(url) {
       this.loading = true
@@ -332,21 +351,29 @@ export default {
         })
 
       if (response) {
-        this.allProducts = response.data
-        this.allProducts.forEach(product => {
-          product.images = [];
-          if (product.relationships.images.data.length > 0) {
-            product.relationships.images.data.forEach(image => {
-              product.images.push(this.baseUrl + response.included.find(i => i.id === image.id).attributes.styles[4].url);
-            })
-          }
-        });
-        this.currentPage = this.page;
-        this.totalPages = response.meta.total_pages;
-        this.totalCount = response.meta.total_count;
-        this.prevPageUrl = response.links.prev;
-        this.selfPageUrl = response.links.self;
-        this.nextPageUrl = response.links.next;
+        this.setProducts(response);
+      }
+      window.scrollTo(0, 0);
+    },
+    async sortProducts() {
+      this.loading = true
+
+      var criteria = ''
+      if (this.select === 'Menor precio') {
+        criteria = 'price';
+      } else if (this.select === 'Mayor precio') {
+        criteria = '-price';
+      }
+
+      const response = await fetch(`${this.apiUrl}/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images&sort=${criteria}`)
+        .then((response) => response.json())
+        .finally(() => (this.loading = false))
+        .catch((error) => {
+          console.log(error)
+        })
+
+      if (response) {
+        this.setProducts(response);
       }
       window.scrollTo(0, 0);
     },
