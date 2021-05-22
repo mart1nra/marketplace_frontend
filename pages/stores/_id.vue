@@ -24,20 +24,53 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel>
-                <v-expansion-panel-header>Price</v-expansion-panel-header>
+                <v-expansion-panel-header>Precio</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <v-range-slider
-                    v-model="range"
-                    :max="max"
-                    :min="min"
-                    :height="25"
-                    class="align-center mt-6"
-                    thumb-label="always"
-                    :thumb-size="27"
-                  ></v-range-slider>
+                    <span v-for="range in priceRanges">
+                      <v-btn
+                        class="mx-1 my-1"
+                        text
+                        small
+                        outlined
+                        :disabled="currentPriceFilter !== '' && range !== currentPriceFilter"
+                        @click="filterByPriceRange(range)"
+                      >{{ priceRangesLabel(range) }}</v-btn>
+                    </span>
+                    <!--v-col cols="5" sm="5" >
+                      <v-text-field
+                        v-model="min"
+                        label="Mín"
+                        type="number"
+                        prefix="$"
+                        dense
+                        solo
+                        outlined
+                        flat
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="5" sm="5" >
+                      <v-text-field
+                        v-model="max"
+                        label="Máx"
+                        type="number"
+                        prefix="$"
+                        dense
+                        solo
+                        outlined
+                        flat
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="2" sm="2" >
+                      <v-btn
+                        icon
+                        color="primary"
+                      >
+                        <v-icon>mdi-filter</v-icon>
+                      </v-btn>
+                    </v-col-->
                 </v-expansion-panel-content>
               </v-expansion-panel>
-              <v-expansion-panel>
+              <!--v-expansion-panel>
                 <v-expansion-panel-header>Rating</v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <v-rating
@@ -49,7 +82,7 @@
                   >
                   </v-rating>
                 </v-expansion-panel-content>
-              </v-expansion-panel>
+              </v-expansion-panel-->
               <v-expansion-panel>
                 <v-expansion-panel-header>Color</v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -123,9 +156,9 @@
             color="primary"
           >
           </v-progress-circular>
-          <v-row v-if="!loading && allProducts" align="center">
+          <v-row v-if="!loading && products" align="center">
             <v-col
-              v-for="(product, i) in allProducts"
+              v-for="(product, i) in products"
               :key="i"
               cols="12"
               sm="6"
@@ -193,9 +226,7 @@
             <v-pagination
               v-model="page"
               :length="totalPages"
-              @previous="goPreviousPage()"
-              @input="goPage(page)"
-              @next="goNextPage()"
+              @input="goToPage(page)"
             ></v-pagination>
             <!--v-btn text color="primary"
               >Next Page<v-icon right>mdi-arrow-right</v-icon>
@@ -212,8 +243,10 @@ import { mapState } from 'vuex';
 export default {
   computed: {
     ...mapState({
-      baseUrl: state => state.repository.baseUrl,
-      apiUrl: state => state.repository.apiUrl
+      products: state => state.product.products,
+      totalCount: state => state.product.totalCount,
+      totalPages: state => state.product.totalPages,
+      loading: state => state.product.loading
     })
   },
   data() {
@@ -225,8 +258,8 @@ export default {
       vendorId: this.$route.params.id,
       allProducts: null,
       images: null,
-      loading: false,
-      range: [90, 230],
+      priceRanges: [],
+      priceRange: 0,
       rating: 4.5,
       select: 'Más relevantes',
       filter: [
@@ -234,15 +267,15 @@ export default {
         'Menor precio',
         'Mayor precio'
       ],
+      filterApplied: false,
+      currentPriceFilter: '',
       page: 1,
       currentPage: 1,
-      totalPages: 0,
-      totalCount: 0,
       prevPageUrl: '',
       selfPageUrl: '',
       nextPageUrl: '',
-      min: 0,
-      max: 300,
+      min: '',
+      max: '',
       tags: ['Laptop', 'Electronics', 'Popular'],
       items: [
         {
@@ -290,8 +323,8 @@ export default {
       ],
     }
   },
-  fetch() {
-    this.getProducts(`${this.apiUrl}/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images`);
+  async fetch() {
+    await this.$store.dispatch('product/getProductsByVendor', this.vendorId);
   },
   mounted() {
     window.addEventListener('resize', this.onResize, {
@@ -312,25 +345,53 @@ export default {
       const _pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
       return _pluralize(c, n);
     },
-    goPreviousPage() {
-      this.getProducts(this.prevPageUrl);
-    },
-    goPage(pageNumber) {
+    async goToPage(pageNumber) {
       if (this.currentPage !== this.page) {
-        this.getProducts(`${this.selfPageUrl}&page=${pageNumber}`);
+        await this.$store.dispatch('product/getProductsPage', pageNumber);
+        this.currentPage = pageNumber;
+        window.scrollTo(0, 0);
       }
     },
-    goNextPage() {
-      this.getProducts(this.nextPageUrl);
+    priceRangesLabel(range) {
+      if (range === this.priceRanges[0]) {
+        return `Hasta $ ${range}`;
+      }
+      if (range === this.priceRanges[this.priceRanges.length - 1]) {
+        return `Más de $ ${range - this.priceRange + this.priceRanges[0]}`;
+      }
+      return `$ ${range - this.priceRange} - $ ${range}`;
+    },
+    setPricesRange(maxPrice, minPrice) {
+      this.priceRange = maxPrice / 4;
+      for (let i = minPrice; i <= maxPrice; i = i + this.priceRange) {
+        this.priceRanges.push(i);
+      }
+      this.priceRanges.push(maxPrice);
     },
     setProducts(products) {
         this.allProducts = products.data;
+        var maxPrice = 0;
+        var minPrice = 99999999999;
         this.allProducts.forEach(product => {
+          // Set product images
           product.images = [];
           if (product.relationships.images.data.length > 0) {
             product.relationships.images.data.forEach(image => {
               product.images.push(this.baseUrl + products.included.find(i => i.id === image.id).attributes.styles[4].url);
             })
+          }
+          // Set product prices range if no filter applied
+          if (!this.filterApplied) {
+            this.currentPriceFilter = '';
+            this.priceRanges = [];
+            this.priceRange = 0;
+
+            var price = parseInt(product.attributes.price);
+            if (price > maxPrice) {
+              maxPrice = price;
+            } else if (price < minPrice) {
+              minPrice = price;
+            }
           }
         });
         this.currentPage = this.page;
@@ -339,21 +400,9 @@ export default {
         this.prevPageUrl = products.links.prev;
         this.selfPageUrl = products.links.self;
         this.nextPageUrl = products.links.next;
-    },
-    async getProducts(url) {
-      this.loading = true
-
-      const response = await fetch(url)
-        .then((response) => response.json())
-        .finally(() => (this.loading = false))
-        .catch((error) => {
-          console.log(error)
-        })
-
-      if (response) {
-        this.setProducts(response);
-      }
-      window.scrollTo(0, 0);
+        if (!this.filterApplied) {
+          this.setPricesRange(maxPrice, minPrice);
+        }
     },
     async sortProducts() {
       this.loading = true
@@ -376,6 +425,34 @@ export default {
         this.setProducts(response);
       }
       window.scrollTo(0, 0);
+    },
+    async filterByPriceRange(r) {
+      this.loading = true;
+      this.filterApplied = !this.filterApplied;
+
+      var range = ''
+      if (this.filterApplied) {
+        this.currentPriceFilter = r;
+        if (r === this.priceRanges[0]) {
+          range = `,${r}`;
+        } else if (r === this.priceRanges[this.priceRanges.length - 1]) {
+          range = `${r},${r + this.priceRange}`;
+        } else {
+          range = `${r - this.priceRange},${r}`;
+        }
+      }
+
+      const response = await fetch(`${this.apiUrl}/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images&filter[price]=${range}`)
+        .then((response) => response.json())
+        .finally(() => (this.loading = false))
+        .catch((error) => {
+          console.log(error)
+        })
+
+      if (response) {
+        this.setProducts(response);
+      }
+      window.scrollTo(0, 0);      
     },
     onResize() {
       var x = window.innerWidth < 960

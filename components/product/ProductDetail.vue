@@ -10,7 +10,7 @@
           >
             <div v-for="(image, i) in images" :key="i" class="mt-3">
               <v-img
-                :src="`${baseUrl}${image.attributes.styles[1].url}`"
+                :src="image"
                 height="70"
                 width="70"
                 contain
@@ -23,7 +23,7 @@
           <v-img
             max-height="430px"
             max-width="500px"
-            :src="`${baseUrl}${images[selectedImage].attributes.styles[4].url}`"
+            :src="images[selectedImage]"
             class="rounded mx-4"
             :class="$vuetify.breakpoint.smOnly ? 'mx-auto' : ''"
             contain
@@ -191,7 +191,6 @@ export default {
   },
   computed: {
     ...mapState({
-      baseUrl: state => state.repository.baseUrl,
       signedIn: state => state.auth.signedIn
     }),
     variantId() {

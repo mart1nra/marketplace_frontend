@@ -1,25 +1,33 @@
-//import Repository, { serializeQuery } from '~/repositories/Repository.js';
-//import { baseUrl } from '~/repositories/Repository';
+import repository, { serializeQuery } from '~/store/repository.js';
+import { baseUrl } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 
 const client = makeClient({ host: 'http://localhost:3000' });
+const COLOR_TYPE = "1";
+const SIZE_TYPE = "2";
+const LENGTH_TYPE = "3";
 
 export const state = () => ({
     product: null,
-    //products: null,
+    products: null,
     //searchResults: null,
-    cartProducts: null
+    cartProducts: null,
     //wishlistItems: null,
     //compareItems: null,
     //brands: null,
     //categories: null,
-    //total: 0
+    totalCount: 0,
+    totalPages: 0,
+    prevPageUrl: '',
+    selfPageUrl: '',
+    nextPageUrl: '',
+    loading: false
 });
 
 export const mutations = {
-    /*setProducts(state, payload) {
+    setProducts(state, payload) {
         state.products = payload;
-    },*/
+    },
     setCartProducts(state, payload) {
         state.cartProducts = payload;
     },
@@ -45,6 +53,9 @@ export const mutations = {
     setProduct(state, payload) {
         state.product = payload;
     },
+    setProductCurrentVariant(state, payload) {
+        state.product.currentVariant = payload;
+    },
     /*setBrands(state, payload) {
         state.brands = payload;
     },
@@ -53,13 +64,22 @@ export const mutations = {
     },
     setSearchResults(state, payload) {
         state.searchResults = payload;
-    },
-    setTotal(state, payload) {
-        state.total = payload;
     },*/
-    setProductCurrentVariant(state, payload) {
-        state.product.currentVariant = payload;
-    }
+    setTotalCount(state, payload) {
+        state.totalCount = payload;
+    },
+    setTotalPages(state, payload) {
+        state.totalPages = payload;
+    },
+    setPrevPageUrl(state, payload) {
+        state.prevPageUrl = payload;
+    },
+    setSelfPageUrl(state, payload) {
+        state.selfPageUrl = payload;
+    },
+    setNextPageUrl(state, payload) {
+        state.nextPageUrl = payload;
+    },
     /*setProductCurrentVariantColor(state, payload) {
         state.product.currentVariantColor = payload;
     },*/
@@ -69,6 +89,9 @@ export const mutations = {
     /*setProductCurrentVariantLengths(state, payload) {
         state.product.currentVariantLengths = payload;
     }*/
+    setLoading(state, payload) {
+        state.loading = payload;
+    },
 };
 
 export const actions = {
@@ -93,62 +116,54 @@ export const actions = {
         return reponse;
     },*/
     async getProductsById({ commit }, payload) {
-        const account = this.$cookies.get('account', { parseJSON: true });
         const response = await client.products.show(payload, { include: 'variants.images,variants.option_values' })
             .then(response => {
-                const product = response.success().data;
+                const product = {};
 
-                product.title = product.attributes.name;
-                product.price = product.attributes.price;
-                product.description = product.attributes.description;
-                product['variants'] = [];
-                response.success().included.forEach(item => {
-                    if (item.type === 'variant') {
-                        item['images'] = [];
-                        item['options'] = {};
-                        item['options']['color'] = {};
-                        item['options']['size'] = {};
-                        item['options']['length'] = {};
-                        product.variants.push(item);
-                    };
-                });
-                product['colors'] = [];
-                product['sizes'] = [];
-                product['lengths'] = [];
-                response.success().included.forEach(item => {
-                    if (item.type === 'image') {
-                        product.variants.forEach(variant => {
-                            if (item.attributes.viewable_id.toString() === variant.id) variant.images.push(item);
+                product.title = response.success().data.attributes.name;
+                product.price = response.success().data.attributes.price;
+                product.description = response.success().data.attributes.description;
+                product.variants = [];
+                product.colors = [];
+                product.sizes = [];
+                product.lengths = [];
+
+                response.success().data.relationships.variants.data.forEach(v => {
+                    var item_variant = response.success().included.find(i => i.type === 'variant' && i.id === v.id);
+                    var variant = {};
+                    variant.id = item_variant.id;
+                    variant.attributes = item_variant.attributes;
+                    variant.images = [];
+                    variant.options = {};
+                    
+                    if (item_variant.relationships.images.data.length > 0) {
+                        item_variant.relationships.images.data.forEach(image => {
+                            variant.images.push(baseUrl + response.success().included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
                         });
                     }
-                });
-                response.success().included.forEach(item => {
-                    if (item.type === 'option_value') {
-                        product.variants.forEach(variant => {
-                            // Variants with no images will not display options therefore unable to be added to cart
-                            if (variant.images.length) {
-                                variant.relationships.option_values.data.forEach(option_value => {
-                                    if (item.id === option_value.id) {
-                                        var option = item.attributes;
-                                        option.id = item.id;
-                                        if (item.relationships.option_type.data.id === '1') {
-                                            variant.options.color = option;
-                                            if (!product.colors.includes(option)) product.colors.push(option);
-                                        } else if (item.relationships.option_type.data.id === '2') {
-                                            variant.options.length = option;
-                                            if (!product.lengths.includes(option)) product.lengths.push(option);
-                                        } else if (item.relationships.option_type.data.id === '3') {
-                                            variant.options.size = option;
-                                            if (!product.sizes.includes(option)) product.sizes.push(option);
-                                        }
-                                    }
-                                });
+                    if (item_variant.relationships.option_values.data.length > 0) {
+                        item_variant.relationships.option_values.data.forEach(ov => {
+                            var item_option = response.success().included.find(i => i.type === 'option_value' && i.id === ov.id);
+                            var option = {};
+                            option.id = item_option.id;
+                            option = item_option.attributes;
+
+                            if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
+                                variant.options.color = option;
+                                if (!product.colors.includes(option)) product.colors.push(option);
+                            } else if (item_option.relationships.option_type.data.id === SIZE_TYPE) {
+                                variant.options.size = option;
+                                if (!product.sizes.includes(option)) product.sizes.push(option);
+                            } else if (item_option.relationships.option_type.data.id === LENGTH_TYPE) {
+                                variant.options.length = option;
+                                if (!product.sizes.includes(option)) product.lengths.push(option);
                             }
                         });
                     }
+                    product.variants.push(variant);
                 });
 
-                product.currentVariant = product.relationships.default_variant.data.id;
+                product.currentVariant = product.variants[0].id;
                 commit('setProduct', product);
                 return product;
             })
@@ -175,7 +190,7 @@ export const actions = {
                 if (item.type === 'variant') {
                     const lineItem = payload.find(i => i.type === 'line_item' && i.relationships.variant.data.id === item.id);
                     const image = payload.find(i => i.type === 'image' && i.attributes.viewable_id.toString() === item.id )
-                    item['image'] = image ? image.attributes.styles[2] : '';
+                    item['image'] = image ? baseUrl + image.attributes.styles[2].url : '';
                     item['lineItemId'] = lineItem.id;
                     item['id'] = item.relationships.product.data.id;
                     item['title'] = lineItem.attributes.name;
@@ -209,6 +224,62 @@ export const actions = {
         }
         commit('setCartProducts', products);
     },
+    async getProductsByVendor({ commit }, payload) {
+        commit('setLoading', true);
+
+        const response = await client.products.list({ filter: { ['vendor_ids']: payload }, 'per_page': 9, include: 'images' })
+            .then(response => {
+                const products = response.success().data;
+
+                products.forEach(product => {
+                    // Set product images
+                    product.images = [];
+                    if (product.relationships.images.data.length > 0) {
+                        product.relationships.images.data.forEach(image => {
+                            product.images.push(baseUrl + response.success().included.find(i => i.id === image.id).attributes.styles[4].url);
+                        })
+                    }
+                });
+
+                commit('setProducts', products);
+                commit('setTotalCount', response.success().meta.total_count);
+                commit('setTotalPages', response.success().meta.total_pages);
+                commit('setPrevPageUrl', response.success().links.prev);
+                commit('setSelfPageUrl', response.success().links.self);
+                commit('setNextPageUrl', response.success().links.next);
+                commit('setLoading', false);
+                return response.success();
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;
+    },
+    async getProductsPage({ commit, state }, payload) {
+        commit('setLoading', true);
+
+        const response = await repository.get(`${state.selfPageUrl}&page=${payload}`)
+            .then(response => {
+                const products = response.data.data;
+
+                products.forEach(product => {
+                    // Set product images
+                    product.images = [];
+                    if (product.relationships.images.data.length > 0) {
+                        product.relationships.images.data.forEach(image => {
+                            product.images.push(baseUrl + response.data.included.find(i => i.id === image.id).attributes.styles[4].url);
+                        })
+                    }
+                });
+
+                commit('setProducts', products);
+                commit('setPrevPageUrl', response.data.links.prev);
+                commit('setSelfPageUrl', response.data.links.self);
+                commit('setNextPageUrl', response.data.links.next);
+                commit('setLoading', false);
+                return response.data;
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;        
+    }
     /*async getWishlishtProducts({ commit }, payload) {
         let query = '';
         payload.forEach(item => {

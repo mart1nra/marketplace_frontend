@@ -38,7 +38,7 @@
               :to="`/product/${products[i].id}`"
             >
               <v-img
-                :src="`${baseUrl}${products[i].image.url}`"
+                :src="products[i].image"
                 contain
                 style="max-width: 80px; max-height: 80px;"
               ></v-img>
@@ -109,7 +109,6 @@ export default {
       cartTotal: state => state.cart.total,
       cartAmount: state => state.cart.amount,
       cart: state => state.cart.cartItems,
-      baseUrl: state => state.repository.baseUrl
     })
   },
   data() {

@@ -22,13 +22,13 @@
             <NuxtLink :to="`/product/${products[i].id}`">
               <v-img
                 contain
-                width="80"
-                :src="`${baseUrl}${products[i].image.url}`"
+                width="110"
+                :src="products[i].image"
                 class="mb-6 mb-lg-0"
               ></v-img>
             </NuxtLink>
 
-            <div class="mx-0 mx-lg-12">
+            <div class="mx-0 mx-lg-6">
               <div
                 class="align-baseline align-center d-flex flex-column flex-column-reverse flex-lg-row"
               >
@@ -126,7 +126,6 @@ export default {
       ...mapState({
         products: state => state.product.cartProducts,
         cart: state => state.cart.cartItems,
-        baseUrl: state => state.repository.baseUrl
       })
   },
   data() {
