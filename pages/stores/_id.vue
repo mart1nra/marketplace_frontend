@@ -202,7 +202,7 @@
                     <div
                       class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
                       :class="{ 'primary--text': hover }"
-                      v-text="product.attributes.name"
+                      v-text="product.title"
                     />
                     <div class="d-flex align-center justify-space-between">
                       <div class="rating d-flex">
@@ -210,7 +210,7 @@
                       </div>
                       <span
                         class="caption font-weight-medium fs-13"
-                        v-html="displayPrice(product.attributes.price)"
+                        v-html="displayPrice(product.price)"
                       ></span>
                     </div>
                   </NuxtLink>

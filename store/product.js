@@ -26,7 +26,33 @@ export const state = () => ({
 
 export const mutations = {
     setProducts(state, payload) {
-        state.products = payload;
+        const data = payload.data ? payload.data.data : payload.success().data;
+        const included = payload.data ? payload.data.included : payload.success().included;
+        const meta = payload.data ? payload.data.meta : payload.success().meta;
+        const links = payload.data ? payload.data.links : payload.success().links;
+        const products = [];
+
+        data.forEach(p => {
+            var product = {};
+            product.id = p.id;
+            product.title = p.attributes.name;
+            product.price = p.attributes.price;
+            product.images = [];
+
+            if (p.relationships.images.data.length > 0) {
+                p.relationships.images.data.forEach(image => {
+                    product.images.push(baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
+                })
+            }
+            products.push(product);
+        });
+
+        state.products = products;
+        state.totalCount = meta.total_count;
+        state.totalPages = meta.total_pages;
+        state.prevPageUrl = links.prev;
+        state.selfPageUrl = links.self;
+        state.nextPageUrl = links.next;
     },
     setCartProducts(state, payload) {
         state.cartProducts = payload;
@@ -119,7 +145,6 @@ export const actions = {
         const response = await client.products.show(payload, { include: 'variants.images,variants.option_values' })
             .then(response => {
                 const product = {};
-
                 product.title = response.success().data.attributes.name;
                 product.price = response.success().data.attributes.price;
                 product.description = response.success().data.attributes.description;
@@ -229,24 +254,7 @@ export const actions = {
 
         const response = await client.products.list({ filter: { ['vendor_ids']: payload }, 'per_page': 9, include: 'images' })
             .then(response => {
-                const products = response.success().data;
-
-                products.forEach(product => {
-                    // Set product images
-                    product.images = [];
-                    if (product.relationships.images.data.length > 0) {
-                        product.relationships.images.data.forEach(image => {
-                            product.images.push(baseUrl + response.success().included.find(i => i.id === image.id).attributes.styles[4].url);
-                        })
-                    }
-                });
-
-                commit('setProducts', products);
-                commit('setTotalCount', response.success().meta.total_count);
-                commit('setTotalPages', response.success().meta.total_pages);
-                commit('setPrevPageUrl', response.success().links.prev);
-                commit('setSelfPageUrl', response.success().links.self);
-                commit('setNextPageUrl', response.success().links.next);
+                commit('setProducts', response);
                 commit('setLoading', false);
                 return response.success();
             })
@@ -258,22 +266,7 @@ export const actions = {
 
         const response = await repository.get(`${state.selfPageUrl}&page=${payload}`)
             .then(response => {
-                const products = response.data.data;
-
-                products.forEach(product => {
-                    // Set product images
-                    product.images = [];
-                    if (product.relationships.images.data.length > 0) {
-                        product.relationships.images.data.forEach(image => {
-                            product.images.push(baseUrl + response.data.included.find(i => i.id === image.id).attributes.styles[4].url);
-                        })
-                    }
-                });
-
-                commit('setProducts', products);
-                commit('setPrevPageUrl', response.data.links.prev);
-                commit('setSelfPageUrl', response.data.links.self);
-                commit('setNextPageUrl', response.data.links.next);
+                commit('setProducts', response);
                 commit('setLoading', false);
                 return response.data;
             })
