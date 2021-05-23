@@ -3,9 +3,11 @@ import { baseUrl } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 
 const client = makeClient({ host: 'http://localhost:3000' });
+
 const COLOR_TYPE = "1";
 const SIZE_TYPE = "2";
 const LENGTH_TYPE = "3";
+const PRODUCTS_PER_PAGE = 9;
 
 export const state = () => ({
     product: null,
@@ -252,7 +254,7 @@ export const actions = {
     async getProductsByVendor({ commit }, payload) {
         commit('setLoading', true);
 
-        const response = await client.products.list({ filter: { ['vendor_ids']: payload }, 'per_page': 9, include: 'images' })
+        const response = await client.products.list({ filter: { ['vendor_ids']: payload }, 'per_page': PRODUCTS_PER_PAGE, include: 'images' })
             .then(response => {
                 commit('setProducts', response);
                 commit('setLoading', false);
@@ -261,10 +263,22 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
     },
-    async getProductsPage({ commit, state }, payload) {
+    async getProductsByPage({ commit, state }, payload) {
         commit('setLoading', true);
 
         const response = await repository.get(`${state.selfPageUrl}&page=${payload}`)
+            .then(response => {
+                commit('setProducts', response);
+                commit('setLoading', false);
+                return response.data;
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;        
+    },
+    async getProductsBySort({ commit, state }, payload) {
+        commit('setLoading', true);
+
+        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?filter${payload.filter}&sort=${payload.sort}&per_page=${PRODUCTS_PER_PAGE}&include=images`)
             .then(response => {
                 commit('setProducts', response);
                 commit('setLoading', false);

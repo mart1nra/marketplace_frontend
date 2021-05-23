@@ -131,10 +131,10 @@
               >{{ pluralize(totalCount, 'producto') }} </small
             >
             <v-select
-              v-model="select"
+              v-model="sortSelected"
               style="max-width: 250px"
               class="pa-0"
-              :items="filter"
+              :items="sortOptions"
               flat
               solo
               hide-details
@@ -257,12 +257,11 @@ export default {
       colors: ['red', 'blue', 'pink', 'indigo', 'orange', 'grey'],
       vendorId: this.$route.params.id,
       allProducts: null,
-      images: null,
       priceRanges: [],
       priceRange: 0,
       rating: 4.5,
-      select: 'Más relevantes',
-      filter: [
+      sortSelected: 'Más relevantes',
+      sortOptions: [
         'Más relevantes',
         'Menor precio',
         'Mayor precio'
@@ -347,7 +346,7 @@ export default {
     },
     async goToPage(pageNumber) {
       if (this.currentPage !== this.page) {
-        await this.$store.dispatch('product/getProductsPage', pageNumber);
+        await this.$store.dispatch('product/getProductsByPage', pageNumber);
         this.currentPage = pageNumber;
         window.scrollTo(0, 0);
       }
@@ -405,25 +404,18 @@ export default {
         }
     },
     async sortProducts() {
-      this.loading = true
+      var filter = `[vendor_ids]=${this.vendorId}`;
+      var sort = '';
 
-      var criteria = ''
-      if (this.select === 'Menor precio') {
-        criteria = 'price';
-      } else if (this.select === 'Mayor precio') {
-        criteria = '-price';
+      if (this.sortSelected === 'Menor precio') {
+        sort = 'price';
+      } else if (this.sortSelected === 'Mayor precio') {
+        sort = '-price';
       }
 
-      const response = await fetch(`${this.apiUrl}/products?filter[vendor_ids]=${this.vendorId}&per_page=9&include=images&sort=${criteria}`)
-        .then((response) => response.json())
-        .finally(() => (this.loading = false))
-        .catch((error) => {
-          console.log(error)
-        })
-
-      if (response) {
-        this.setProducts(response);
-      }
+      await this.$store.dispatch('product/getProductsBySort', { 'filter': filter, 'sort': sort });
+      this.page = 1;
+      this.currentPage = 1;
       window.scrollTo(0, 0);
     },
     async filterByPriceRange(r) {
