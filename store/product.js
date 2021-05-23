@@ -278,7 +278,19 @@ export const actions = {
     async getProductsBySort({ commit, state }, payload) {
         commit('setLoading', true);
 
-        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?filter${payload.filter}&sort=${payload.sort}&per_page=${PRODUCTS_PER_PAGE}&include=images`)
+        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?filter${payload.category}&sort=${payload.sort}&per_page=${PRODUCTS_PER_PAGE}&include=images${payload.filter}`)
+            .then(response => {
+                commit('setProducts', response);
+                commit('setLoading', false);
+                return response.data;
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;        
+    },
+    async getProductsByPriceRange({ commit, state }, payload) {
+        commit('setLoading', true);
+
+        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?filter${payload.category}&filter[price]=${payload.range}&per_page=${PRODUCTS_PER_PAGE}&include=images${payload.sort}`)
             .then(response => {
                 commit('setProducts', response);
                 commit('setLoading', false);
