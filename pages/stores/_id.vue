@@ -27,17 +27,19 @@
                 <v-expansion-panel-header>Precio</v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <span v-for="range in priceRanges">
-                      <v-btn
-                        class="font-weight-light mx-1 my-1"
-                        text
-                        small
+                      <v-chip
+                        class="ma-1"
+                        color="grey"
+                        label
                         outlined
+                        small
+                        :close="filterApplied && range === currentPriceFilter"
                         :disabled="filterApplied && range !== currentPriceFilter"
                         @click="filterByPriceRange(range)"
+                        @click:close="removeFilterByPriceRange(range)"
                       >
                         {{ priceRangesLabel(range) }}
-                        <v-icon v-if="filterApplied && range === currentPriceFilter" right>mdi-close</v-icon>
-                      </v-btn>
+                      </v-chip><br>
                     </span>
                 </v-expansion-panel-content>
               </v-expansion-panel>
@@ -174,8 +176,7 @@
                     <div
                       class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
                       :class="{ 'primary--text': hover }"
-                      v-text="product.title"
-                    />
+                    ><span class="text-capitalize">{{ product.title }}</span></div>
                     <div class="d-flex align-center justify-space-between">
                       <div class="rating d-flex">
                         <Stars />
@@ -229,8 +230,8 @@ export default {
       colors: ['red', 'blue', 'pink', 'indigo', 'orange', 'grey'],
       vendorId: this.$route.params.id,
       allProducts: null,
-      priceRanges: [1000, 2000, 3000, 4000, 5000],
-      priceRange: 1000,
+      priceRanges: [1500, 3000, 4500, 6000, 7500],
+      priceRange: 1500,
       rating: 4.5,
       sort: '',
       sortSelected: false,
@@ -307,9 +308,10 @@ export default {
       console.log('Add to favorite')
     },
     displayPrice(p) {
-      var price = p;
+      var price = p.toString();
       var dec_pos = price.indexOf('.');
-      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      if (dec_pos === -1) dec_pos = price.length;
+      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' || dec_pos === price.length ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     pluralize(c, n) {
@@ -325,12 +327,12 @@ export default {
     },
     priceRangesLabel(range) {
       if (range === this.priceRanges[0]) {
-        return `Hasta $ ${range}`;
+        return 'Hasta ' + this.displayPrice(range);
       }
       if (range === this.priceRanges[this.priceRanges.length - 1]) {
-        return `Más de $ ${range - this.priceRange}`;
+        return 'Más de ' + this.displayPrice(range - this.priceRange);
       }
-      return `$ ${range - this.priceRange} - $ ${range}`;
+      return this.displayPrice(range - this.priceRange) + ' - ' + this.displayPrice(range);
     },
     setPricesRange(maxPrice, minPrice) {
       this.priceRange = maxPrice / 4;
@@ -362,10 +364,9 @@ export default {
       window.scrollTo(0, 0);
     },
     async filterByPriceRange(r) {
-      this.filterApplied = !this.filterApplied;
       var range = '';
 
-      if (this.filterApplied) {
+      if (!this.filterApplied) {
         this.currentPriceFilter = r;
         if (r === this.priceRanges[0]) {
           range = `,${r}`;
@@ -374,18 +375,27 @@ export default {
         } else {
           range = `${r - this.priceRange},${r}`;
         }
-        this.filter = `&filter[price]=${range}`;
-      } else {
-        this.currentPriceFilter = '';
-        this.filter = '';
-      }
+        var sort = this.sortSelected ? this.sort : '';
 
+        await this.$store.dispatch('product/getProductsByPriceRange', { 'category': `[vendor_ids]=${this.vendorId}`, 'range': range, 'sort': sort });
+        this.page = 1;
+        this.currentPage = 1;
+        this.filterApplied = true;
+        this.filter = `&filter[price]=${range}`;
+        window.scrollTo(0, 0);
+      } 
+    },
+    async removeFilterByPriceRange(range) {
       var sort = this.sortSelected ? this.sort : '';
 
-      await this.$store.dispatch('product/getProductsByPriceRange', { 'category': `[vendor_ids]=${this.vendorId}`, 'range': range, 'sort': sort });
+      await this.$store.dispatch('product/getProductsByPriceRange', { 'category': `[vendor_ids]=${this.vendorId}`, 'range': '', 'sort': sort });
       this.page = 1;
       this.currentPage = 1;
-      window.scrollTo(0, 0);      
+      this.filterApplied = false;
+      this.currentPriceFilter = '';
+      this.filter = '';
+      window.scrollTo(0, 0);
+
     },
     onResize() {
       var x = window.innerWidth < 960

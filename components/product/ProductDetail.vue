@@ -31,7 +31,7 @@
         </div>
       </v-col>
       <v-col cols="12" md="12" lg="6" xl="6">
-        <h2>{{ product.title.toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))) }}</h2>
+        <h2 class="text-capitalize">{{ product.title }}</h2>
         <Stars :size="20" />
         <h2 class="font-weight-bold" v-html="displayPrice(product.price)"></h2>
         <h5 v-if="product.colors.length > 0" class="mt-3 mb-1">Color: 
