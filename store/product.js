@@ -1,6 +1,7 @@
 import repository, { serializeQuery } from '~/store/repository.js';
 import { baseUrl } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
+import * as emptyImageUrl from '~/assets/img/product-coming-soon.jpg'
 
 const client = makeClient({ host: 'http://localhost:3000' });
 
@@ -23,6 +24,7 @@ export const state = () => ({
     prevPageUrl: '',
     selfPageUrl: '',
     nextPageUrl: '',
+    emptyImage: emptyImageUrl,
     loading: false
 });
 
@@ -45,6 +47,8 @@ export const mutations = {
                 p.relationships.images.data.forEach(image => {
                     product.images.push(baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
                 })
+            } else {
+                product.images.push(state.emptyImage);
             }
             products.push(product);
         });
@@ -158,8 +162,8 @@ export const actions = {
                 response.success().data.relationships.variants.data.forEach(v => {
                     var item_variant = response.success().included.find(i => i.type === 'variant' && i.id === v.id);
                     var variant = {};
-                    variant.id = item_variant.id;
                     variant.attributes = item_variant.attributes;
+                    variant.id = item_variant.id;
                     variant.images = [];
                     variant.options = {};
                     
@@ -172,8 +176,8 @@ export const actions = {
                         item_variant.relationships.option_values.data.forEach(ov => {
                             var item_option = response.success().included.find(i => i.type === 'option_value' && i.id === ov.id);
                             var option = {};
-                            option.id = item_option.id;
                             option = item_option.attributes;
+                            option.id = item_option.id;
 
                             if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
                                 variant.options.color = option;
@@ -190,7 +194,7 @@ export const actions = {
                     product.variants.push(variant);
                 });
 
-                product.currentVariant = product.variants[0].id;
+                product.currentVariant = response.success().data.relationships.default_variant.data.id;
                 commit('setProduct', product);
                 return product;
             })

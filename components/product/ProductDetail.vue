@@ -191,14 +191,15 @@ export default {
   },
   computed: {
     ...mapState({
-      signedIn: state => state.auth.signedIn
+      signedIn: state => state.auth.signedIn,
+      emptyImage: state => state.product.emptyImage
     }),
     variantId() {
       return this.$store.state.product.product.currentVariant;
     },
     images() {
       const variant = this.product.variants.find(variant => variant.id === this.variantId);
-      return variant ? this.product.variants.find(variant => variant.id === this.variantId).images : [];
+      return variant ? this.product.variants.find(variant => variant.id === this.variantId).images : [this.emptyImage];
     },
     disableAddToCart() {
       return (!this.product.colors.length) ||

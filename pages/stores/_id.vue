@@ -28,7 +28,7 @@
                 <v-expansion-panel-content>
                     <span v-for="range in priceRanges">
                       <v-btn
-                        class="mx-1 my-1"
+                        class="font-weight-light mx-1 my-1"
                         text
                         small
                         outlined
@@ -151,7 +151,8 @@
                   <v-carousel
                     hide-delimiters
                     show-arrows-on-hover
-                    height="300"
+                    :show-arrows="product.images.length > 1"
+                    height="320"
                   >
                     <v-carousel-item
                       v-for="(image, i) in product.images"
