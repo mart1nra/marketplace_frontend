@@ -26,21 +26,21 @@
               <v-expansion-panel>
                 <v-expansion-panel-header>Precio</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <span v-for="range in priceRanges">
-                      <v-chip
-                        class="ma-1 pa-1"
-                        color="#757575"
-                        label
-                        outlined
-                        small
-                        :close="filterPriceApplied && range === currentPriceFilter"
-                        :disabled="filterPriceApplied && range !== currentPriceFilter"
-                        @click="filterByPriceRange(range)"
-                        @click:close="removeFilterByPriceRange()"
-                      >
-                        {{ priceRangesLabel(range) }}
-                      </v-chip>
-                    </span>
+                  <span v-for="range in priceRanges">
+                    <v-chip
+                      class="ma-1 pa-1"
+                      color="#757575"
+                      label
+                      outlined
+                      small
+                      :close="filterPriceApplied && range === currentPriceFilter"
+                      :disabled="filterPriceApplied && range !== currentPriceFilter"
+                      @click="filterByPriceRange(range)"
+                      @click:close="filterByPriceRange()"
+                    >
+                      {{ priceRangesLabel(range) }}
+                    </v-chip>
+                  </span>
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <!--v-expansion-panel>
@@ -82,6 +82,56 @@
                       </v-btn>
                     </v-hover>
                   </span>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-header>Talle</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <span v-for="size in productsSizes">
+                    <v-chip
+                      class="ma-1 pa-2"
+                      color="#757575"
+                      outlined
+                      small
+                      :close="filterSizeApplied && size === currentSizeFilter"
+                      :disabled="filterSizeApplied && size !== currentSizeFilter"
+                      @click="filterBySize(size)"
+                      @click:close="filterBySize()"
+                    >
+                      {{ size.presentation }}
+                    </v-chip>
+                  </span>
+
+                  <!--span v-for="size in productsSizes">
+                    <v-hover v-slot="{ hover }">
+                      <v-btn
+                        class="ma-1"
+                        text
+                        x-small
+                        outlined
+                        @click="filterBySize(size)"
+                      >{{ size.presentation }}</v-btn>
+                    </v-hover>
+                  </span-->
+                  <!--span v-for="color in productsLengths">
+                    
+                        max-width="25"
+                        max-height="25"
+                        elevation="0"
+                        :disabled="filterColorApplied && color !== currentColorFilter"
+                        :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+                        :outlined="color.presentation === '#FFFFFF' && !(filterColorApplied && color !== currentColorFilter)"
+                        @click="filterByColor(color)"
+                      >
+                        <span v-if="filterColorApplied && hover">
+                          <v-icon
+                            small
+                            :color="color.presentation === '#FFFFFF' ? 'black' : 'white'"
+                            @click="removeFilterByColor(color)"
+                          >mdi-close</v-icon>
+                        </span>
+                    
+                  </span-->
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel>
@@ -231,10 +281,12 @@ export default {
       totalCount: state => state.product.totalCount,
       totalPages: state => state.product.totalPages,
       productsColors: state => state.product.productsColors,
+      productsSizes: state => state.product.productsSizes,
+      productsLengths: state => state.product.productsLengths,
       loading: state => state.product.loading
     }),
     filterApplied() {
-      return this.filterPriceApplied || this.filterColorApplied;
+      return this.filterPriceApplied || this.filterColorApplied || this.filterSizeApplied;
     }
   },
   data() {
@@ -257,8 +309,10 @@ export default {
       },
       filterPriceApplied: false,
       filterColorApplied: false,
+      filterSizeApplied: false,
       currentPriceFilter: '',
       currentColorFilter: '',
+      currentSizeFilter: '',
       page: 1,
       currentPage: 1,
       tags: ['Laptop', 'Electronics', 'Popular'],
@@ -309,7 +363,6 @@ export default {
     }
   },
   async fetch() {
-    await this.$store.dispatch('product/getProductsColors');
     await this.$store.dispatch('product/getProductsByVendor', this.vendorId);
   },
   mounted() {
@@ -364,10 +417,9 @@ export default {
       window.scrollTo(0, 0);
     },
     async filterByPriceRange(r) {
-      var range = '';
-
       if (!this.filterPriceApplied) {
         this.currentPriceFilter = r;
+        var range = '';
 
         if (r === this.priceRanges[0]) {
           range = `,${r}`;
@@ -377,26 +429,17 @@ export default {
           range = `${r - this.priceRange},${r}`;
         }
         this.filters['filter[price]'] = range;
-
-        await this.$store.dispatch('product/getProductsByFilters', this.filters);
-
-        this.page = 1;
-        this.currentPage = 1;
-        this.filterPriceApplied = true;
-        window.scrollTo(0, 0);
-      } 
-    },
-    async removeFilterByPriceRange() {
-      delete this.filters[Object.keys(this.filters).find(k => k === 'filter[price]')];
+      } else if (!r) {
+        delete this.filters[Object.keys(this.filters).find(k => k === 'filter[price]')];
+        this.currentPriceFilter = '';
+      } else return;
 
       await this.$store.dispatch('product/getProductsByFilters', this.filters);
 
       this.page = 1;
       this.currentPage = 1;
-      this.filterPriceApplied = false;
-      this.currentPriceFilter = '';
+      this.filterPriceApplied = !this.filterPriceApplied;
       window.scrollTo(0, 0);
-
     },
     async filterByColor(color) {
       if (!this.filterColorApplied) {
@@ -411,7 +454,7 @@ export default {
         window.scrollTo(0, 0);
       }
     },
-    async removeFilterByColor(color) {
+    async removeFilterByColor() {
       delete this.filters[Object.keys(this.filters).find(k => k === 'filter[options][color]')];
 
       await this.$store.dispatch('product/getProductsByFilters', this.filters);
@@ -421,7 +464,22 @@ export default {
       this.filterColorApplied = false;
       this.currentColorFilter = '';
       window.scrollTo(0, 0);
+    },
+    async filterBySize(size) {
+      if (!this.filterSizeApplied) {
+        this.currentSizeFilter = size;
+        this.filters['filter[options][talle]'] = size.name;
+      } else if (!size) {
+        delete this.filters[Object.keys(this.filters).find(k => k === 'filter[options][talle]')];
+        this.currentSizeFilter = '';
+      } else return;
 
+      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+
+      this.page = 1;
+      this.currentPage = 1;
+      this.filterSizeApplied = !this.filterSizeApplied;
+      window.scrollTo(0, 0);
     },
     onResize() {
       var x = window.innerWidth < 960

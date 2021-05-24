@@ -19,5 +19,7 @@ export const actions = {
             cartItems = await dispatch('cart/getCartInfo');
             dispatch('product/getCartProducts', cartItems);
         }
+
+        dispatch('product/getProductsOptions');
     }
 };

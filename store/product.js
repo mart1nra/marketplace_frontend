@@ -25,6 +25,8 @@ export const state = () => ({
     selfPageUrl: '',
     nextPageUrl: '',
     productsColors: [],
+    productsSizes: [],
+    productsLengths: [],
     emptyImage: emptyImageUrl,
     loading: false
 });
@@ -61,8 +63,16 @@ export const mutations = {
         state.selfPageUrl = links.self;
         state.nextPageUrl = links.next;
     },
-    setProductsColors(state, payload) {
-        state.productsColors = payload;
+    setProductsOptions(state, payload) {
+        payload.forEach(option => {
+            if (option.type === 'color') {
+                state.productsColors.push(option);
+            } else if (option.type === 'size') {
+                state.productsSizes.push(option);
+            } else if (option.type === 'length') {
+                state.productsLengths.push(option);
+            }
+        })
     },
     setCartProducts(state, payload) {
         state.cartProducts = payload;
@@ -259,15 +269,10 @@ export const actions = {
         }
         commit('setCartProducts', products);
     },
-    async getProductsColors({ commit }) {
-        const response = await repository.get(`${frontendUrl}/colors.json`)
+    async getProductsOptions({ commit }) {
+        const response = await repository.get(`${frontendUrl}/options.json`)
             .then(response => {
-                const productsColors = [];
-
-                response.data.forEach(option => {
-                    productsColors.push(option);
-                })
-                commit('setProductsColors', productsColors);
+                commit('setProductsOptions', response.data);
                 return response.success();
             })
             .catch(error => ({ error: JSON.stringify(error) }));

@@ -1,0 +1,23 @@
+[
+	{ "type": "color", "name": "Amarillo", 	 "presentation": "#FFFF00" },
+	{ "type": "color", "name": "Azul", 			 "presentation": "#0000FF" },
+	{ "type": "color", "name": "Azul claro", "presentation": "#add8e6" },
+	{ "type": "color", "name": "Beige", 		 "presentation": "#E1C699" },
+	{ "type": "color", "name": "Blanco", 		 "presentation": "#FFFFFF" },
+	{ "type": "color", "name": "Gris", 			 "presentation": "#808080" },
+	{ "type": "color", "name": "Naranja", 	 "presentation": "#FF8800" },
+	{ "type": "color", "name": "Negro", 		 "presentation": "#000000" },
+	{ "type": "color", "name": "Rojo", 			 "presentation": "#FF0000" },
+	{ "type": "color", "name": "Rosa", 			 "presentation": "#FFA6C9" },
+	{ "type": "color", "name": "Verde", 		 "presentation": "#228C22" },
+
+	{ "type": "size", "name": "Extra chico", 	"presentation": "XS" },
+	{ "type": "size", "name": "Chico", 			 	"presentation": "S" },
+	{ "type": "size", "name": "Medio", 			 	"presentation": "M" },
+	{ "type": "size", "name": "Grande", 		 	"presentation": "L" },
+	{ "type": "size", "name": "Extra grande", "presentation": "XL" },
+
+	{ "type": "length", "name": "Corto",  "presentation": "Mini" },
+	{ "type": "length", "name": "Medio",  "presentation": "Midi" },
+	{ "type": "length", "name": "Máximo", "presentation": "Maxi" }
+]
