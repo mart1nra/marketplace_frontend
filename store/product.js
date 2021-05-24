@@ -21,9 +21,7 @@ export const state = () => ({
     //categories: null,
     totalCount: 0,
     totalPages: 0,
-    prevPageUrl: '',
     selfPageUrl: '',
-    nextPageUrl: '',
     productsColors: [],
     productsSizes: [],
     productsLengths: [],
@@ -59,9 +57,7 @@ export const mutations = {
         state.products = products;
         state.totalCount = meta.total_count;
         state.totalPages = meta.total_pages;
-        state.prevPageUrl = links.prev;
         state.selfPageUrl = links.self;
-        state.nextPageUrl = links.next;
     },
     setProductsOptions(state, payload) {
         payload.forEach(option => {
@@ -117,14 +113,8 @@ export const mutations = {
     setTotalPages(state, payload) {
         state.totalPages = payload;
     },
-    setPrevPageUrl(state, payload) {
-        state.prevPageUrl = payload;
-    },
     setSelfPageUrl(state, payload) {
         state.selfPageUrl = payload;
-    },
-    setNextPageUrl(state, payload) {
-        state.nextPageUrl = payload;
     },
     /*setProductCurrentVariantColor(state, payload) {
         state.product.currentVariantColor = payload;
@@ -278,18 +268,6 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
     },
-    async getProductsByVendor({ commit }, payload) {
-        commit('setLoading', true);
-
-        const response = await client.products.list({ filter: { ['vendor_ids']: payload }, 'per_page': PRODUCTS_PER_PAGE, include: 'images' })
-            .then(response => {
-                commit('setProducts', response);
-                commit('setLoading', false);
-                return response.success();
-            })
-            .catch(error => ({ error: JSON.stringify(error) }));
-        return response;
-    },
     async getProductsByPage({ commit, state }, payload) {
         commit('setLoading', true);
 
@@ -302,10 +280,10 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;        
     },
-    async getProductsByFilters({ commit, state }, payload) {
+    async getProductsByFilters({ commit }, payload) {
         commit('setLoading', true);
 
-        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?${serializeQuery(payload)}&per_page=${PRODUCTS_PER_PAGE}`)
+        const response = await client.products.list({ filter: payload.filter, 'sort': payload.sort, 'per_page': PRODUCTS_PER_PAGE, include: 'images' })
             .then(response => {
                 commit('setProducts', response);
                 commit('setLoading', false);

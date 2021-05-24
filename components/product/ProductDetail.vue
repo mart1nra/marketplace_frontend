@@ -203,7 +203,7 @@ export default {
     },
     disableAddToCart() {
       return (!this.product.colors.length) ||
-             (this.product.sizes.length > 0 && this.selectedSize === null) ||
+             (this.product.sizes.length > 0 && this.selectedSize === null && this.product.variants[this.selectedColor].options.size !== undefined) ||
              (this.product.lengths.length > 0 && this.selectedLength === null) ||
              (this.product.lengths.length > 0 && this.selectedLength === undefined);
     }
@@ -249,7 +249,7 @@ export default {
     checkSize(size) {
       const item = this.product.variants.find(variant =>
         variant.options.color.id === this.product.colors[this.selectedColor].id &&
-        variant.options.size.id === size.id)
+        (variant.options.size ? variant.options.size.id === size.id : false))
 
       return item ? item.options.color.id : null;
     },
@@ -277,9 +277,9 @@ export default {
         this.loading = !this.loading;
 
         const variantId = this.product.variants.find(variant =>
-          (this.product.colors.length === 0 || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
-          (this.product.sizes.length === 0 || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&
-          (this.product.lengths.length === 0 || variant.options.length.id === this.product.lengths[this.selectedLength].id)
+          (!variant.options.color || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
+          (!variant.options.size || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&
+          (!variant.options.length || variant.options.length.id === this.product.lengths[this.selectedLength].id)
         ).id
 
         let item = {
@@ -347,8 +347,8 @@ export default {
     async addItemToCart(payload) {
       var variant = this.product.variants.find(variant => variant.id === payload.variant_id);
       var itemOptions = variant.options.color.name;
-      if (Object.keys(variant.options.size).length) itemOptions = itemOptions + '/' + variant.options.size.presentation;
-      if (Object.keys(variant.options.length).length) itemOptions = itemOptions + '/' + variant.options.length.presentation;
+      if (variant.options.size) itemOptions = itemOptions + '/' + variant.options.size.presentation;
+      if (variant.options.length) itemOptions = itemOptions + '/' + variant.options.length.presentation;
 
       const cartItems = await this.$store.dispatch('cart/addProductToCart', payload);
       if (!cartItems.error) {

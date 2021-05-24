@@ -303,9 +303,9 @@ export default {
         'Menor precio',
         'Mayor precio'
       ],
+      sort: '',
       filters: {
-        'filter[vendor_ids]': this.$route.params.id,
-        'include': 'images'
+        '[vendor_ids]': this.$route.params.id
       },
       filterPriceApplied: false,
       filterColorApplied: false,
@@ -363,7 +363,7 @@ export default {
     }
   },
   async fetch() {
-    await this.$store.dispatch('product/getProductsByVendor', this.vendorId);
+    await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
   },
   mounted() {
     window.addEventListener('resize', this.onResize, {
@@ -409,9 +409,9 @@ export default {
       } else if (this.currentSort === 'Mayor precio') {
         sort = '-price';
       }
-      this.filters['sort'] = sort;
+      this.sort = sort;
 
-      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+      await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': sort });
       this.page = 1;
       this.currentPage = 1;
       window.scrollTo(0, 0);
@@ -428,13 +428,13 @@ export default {
         } else {
           range = `${r - this.priceRange},${r}`;
         }
-        this.filters['filter[price]'] = range;
+        this.filters['[price]'] = range;
       } else if (!r) {
-        delete this.filters[Object.keys(this.filters).find(k => k === 'filter[price]')];
+        delete this.filters[Object.keys(this.filters).find(k => k === '[price]')];
         this.currentPriceFilter = '';
       } else return;
 
-      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+      await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
       this.page = 1;
       this.currentPage = 1;
@@ -444,9 +444,9 @@ export default {
     async filterByColor(color) {
       if (!this.filterColorApplied) {
         this.currentColorFilter = color;
-        this.filters['filter[options][color]'] = color.name;
+        this.filters['[options][color]'] = color.name;
 
-        await this.$store.dispatch('product/getProductsByFilters', this.filters);
+        await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
         this.page = 1;
         this.currentPage = 1;
@@ -455,9 +455,9 @@ export default {
       }
     },
     async removeFilterByColor() {
-      delete this.filters[Object.keys(this.filters).find(k => k === 'filter[options][color]')];
+      delete this.filters[Object.keys(this.filters).find(k => k === '[options][color]')];
 
-      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+      await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
       this.page = 1;
       this.currentPage = 1;
@@ -468,13 +468,13 @@ export default {
     async filterBySize(size) {
       if (!this.filterSizeApplied) {
         this.currentSizeFilter = size;
-        this.filters['filter[options][talle]'] = size.name;
+        this.filters['[options][talle]'] = size.name;
       } else if (!size) {
-        delete this.filters[Object.keys(this.filters).find(k => k === 'filter[options][talle]')];
+        delete this.filters[Object.keys(this.filters).find(k => k === '[options][talle]')];
         this.currentSizeFilter = '';
       } else return;
 
-      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+      await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
       this.page = 1;
       this.currentPage = 1;
