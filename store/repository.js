@@ -11,6 +11,7 @@ export const customHeaders = {
 };
 
 export const baseUrl = 'http://localhost:3000';
+export const frontendUrl = 'http://localhost:8000';
 
 export default axios.create({
     baseUrl,

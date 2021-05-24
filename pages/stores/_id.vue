@@ -28,18 +28,18 @@
                 <v-expansion-panel-content>
                     <span v-for="range in priceRanges">
                       <v-chip
-                        class="ma-1"
-                        color="grey"
+                        class="ma-1 pa-1"
+                        color="#757575"
                         label
                         outlined
                         small
-                        :close="filterApplied && range === currentPriceFilter"
-                        :disabled="filterApplied && range !== currentPriceFilter"
+                        :close="filterPriceApplied && range === currentPriceFilter"
+                        :disabled="filterPriceApplied && range !== currentPriceFilter"
                         @click="filterByPriceRange(range)"
-                        @click:close="removeFilterByPriceRange(range)"
+                        @click:close="removeFilterByPriceRange()"
                       >
                         {{ priceRangesLabel(range) }}
-                      </v-chip><br>
+                      </v-chip>
                     </span>
                 </v-expansion-panel-content>
               </v-expansion-panel>
@@ -59,18 +59,29 @@
               <v-expansion-panel>
                 <v-expansion-panel-header>Color</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <div class="custom-grid">
-                    <v-checkbox
-                      v-for="(color, i) in colors"
-                      :key="i"
-                      v-model="selectedColor"
-                      :label="color"
-                      :color="color"
-                      :value="color"
-                      hide-details
-                      class="text-capitalize"
-                    ></v-checkbox>
-                  </div>
+                  <span v-for="color in productsColors">
+                    <v-hover v-slot="{ hover }">
+                      <v-btn
+                        class="ma-1"
+                        max-width="25"
+                        max-height="25"
+                        elevation="0"
+                        fab
+                        :disabled="filterColorApplied && color !== currentColorFilter"
+                        :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+                        :outlined="color.presentation === '#FFFFFF' && !(filterColorApplied && color !== currentColorFilter)"
+                        @click="filterByColor(color)"
+                      >
+                        <span v-if="filterColorApplied && hover">
+                          <v-icon
+                            small
+                            :color="color.presentation === '#FFFFFF' ? 'black' : 'white'"
+                            @click="removeFilterByColor(color)"
+                          >mdi-close</v-icon>
+                        </span>
+                      </v-btn>
+                    </v-hover>
+                  </span>
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel>
@@ -219,35 +230,37 @@ export default {
       products: state => state.product.products,
       totalCount: state => state.product.totalCount,
       totalPages: state => state.product.totalPages,
+      productsColors: state => state.product.productsColors,
       loading: state => state.product.loading
-    })
+    }),
+    filterApplied() {
+      return this.filterPriceApplied || this.filterColorApplied;
+    }
   },
   data() {
     return {
+      vendorId: this.$route.params.id,
       panel: [1, 2, 3, 4],
       filterOn: true,
-      selectedColor: ['red', 'pink', 'blue', 'orange', 'indigo'],
-      colors: ['red', 'blue', 'pink', 'indigo', 'orange', 'grey'],
-      vendorId: this.$route.params.id,
-      allProducts: null,
       priceRanges: [1500, 3000, 4500, 6000, 7500],
       priceRange: 1500,
       rating: 4.5,
-      sort: '',
-      sortSelected: false,
       currentSort: 'Más relevantes',
       sortOptions: [
         'Más relevantes',
         'Menor precio',
         'Mayor precio'
       ],
-      filter: '',
-      filterApplied: false,
+      filters: {
+        'filter[vendor_ids]': this.$route.params.id,
+        'include': 'images'
+      },
+      filterPriceApplied: false,
+      filterColorApplied: false,
       currentPriceFilter: '',
+      currentColorFilter: '',
       page: 1,
       currentPage: 1,
-      min: '',
-      max: '',
       tags: ['Laptop', 'Electronics', 'Popular'],
       items: [
         {
@@ -296,6 +309,7 @@ export default {
     }
   },
   async fetch() {
+    await this.$store.dispatch('product/getProductsColors');
     await this.$store.dispatch('product/getProductsByVendor', this.vendorId);
   },
   mounted() {
@@ -332,33 +346,19 @@ export default {
       if (range === this.priceRanges[this.priceRanges.length - 1]) {
         return 'Más de ' + this.displayPrice(range - this.priceRange);
       }
-      return this.displayPrice(range - this.priceRange) + ' - ' + this.displayPrice(range);
-    },
-    setPricesRange(maxPrice, minPrice) {
-      this.priceRange = maxPrice / 4;
-      for (let i = minPrice; i <= maxPrice; i = i + this.priceRange) {
-        this.priceRanges.push(i);
-      }
-      this.priceRanges.push(maxPrice);
+      return this.displayPrice(range - this.priceRange) + ' a ' + this.displayPrice(range);
     },
     async sortProducts() {
       var sort = '';
 
       if (this.currentSort === 'Menor precio') {
         sort = 'price';
-        this.sortSelected = true;
       } else if (this.currentSort === 'Mayor precio') {
         sort = '-price';
-        this.sortSelected = true;
-      } else {
-        this.sortSelected = false;
-        this.sort = '';
       }
-      this.sort = `&sort=${sort}`;
+      this.filters['sort'] = sort;
 
-      var filter = this.filterApplied ? this.filter : '';
-
-      await this.$store.dispatch('product/getProductsBySort', { 'category': `[vendor_ids]=${this.vendorId}`, 'sort': sort , 'filter': filter });
+      await this.$store.dispatch('product/getProductsByFilters', this.filters);
       this.page = 1;
       this.currentPage = 1;
       window.scrollTo(0, 0);
@@ -366,8 +366,9 @@ export default {
     async filterByPriceRange(r) {
       var range = '';
 
-      if (!this.filterApplied) {
+      if (!this.filterPriceApplied) {
         this.currentPriceFilter = r;
+
         if (r === this.priceRanges[0]) {
           range = `,${r}`;
         } else if (r === this.priceRanges[this.priceRanges.length - 1]) {
@@ -375,25 +376,50 @@ export default {
         } else {
           range = `${r - this.priceRange},${r}`;
         }
-        var sort = this.sortSelected ? this.sort : '';
+        this.filters['filter[price]'] = range;
 
-        await this.$store.dispatch('product/getProductsByPriceRange', { 'category': `[vendor_ids]=${this.vendorId}`, 'range': range, 'sort': sort });
+        await this.$store.dispatch('product/getProductsByFilters', this.filters);
+
         this.page = 1;
         this.currentPage = 1;
-        this.filterApplied = true;
-        this.filter = `&filter[price]=${range}`;
+        this.filterPriceApplied = true;
         window.scrollTo(0, 0);
       } 
     },
-    async removeFilterByPriceRange(range) {
-      var sort = this.sortSelected ? this.sort : '';
+    async removeFilterByPriceRange() {
+      delete this.filters[Object.keys(this.filters).find(k => k === 'filter[price]')];
 
-      await this.$store.dispatch('product/getProductsByPriceRange', { 'category': `[vendor_ids]=${this.vendorId}`, 'range': '', 'sort': sort });
+      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+
       this.page = 1;
       this.currentPage = 1;
-      this.filterApplied = false;
+      this.filterPriceApplied = false;
       this.currentPriceFilter = '';
-      this.filter = '';
+      window.scrollTo(0, 0);
+
+    },
+    async filterByColor(color) {
+      if (!this.filterColorApplied) {
+        this.currentColorFilter = color;
+        this.filters['filter[options][color]'] = color.name;
+
+        await this.$store.dispatch('product/getProductsByFilters', this.filters);
+
+        this.page = 1;
+        this.currentPage = 1;
+        this.filterColorApplied = true;
+        window.scrollTo(0, 0);
+      }
+    },
+    async removeFilterByColor(color) {
+      delete this.filters[Object.keys(this.filters).find(k => k === 'filter[options][color]')];
+
+      await this.$store.dispatch('product/getProductsByFilters', this.filters);
+
+      this.page = 1;
+      this.currentPage = 1;
+      this.filterColorApplied = false;
+      this.currentColorFilter = '';
       window.scrollTo(0, 0);
 
     },

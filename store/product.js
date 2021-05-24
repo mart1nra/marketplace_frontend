@@ -1,5 +1,5 @@
 import repository, { serializeQuery } from '~/store/repository.js';
-import { baseUrl } from '~/store/repository';
+import { baseUrl, frontendUrl } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 import * as emptyImageUrl from '~/assets/img/product-coming-soon.jpg'
 
@@ -24,6 +24,7 @@ export const state = () => ({
     prevPageUrl: '',
     selfPageUrl: '',
     nextPageUrl: '',
+    productsColors: [],
     emptyImage: emptyImageUrl,
     loading: false
 });
@@ -59,6 +60,9 @@ export const mutations = {
         state.prevPageUrl = links.prev;
         state.selfPageUrl = links.self;
         state.nextPageUrl = links.next;
+    },
+    setProductsColors(state, payload) {
+        state.productsColors = payload;
     },
     setCartProducts(state, payload) {
         state.cartProducts = payload;
@@ -255,6 +259,20 @@ export const actions = {
         }
         commit('setCartProducts', products);
     },
+    async getProductsColors({ commit }) {
+        const response = await repository.get(`${frontendUrl}/colors.json`)
+            .then(response => {
+                const productsColors = [];
+
+                response.data.forEach(option => {
+                    productsColors.push(option);
+                })
+                commit('setProductsColors', productsColors);
+                return response.success();
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;
+    },
     async getProductsByVendor({ commit }, payload) {
         commit('setLoading', true);
 
@@ -279,22 +297,10 @@ export const actions = {
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;        
     },
-    async getProductsBySort({ commit, state }, payload) {
+    async getProductsByFilters({ commit, state }, payload) {
         commit('setLoading', true);
 
-        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?filter${payload.category}&sort=${payload.sort}&per_page=${PRODUCTS_PER_PAGE}&include=images${payload.filter}`)
-            .then(response => {
-                commit('setProducts', response);
-                commit('setLoading', false);
-                return response.data;
-            })
-            .catch(error => ({ error: JSON.stringify(error) }));
-        return response;        
-    },
-    async getProductsByPriceRange({ commit, state }, payload) {
-        commit('setLoading', true);
-
-        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?filter${payload.category}&filter[price]=${payload.range}&per_page=${PRODUCTS_PER_PAGE}&include=images${payload.sort}`)
+        const response = await repository.get(`${baseUrl}/api/v2/storefront/products?${serializeQuery(payload)}&per_page=${PRODUCTS_PER_PAGE}`)
             .then(response => {
                 commit('setProducts', response);
                 commit('setLoading', false);

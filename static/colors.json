@@ -1,0 +1,13 @@
+[
+	{ "name": "Amarillo", "presentation": "#FFFF00" },
+	{ "name": "Azul", "presentation": "#0000FF" },
+	{ "name": "Azul claro", "presentation": "#add8e6" },
+	{ "name": "Beige", "presentation": "#E1C699" },
+	{ "name": "Blanco", "presentation": "#FFFFFF" },
+	{ "name": "Gris", "presentation": "#808080" },
+	{ "name": "Naranja", "presentation": "#FF8800" },
+	{ "name": "Negro", "presentation": "#000000" },
+	{ "name": "Rojo", "presentation": "#FF0000" },
+	{ "name": "Rosa", "presentation": "#FFA6C9" },
+	{ "name": "Verde", "presentation": "#228C22" }
+]
