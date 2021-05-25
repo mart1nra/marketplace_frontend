@@ -3,155 +3,140 @@
     <v-container :class="$vuetify.breakpoint.mdAndUp ? 'py-12 my-12' : ''">
       <v-row>
         <v-col v-if="filterOn" cols="12" sm="12" md="4" lg="3" xl="3">
-          <v-card class="elevation-cs py-3 px-0">
-            <v-expansion-panels
-              v-model="panel"
-              multiple
-              flat
-              tile
-              data-aos="fade-zoom-in"
-            >
-              <v-expansion-panel>
-                <v-expansion-panel-header>Categories</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-treeview
-                    :items="items"
-                    :selected-color="'#fff'"
-                    activatable
-                    open-on-click
-                    dense
-                  ></v-treeview>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header>Precio</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <span v-for="range in priceRanges">
-                    <v-chip
-                      class="ma-1 pa-1"
-                      color="#757575"
-                      label
-                      outlined
-                      small
-                      :close="filterPriceApplied && range === currentPriceFilter"
-                      :disabled="filterPriceApplied && range !== currentPriceFilter"
-                      @click="filterByPriceRange(range)"
-                      @click:close="filterByPriceRange()"
-                    >
-                      {{ priceRangesLabel(range) }}
-                    </v-chip>
-                  </span>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <!--v-expansion-panel>
-                <v-expansion-panel-header>Rating</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-rating
-                    v-model="rating"
-                    hover
-                    background-color="orange lighten-3"
-                    half-increments
-                    color="orange"
+          <v-expansion-panels
+            v-model="panel"
+            accordion
+            multiple
+            data-aos="fade-zoom-in"
+          >
+            <v-expansion-panel>
+              <v-expansion-panel-header class="text-subtitle-2">Categories</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-treeview
+                  :items="items"
+                  :selected-color="'#fff'"
+                  activatable
+                  open-on-click
+                  dense
+                ></v-treeview>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header class="text-subtitle-2">Precio</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <span v-for="range in priceRanges">
+                  <v-chip
+                    class="ma-1 pa-1"
+                    color="#757575"
+                    label
+                    outlined
+                    small
+                    :close="filterPriceApplied && range === currentPriceFilter"
+                    :disabled="filterPriceApplied && range !== currentPriceFilter"
+                    @click="filterByPriceRange(range)"
+                    @click:close="filterByPriceRange()"
                   >
-                  </v-rating>
-                </v-expansion-panel-content>
-              </v-expansion-panel-->
-              <v-expansion-panel>
-                <v-expansion-panel-header>Color</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <span v-for="color in productsColors">
-                    <v-hover v-slot="{ hover }">
-                      <v-btn
-                        class="ma-1"
-                        max-width="25"
-                        max-height="25"
-                        elevation="0"
-                        fab
-                        :disabled="filterColorApplied && color !== currentColorFilter"
-                        :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
-                        :outlined="color.presentation === '#FFFFFF' && !(filterColorApplied && color !== currentColorFilter)"
-                        @click="filterByColor(color)"
-                      >
-                        <span v-if="filterColorApplied && hover">
-                          <v-icon
-                            small
-                            :color="color.presentation === '#FFFFFF' ? 'black' : 'white'"
-                            @click="removeFilterByColor(color)"
-                          >mdi-close</v-icon>
-                        </span>
-                      </v-btn>
-                    </v-hover>
-                  </span>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header>Talle</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <span v-for="size in productsSizes">
-                    <v-chip
-                      class="ma-1 pa-2"
-                      color="#757575"
-                      outlined
-                      small
-                      :close="filterSizeApplied && size === currentSizeFilter"
-                      :disabled="filterSizeApplied && size !== currentSizeFilter"
-                      @click="filterBySize(size)"
-                      @click:close="filterBySize()"
+                    {{ priceRangesLabel(range) }}
+                  </v-chip>
+                </span>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <!--v-expansion-panel>
+              <v-expansion-panel-header>Rating</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-rating
+                  v-model="rating"
+                  hover
+                  background-color="orange lighten-3"
+                  half-increments
+                  color="orange"
+                >
+                </v-rating>
+              </v-expansion-panel-content>
+            </v-expansion-panel-->
+            <v-expansion-panel>
+              <v-expansion-panel-header class="text-subtitle-2">Color</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <span v-for="color in productsColors">
+                  <v-hover v-slot="{ hover }">
+                    <v-btn
+                      class="ma-1"
+                      max-width="25"
+                      max-height="25"
+                      elevation="0"
+                      fab
+                      :disabled="filterColorApplied && color !== currentColorFilter"
+                      :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+                      :outlined="color.presentation === '#FFFFFF' && !(filterColorApplied && color !== currentColorFilter)"
+                      @click="filterByColor(color)"
                     >
-                      {{ size.presentation }}
-                    </v-chip>
-                  </span>
-
-                  <!--span v-for="size in productsSizes">
-                    <v-hover v-slot="{ hover }">
-                      <v-btn
-                        class="ma-1"
-                        text
-                        x-small
-                        outlined
-                        @click="filterBySize(size)"
-                      >{{ size.presentation }}</v-btn>
-                    </v-hover>
-                  </span-->
-                  <!--span v-for="color in productsLengths">
-                    
-                        max-width="25"
-                        max-height="25"
-                        elevation="0"
-                        :disabled="filterColorApplied && color !== currentColorFilter"
-                        :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
-                        :outlined="color.presentation === '#FFFFFF' && !(filterColorApplied && color !== currentColorFilter)"
-                        @click="filterByColor(color)"
-                      >
-                        <span v-if="filterColorApplied && hover">
-                          <v-icon
-                            small
-                            :color="color.presentation === '#FFFFFF' ? 'black' : 'white'"
-                            @click="removeFilterByColor(color)"
-                          >mdi-close</v-icon>
-                        </span>
-                    
-                  </span-->
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header>Tags</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-chip-group column>
-                    <v-chip
-                      v-for="tag in tags"
-                      :key="tag"
-                      active
-                      active-class="primary--text"
-                      small
-                    >
-                      {{ tag }}
-                    </v-chip>
-                  </v-chip-group>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-card>
+                      <span v-if="filterColorApplied && hover">
+                        <v-icon
+                          small
+                          :color="color.presentation === '#FFFFFF' ? 'black' : 'white'"
+                          @click="removeFilterByColor(color)"
+                        >mdi-close</v-icon>
+                      </span>
+                    </v-btn>
+                  </v-hover>
+                </span>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header class="text-subtitle-2">Talle</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <span v-for="size in productsSizes">
+                  <v-chip
+                    class="ma-1 pa-2"
+                    color="#757575"
+                    outlined
+                    small
+                    :close="filterSizeApplied && size === currentSizeFilter"
+                    :disabled="filterSizeApplied && size !== currentSizeFilter"
+                    @click="filterBySize(size)"
+                    @click:close="filterBySize()"
+                  >
+                    {{ size.presentation }}
+                  </v-chip>
+                </span>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header class="text-subtitle-2">Largo</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <span v-for="length in productsLengths">
+                  <v-chip
+                    class="ma-1 pa-2"
+                    color="#757575"
+                    outlined
+                    small
+                    :close="filterLengthApplied && length === currentLengthFilter"
+                    :disabled="filterLengthApplied && length !== currentLengthFilter"
+                    @click="filterByLength(length)"
+                    @click:close="filterByLength()"
+                  >
+                    {{ length.presentation }}
+                  </v-chip>
+                </span>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header class="text-subtitle-2">Tags</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-chip-group column>
+                  <v-chip
+                    v-for="tag in tags"
+                    :key="tag"
+                    active
+                    active-class="primary--text"
+                    small
+                  >
+                    {{ tag }}
+                  </v-chip>
+                </v-chip-group>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </v-col>
         <v-col cols="12" sm="12" md="8" lg="9" xl="9">
           <div class="d-flex align-center justify-space-between">
@@ -292,7 +277,7 @@ export default {
   data() {
     return {
       vendorId: this.$route.params.id,
-      panel: [1, 2, 3, 4],
+      panel: [0, 1, 2, 3, 4, 5],
       filterOn: true,
       priceRanges: [1500, 3000, 4500, 6000, 7500],
       priceRange: 1500,
@@ -310,9 +295,11 @@ export default {
       filterPriceApplied: false,
       filterColorApplied: false,
       filterSizeApplied: false,
+      filterLengthApplied: false,
       currentPriceFilter: '',
       currentColorFilter: '',
       currentSizeFilter: '',
+      currentLengthFilter: '',
       page: 1,
       currentPage: 1,
       tags: ['Laptop', 'Electronics', 'Popular'],
@@ -479,6 +466,22 @@ export default {
       this.page = 1;
       this.currentPage = 1;
       this.filterSizeApplied = !this.filterSizeApplied;
+      window.scrollTo(0, 0);
+    },
+    async filterByLength(length) {
+      if (!this.filterLengthApplied) {
+        this.currentLengthFilter = length;
+        this.filters['[options][largo]'] = length.name;
+      } else if (!length) {
+        delete this.filters[Object.keys(this.filters).find(k => k === '[options][largo]')];
+        this.currentLengthFilter = '';
+      } else return;
+
+      await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
+
+      this.page = 1;
+      this.currentPage = 1;
+      this.filterLengthApplied = !this.filterLengthApplied;
       window.scrollTo(0, 0);
     },
     onResize() {
