@@ -30,6 +30,60 @@ export const state = () => ({
 });
 
 export const mutations = {
+    setProduct(state, payload) {
+        const data = payload.success().data;
+        const included = payload.success().included;
+
+        const product = {};
+        product.title = data.attributes.name;
+        product.price = data.attributes.price;
+        product.description = data.attributes.description;
+        product.variants = [];
+        product.colors = [];
+        product.sizes = [];
+        product.lengths = [];
+
+        data.relationships.variants.data.forEach(v => {
+            var item_variant = included.find(i => i.type === 'variant' && i.id === v.id);
+            var variant = {};
+            variant.attributes = item_variant.attributes;
+            variant.id = item_variant.id;
+            variant.images = [];
+            variant.options = {};
+            
+            if (item_variant.relationships.images.data.length > 0) {
+                item_variant.relationships.images.data.forEach(image => {
+                    variant.images.push(baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
+                });
+            }
+            if (item_variant.relationships.option_values.data.length > 0) {
+                item_variant.relationships.option_values.data.forEach(ov => {
+                    var item_option = included.find(i => i.type === 'option_value' && i.id === ov.id);
+                    var option = {};
+                    option = item_option.attributes;
+                    option.id = item_option.id;
+
+                    if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
+                        variant.options.color = option;
+                        if (!product.colors.includes(option)) product.colors.push(option);
+                    } else if (item_option.relationships.option_type.data.id === SIZE_TYPE) {
+                        variant.options.size = option;
+                        if (!product.sizes.includes(option)) product.sizes.push(option);
+                    } else if (item_option.relationships.option_type.data.id === LENGTH_TYPE) {
+                        variant.options.length = option;
+                        if (!product.lengths.includes(option)) product.lengths.push(option);
+                    }
+                });
+            }
+            product.variants.push(variant);
+        });
+
+        product.sizes.sort((a, b) => a.position - b.position);
+        product.lengths.sort((a, b) => a.position - b.position);
+
+        product.currentVariant = data.relationships.default_variant.data.id;
+        state.product = product;
+    },
     setProducts(state, payload) {
         const data = payload.data ? payload.data.data : payload.success().data;
         const included = payload.data ? payload.data.included : payload.success().included;
@@ -92,9 +146,6 @@ export const mutations = {
     /*setCompareItems(state, payload) {
         state.compareItems = payload;
     },*/
-    setProduct(state, payload) {
-        state.product = payload;
-    },
     setProductCurrentVariant(state, payload) {
         state.product.currentVariant = payload;
     },
@@ -152,55 +203,13 @@ export const actions = {
         return reponse;
     },*/
     async getProductsById({ commit }, payload) {
+        commit('setLoading', true);
+
         const response = await client.products.show(payload, { include: 'variants.images,variants.option_values' })
             .then(response => {
-                const product = {};
-                product.title = response.success().data.attributes.name;
-                product.price = response.success().data.attributes.price;
-                product.description = response.success().data.attributes.description;
-                product.variants = [];
-                product.colors = [];
-                product.sizes = [];
-                product.lengths = [];
-
-                response.success().data.relationships.variants.data.forEach(v => {
-                    var item_variant = response.success().included.find(i => i.type === 'variant' && i.id === v.id);
-                    var variant = {};
-                    variant.attributes = item_variant.attributes;
-                    variant.id = item_variant.id;
-                    variant.images = [];
-                    variant.options = {};
-                    
-                    if (item_variant.relationships.images.data.length > 0) {
-                        item_variant.relationships.images.data.forEach(image => {
-                            variant.images.push(baseUrl + response.success().included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
-                        });
-                    }
-                    if (item_variant.relationships.option_values.data.length > 0) {
-                        item_variant.relationships.option_values.data.forEach(ov => {
-                            var item_option = response.success().included.find(i => i.type === 'option_value' && i.id === ov.id);
-                            var option = {};
-                            option = item_option.attributes;
-                            option.id = item_option.id;
-
-                            if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
-                                variant.options.color = option;
-                                if (!product.colors.includes(option)) product.colors.push(option);
-                            } else if (item_option.relationships.option_type.data.id === SIZE_TYPE) {
-                                variant.options.size = option;
-                                if (!product.sizes.includes(option)) product.sizes.push(option);
-                            } else if (item_option.relationships.option_type.data.id === LENGTH_TYPE) {
-                                variant.options.length = option;
-                                if (!product.lengths.includes(option)) product.lengths.push(option);
-                            }
-                        });
-                    }
-                    product.variants.push(variant);
-                });
-
-                product.currentVariant = response.success().data.relationships.default_variant.data.id;
-                commit('setProduct', product);
-                return product;
+                commit('setProduct', response);
+                commit('setLoading', false);
+                return response.success();
             })
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
@@ -263,7 +272,7 @@ export const actions = {
         const response = await repository.get(`${frontendUrl}/options.json`)
             .then(response => {
                 commit('setProductsOptions', response.data);
-                return response.success();
+                return response.data;
             })
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;
@@ -287,7 +296,7 @@ export const actions = {
             .then(response => {
                 commit('setProducts', response);
                 commit('setLoading', false);
-                return response.data;
+                return response.success();
             })
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;        
