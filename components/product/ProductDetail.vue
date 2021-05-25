@@ -199,7 +199,7 @@ export default {
     },
     images() {
       const variant = this.product.variants.find(variant => variant.id === this.variantId);
-      return variant ? this.product.variants.find(variant => variant.id === this.variantId).images : [this.emptyImage];
+      return (variant && variant.images.length) ? variant.images : [this.emptyImage];
     },
     disableAddToCart() {
       return (!this.product.colors.length) ||
