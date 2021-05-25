@@ -192,6 +192,7 @@ export default {
   computed: {
     ...mapState({
       signedIn: state => state.auth.signedIn,
+      productImagesByColor: state => state.product.productImagesByColor,
       emptyImage: state => state.product.emptyImage
     }),
     variantId() {
@@ -199,7 +200,11 @@ export default {
     },
     images() {
       const variant = this.product.variants.find(variant => variant.id === this.variantId);
-      return (variant && variant.images.length) ? variant.images : [this.emptyImage];
+      if (variant && variant.images.length) {
+        return variant.images;
+      } else {
+        return this.productImagesByColor[this.product.colors[this.selectedColor].id] ? this.productImagesByColor[this.product.colors[this.selectedColor].id] : [this.emptyImage];
+      }
     },
     disableAddToCart() {
       return (!this.product.colors.length) ||

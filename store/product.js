@@ -22,6 +22,7 @@ export const state = () => ({
     totalCount: 0,
     totalPages: 0,
     selfPageUrl: '',
+    productImagesByColor: {},
     productsColors: [],
     productsSizes: [],
     productsLengths: [],
@@ -39,9 +40,11 @@ export const mutations = {
         product.price = data.attributes.price;
         product.description = data.attributes.description;
         product.variants = [];
+        product.images = [];
         product.colors = [];
         product.sizes = [];
         product.lengths = [];
+        var variantsImages = []
 
         data.relationships.variants.data.forEach(v => {
             var item_variant = included.find(i => i.type === 'variant' && i.id === v.id);
@@ -50,12 +53,7 @@ export const mutations = {
             variant.id = item_variant.id;
             variant.images = [];
             variant.options = {};
-            
-            if (item_variant.relationships.images.data.length > 0) {
-                item_variant.relationships.images.data.forEach(image => {
-                    variant.images.push(baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
-                });
-            }
+
             if (item_variant.relationships.option_values.data.length > 0) {
                 item_variant.relationships.option_values.data.forEach(ov => {
                     var item_option = included.find(i => i.type === 'option_value' && i.id === ov.id);
@@ -75,8 +73,34 @@ export const mutations = {
                     }
                 });
             }
+            if (item_variant.relationships.images.data.length > 0) {
+                item_variant.relationships.images.data.forEach(image => {
+                    var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
+                    variant.images.push(imageUrl);
+                    variantsImages.push(imageUrl);
+                    if (!state.productImagesByColor[variant.options.color.id]) {
+                        state.productImagesByColor[variant.options.color.id] = [];
+                    }
+                    state.productImagesByColor[variant.options.color.id].push(imageUrl);
+                    
+                });
+            }
             product.variants.push(variant);
         });
+
+        if (!variantsImages.length) {
+            if (data.relationships.images.data.length > 0) {
+                data.relationships.images.data.forEach(image => {
+                    var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
+                    product.colors.forEach(color => {
+                        if (!state.productImagesByColor[color.id]) {
+                            state.productImagesByColor[color.id] = [];
+                        }
+                        state.productImagesByColor[color.id].push(imageUrl);
+                    })
+                });
+            }
+        }
 
         product.sizes.sort((a, b) => a.position - b.position);
         product.lengths.sort((a, b) => a.position - b.position);
@@ -205,7 +229,7 @@ export const actions = {
     async getProductsById({ commit }, payload) {
         commit('setLoading', true);
 
-        const response = await client.products.show(payload, { include: 'variants.images,variants.option_values' })
+        const response = await client.products.show(payload, { include: 'images,variants.option_values' })
             .then(response => {
                 commit('setProduct', response);
                 commit('setLoading', false);
