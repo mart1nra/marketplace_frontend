@@ -92,7 +92,7 @@
               text
               small
               outlined
-              :disabled="selectedSize || selectedSize === 0 || product.sizes.length === 0 ? product.sizes.length > 0 && checkLength(length) !== product.sizes[selectedSize].id : true"
+              :disabled="checkLengthDisabled(length)"
             >{{ length.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
@@ -204,7 +204,7 @@ export default {
     disableAddToCart() {
       return (!this.product.colors.length) ||
              (this.product.sizes.length > 0 && this.selectedSize === null && this.product.variants[this.selectedColor].options.size !== undefined) ||
-             (this.product.lengths.length > 0 && this.selectedLength === null) ||
+             (this.product.lengths.length > 0 && this.selectedLength === null && this.product.variants[this.selectedColor].options.length !== undefined) ||
              (this.product.lengths.length > 0 && this.selectedLength === undefined);
     }
   },
@@ -253,16 +253,18 @@ export default {
 
       return item ? item.options.color.id : null;
     },
-    checkLength(length) {
-      if (this.selectedSize || this.selectedSize === 0) {
-        const item = this.product.variants.find(variant =>
-          variant.options.color.id === this.product.colors[this.selectedColor].id &&
-          variant.options.size.id === this.product.sizes[this.selectedSize].id &&
-          variant.options.length.id === length.id)
+    checkLengthDisabled(length) {
+      var variant = this.product.variants.find(variant =>
+        variant.options.color.id === this.product.colors[this.selectedColor].id &&
+        ((variant.options.size && (this.selectedSize || this.selectedSize === 0)) ? variant.options.size.id === this.product.sizes[this.selectedSize].id : true) &&
+        (variant.options.length ? variant.options.length.id === length.id : false))
 
-        return item ? item.options.size.id : null;
+      if (!this.selectedSize && this.selectedSize !== 0) {
+
+        return (!variant || (variant && variant.options.size)) ? true : false;
       } else {
-        return null;
+
+        return variant ? false : true;
       }
     },
     notification(visible, color, icon, title, text) {

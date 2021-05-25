@@ -191,7 +191,7 @@ export const actions = {
                                 if (!product.sizes.includes(option)) product.sizes.push(option);
                             } else if (item_option.relationships.option_type.data.id === LENGTH_TYPE) {
                                 variant.options.length = option;
-                                if (!product.sizes.includes(option)) product.lengths.push(option);
+                                if (!product.lengths.includes(option)) product.lengths.push(option);
                             }
                         });
                     }
