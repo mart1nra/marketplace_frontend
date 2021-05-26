@@ -389,6 +389,8 @@ export default {
       return this.displayPrice(range - this.priceRange) + ' a ' + this.displayPrice(range);
     },
     async sortProducts() {
+      window.scrollTo(0, 0);
+
       var sort = '';
 
       if (this.currentSort === 'Menor precio') {
@@ -401,9 +403,10 @@ export default {
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': sort });
       this.page = 1;
       this.currentPage = 1;
-      window.scrollTo(0, 0);
     },
     async filterByPriceRange(r) {
+      window.scrollTo(0, 0);
+
       if (!this.filterPriceApplied) {
         this.currentPriceFilter = r;
         var range = '';
@@ -426,9 +429,10 @@ export default {
       this.page = 1;
       this.currentPage = 1;
       this.filterPriceApplied = !this.filterPriceApplied;
-      window.scrollTo(0, 0);
     },
     async filterByColor(color) {
+      window.scrollTo(0, 0);
+
       if (!this.filterColorApplied) {
         this.currentColorFilter = color;
         this.filters['[options][color]'] = color.name;
@@ -438,10 +442,11 @@ export default {
         this.page = 1;
         this.currentPage = 1;
         this.filterColorApplied = true;
-        window.scrollTo(0, 0);
       }
     },
     async removeFilterByColor() {
+      window.scrollTo(0, 0);
+
       delete this.filters[Object.keys(this.filters).find(k => k === '[options][color]')];
 
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
@@ -450,9 +455,10 @@ export default {
       this.currentPage = 1;
       this.filterColorApplied = false;
       this.currentColorFilter = '';
-      window.scrollTo(0, 0);
     },
     async filterBySize(size) {
+      window.scrollTo(0, 0);
+
       if (!this.filterSizeApplied) {
         this.currentSizeFilter = size;
         this.filters['[options][talle]'] = size.name;
@@ -466,9 +472,10 @@ export default {
       this.page = 1;
       this.currentPage = 1;
       this.filterSizeApplied = !this.filterSizeApplied;
-      window.scrollTo(0, 0);
     },
     async filterByLength(length) {
+      window.scrollTo(0, 0);
+      
       if (!this.filterLengthApplied) {
         this.currentLengthFilter = length;
         this.filters['[options][largo]'] = length.name;
@@ -482,7 +489,6 @@ export default {
       this.page = 1;
       this.currentPage = 1;
       this.filterLengthApplied = !this.filterLengthApplied;
-      window.scrollTo(0, 0);
     },
     onResize() {
       var x = window.innerWidth < 960

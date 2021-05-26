@@ -26,6 +26,7 @@ export const state = () => ({
     productsColors: [],
     productsSizes: [],
     productsLengths: [],
+    currentFilters: [],
     emptyImage: emptyImageUrl,
     loading: false
 });
@@ -44,7 +45,7 @@ export const mutations = {
         product.colors = [];
         product.sizes = [];
         product.lengths = [];
-        var variantsImages = []
+        var variantsImages = [];
 
         data.relationships.variants.data.forEach(v => {
             var item_variant = included.find(i => i.type === 'variant' && i.id === v.id);
@@ -121,14 +122,61 @@ export const mutations = {
             product.title = p.attributes.name;
             product.price = p.attributes.price;
             product.images = [];
+            var imagesByColor = {};
 
             if (p.relationships.images.data.length > 0) {
-                p.relationships.images.data.forEach(image => {
-                    product.images.push(baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url);
-                })
+                p.relationships.variants.data.forEach(variant => {
+                    var variantData = included.find(v => v.type === 'variant' && v.id === variant.id);
+
+                    if (variantData.relationships.images.data.length > 0) {
+                        variantData.relationships.images.data.forEach(image => {
+                            var img = included.find(i => i.type === 'image' && i.id === image.id);
+                            var imageUrl = baseUrl + img.attributes.styles[4].url;
+                            // Put first the image of color filter if applied
+                            var op = null;
+                            variantData.relationships.option_values.data.forEach(option => {
+                                op = included.find(o => o.type === 'option_value' && o.id === option.id);
+                                if (op.relationships.option_type.data.id === COLOR_TYPE) {
+                                    if (op.attributes.name === state.currentFilters['[options][color]']) {
+                                        product.images.unshift(imageUrl);
+                                    } else {
+                                        product.images.push(imageUrl);
+                                    }
+                                    if (!imagesByColor[op.id]) {
+                                        imagesByColor[op.id] = [];
+                                    }
+                                    imagesByColor[op.id].push(imageUrl);
+                                }
+                            });
+                        });
+                    } else {
+                        // Put first the placeholder image of color filter if applied
+                        var op = null;
+                        variantData.relationships.option_values.data.forEach(option => {
+                            op = included.find(o => o.type === 'option_value' && o.id === option.id);
+                            if (op.relationships.option_type.data.id === COLOR_TYPE) {
+                                if (op.attributes.name === state.currentFilters['[options][color]']) {
+                                    if (!imagesByColor[op.id] && product.images.length > 0) {
+                                        product.images.unshift(state.emptyImage);
+                                    }   
+                                }
+                            }
+                        });
+                    }
+                });
             } else {
                 product.images.push(state.emptyImage);
             }
+
+            if (!imagesByColor.length) {
+                if (p.relationships.images.data.length > 0) {
+                    p.relationships.images.data.forEach(image => {
+                        var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
+                        product.images.push(imageUrl);
+                    });
+                }                
+            }
+
             products.push(product);
         });
 
@@ -172,6 +220,9 @@ export const mutations = {
     },*/
     setProductCurrentVariant(state, payload) {
         state.product.currentVariant = payload;
+    },
+    setCurrentFilters(state, payload) {
+        state.currentFilters = payload;
     },
     /*setBrands(state, payload) {
         state.brands = payload;
@@ -316,9 +367,10 @@ export const actions = {
     async getProductsByFilters({ commit }, payload) {
         commit('setLoading', true);
 
-        const response = await client.products.list({ filter: payload.filter, 'sort': payload.sort, 'per_page': PRODUCTS_PER_PAGE, include: 'images' })
+        const response = await client.products.list({ filter: payload.filter, 'sort': payload.sort, 'per_page': PRODUCTS_PER_PAGE, include: 'images,variants.option_values' })
             .then(response => {
                 commit('setProducts', response);
+                commit('setCurrentFilters', payload.filter);
                 commit('setLoading', false);
                 return response.success();
             })

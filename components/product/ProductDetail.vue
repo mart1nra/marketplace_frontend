@@ -203,7 +203,7 @@ export default {
       if (variant && variant.images.length) {
         return variant.images;
       } else {
-        return this.productImagesByColor[this.product.colors[this.selectedColor].id] ? this.productImagesByColor[this.product.colors[this.selectedColor].id] : [this.emptyImage];
+        return (this.product.colors.length > 0 && this.productImagesByColor[this.product.colors[this.selectedColor].id]) ? this.productImagesByColor[this.product.colors[this.selectedColor].id] : [this.emptyImage];
       }
     },
     disableAddToCart() {
