@@ -251,9 +251,9 @@ export const mutations = {
     setBreadcrumbs(state, payload) {
         payload.forEach(breadcrumb => {
             breadcrumb['nuxt'] = true;
-            breadcrumb['activeClass'] = 'text-subtitle-2';
+            breadcrumb['activeClass'] = 'font-weight-bold';
         });
-        payload.unshift({ disabled: true, text: "Volver a" });
+        payload.unshift({ disabled: true, activeClass: 'font-weight-light', text: "Volver a" });
 
         state.breadcrumbs = payload;
     },

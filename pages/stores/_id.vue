@@ -148,7 +148,7 @@
               class="hidden-md-and-up"
             ></v-switch>
 
-            <small class="hidden-sm-and-down"
+            <small class="text--disabled font-weight-medium hidden-sm-and-down"
               >{{ pluralize(totalCount, 'producto') }} </small
             >
             <v-select
