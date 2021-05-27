@@ -28,6 +28,7 @@ export const state = () => ({
     productsLengths: [],
     currentFilters: [],
     emptyImage: emptyImageUrl,
+    breadcrumbs: [],
     loading: false
 });
 
@@ -45,6 +46,7 @@ export const mutations = {
         product.colors = [];
         product.sizes = [];
         product.lengths = [];
+        product.vendor = {};
         var variantsImages = [];
 
         data.relationships.variants.data.forEach(v => {
@@ -105,6 +107,10 @@ export const mutations = {
 
         product.sizes.sort((a, b) => a.position - b.position);
         product.lengths.sort((a, b) => a.position - b.position);
+
+        var vendor = included.find(item => item.type == 'vendor' && item.id === data.relationships.vendor.data.id);
+        product.vendor.id = vendor.id;
+        product.vendor.name = vendor.attributes.name;
 
         product.currentVariant = data.relationships.default_variant.data.id;
         state.product = product;
@@ -242,15 +248,15 @@ export const mutations = {
     setSelfPageUrl(state, payload) {
         state.selfPageUrl = payload;
     },
-    /*setProductCurrentVariantColor(state, payload) {
-        state.product.currentVariantColor = payload;
-    },*/
-    /*setProductCurrentVariantSizes(state, payload) {
-        state.product.currentVariantSizes = payload;
-    },*/
-    /*setProductCurrentVariantLengths(state, payload) {
-        state.product.currentVariantLengths = payload;
-    }*/
+    setBreadcrumbs(state, payload) {
+        payload.forEach(breadcrumb => {
+            breadcrumb['nuxt'] = true;
+            breadcrumb['activeClass'] = 'text-subtitle-2';
+        });
+        payload.unshift({ disabled: true, text: "Volver a" });
+
+        state.breadcrumbs = payload;
+    },
     setLoading(state, payload) {
         state.loading = payload;
     },
@@ -280,7 +286,7 @@ export const actions = {
     async getProductsById({ commit }, payload) {
         commit('setLoading', true);
 
-        const response = await client.products.show(payload, { include: 'images,variants.option_values' })
+        const response = await client.products.show(payload, { include: 'images,variants.option_values,vendor' })
             .then(response => {
                 commit('setProduct', response);
                 commit('setLoading', false);

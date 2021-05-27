@@ -1,10 +1,12 @@
 <template>
   <div>
     <v-container :class="$vuetify.breakpoint.mdAndUp ? 'py-12 my-12' : ''">
+      <Breadcrumb />
       <v-row>
         <v-col v-if="filterOn" cols="12" sm="12" md="4" lg="3" xl="3">
           <v-expansion-panels
             v-model="panel"
+            class="elevation-cs"
             accordion
             multiple
             data-aos="fade-zoom-in"
@@ -222,13 +224,13 @@
                     <div
                       class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
                       :class="{ 'primary--text': hover }"
-                    ><span class="text-capitalize">{{ product.title }}</span></div>
+                    ><span class="text-subtitle-1 text-capitalize">{{ product.title }}</span></div>
                     <div class="d-flex align-center justify-space-between">
                       <div class="rating d-flex">
                         <Stars />
                       </div>
                       <span
-                        class="caption font-weight-medium fs-13"
+                        class="text-subtitle-1 font-weight-medium fs-13"
                         v-html="displayPrice(product.price)"
                       ></span>
                     </div>
@@ -268,6 +270,7 @@ export default {
       productsColors: state => state.product.productsColors,
       productsSizes: state => state.product.productsSizes,
       productsLengths: state => state.product.productsLengths,
+      breadcrumbs: state => state.product.breadcrumbs,
       loading: state => state.product.loading
     }),
     filterApplied() {
@@ -353,6 +356,8 @@ export default {
     await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
   },
   mounted() {
+    this.$store.commit('product/setBreadcrumbs', [{ text: "Tiendas", to: "/stores" }]);
+
     window.addEventListener('resize', this.onResize, {
       passive: true,
     })

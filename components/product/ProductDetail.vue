@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <Breadcrumb />
     <v-row justify="center">
       <v-col cols="12" md="12" lg="6" xl="6">
         <div v-if="images.length > 0"
@@ -31,11 +32,11 @@
         </div>
       </v-col>
       <v-col cols="12" md="12" lg="6" xl="6">
-        <h2 class="text-capitalize">{{ product.title }}</h2>
+        <h2 class="text-h5 text-capitalize">{{ product.title }}</h2>
         <Stars :size="20" />
-        <h2 class="font-weight-bold" v-html="displayPrice(product.price)"></h2>
-        <h5 v-if="product.colors.length > 0" class="mt-3 mb-1">Color: 
-          <span class="font-weight-light">{{ product.colors[selectedColor].name }}</span>
+        <h2 class="text-h5 font-weight-light" v-html="displayPrice(product.price)"></h2>
+        <h5 v-if="product.colors.length > 0" class="text--secondary mt-3 mb-1">Color: 
+          <span class="text--primary font-weight-light">{{ product.colors[selectedColor].name }}</span>
         </h5>
         <v-btn-toggle
           v-model="selectedColor"
@@ -181,9 +182,6 @@ import { mapState } from 'vuex';
 
 export default {
   props: {
-    title: {
-      default: true,
-    },
     product: {
       type: Object,
       default: {}
@@ -233,6 +231,13 @@ export default {
         icon: ''
       }
     }
+  },
+  mounted() {
+    this.$store.commit('product/setBreadcrumbs',
+      [
+        { text: "Tiendas", to: "/stores" },
+        { text: this.product.vendor.name, to: `/stores/${this.product.vendor.id}` }
+      ]);
   },
   methods: {
     displayPrice(p) {
