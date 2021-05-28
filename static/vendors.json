@@ -1,4 +1,4 @@
 [
-	{ "id": 1, "title": "Primera Tienda", "slug": "vendedor-1", "image": "http://dummyimage.com/1600x900.png/5fa2dd/ffffff" },
-	{ "id": 2, "title": "La Mejor Moda", "slug": "vendedor-2", "image": "http://dummyimage.com/1600x900.png/cc0000/ffffff" }
+	{ "id": 1, "title": "Primera Tienda", "slug": "primera-tienda", "image": "https://www.designmantic.com/logo-images/166869.png?company=Company+Name&slogan=&verify=1" },
+	{ "id": 2, "title": "La Mejor Moda", "slug": "la-mejor-moda", "image": "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/128100213/original/487a28cbe7cb306c7f8cc386ecf0e43d981f05aa/design-creative-fashion-logo-and-fashion-pattern.jpg" }
 ]

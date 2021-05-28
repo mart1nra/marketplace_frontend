@@ -1,10 +1,10 @@
 <template>
   <div>
     <v-container :class="$vuetify.breakpoint.mdAndUp ? 'py-12 my-12' : ''">
-      <v-row>
+      <v-row v-for="(vendorItem, i) in allVendors" :key="i">
         <v-col cols="12" sm="12" md="12" lg="12" xl="12">
-          <div class="d-flex align-center justify-space-between">
-            <small>V</small>
+          <div class="d-flex text-h5 font-weight-medium justify-space-between">
+            {{ vendorItem[0] }}
           </div>
 
           <v-divider></v-divider>
@@ -17,9 +17,7 @@
           >
           </v-progress-circular>
           <v-row v-if="!loading && allVendors" align="center">
-            <v-col
-              v-for="(vendor, i) in allVendors"
-              :key="i"
+            <v-col v-for="(vendor, i) in vendorItem[1]" :key="i"
               cols="12"
               sm="6"
               md="4"
@@ -53,7 +51,7 @@
                     </template>
                   </v-img>
                   <div
-                    class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
+                    class="px-0 text-subtitle-1 text-center mt-2"
                     :class="{ 'primary--text': hover }"
                     v-text="vendor.title"
                   />
@@ -69,7 +67,7 @@
 <script>
 export default {
   data: () => ({
-    allVendors: null,
+    allVendors: [],
     loading: false
   }),
   async fetch() {
@@ -83,7 +81,19 @@ export default {
       })
 
     if (response) {
-      this.allVendors = response
+      var vendors = {}
+
+      response.forEach(vendor => {
+        if (!vendors[vendor.title[0].toUpperCase()]) {
+          vendors[vendor.title[0].toUpperCase()] = [];
+        }
+        vendors[vendor.title[0].toUpperCase()].push(vendor);
+      });
+
+      this.allVendors = Object.entries(vendors);
+      this.allVendors.join();
+      this.allVendors.sort();
+      console.log(this.allVendors);
     }
   },
   methods: {

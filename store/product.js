@@ -255,7 +255,7 @@ export const mutations = {
             breadcrumb['nuxt'] = true;
             breadcrumb['activeClass'] = 'font-weight-bold';
         });
-        payload.unshift({ disabled: true, activeClass: 'font-weight-light', text: "Volver a" });
+        payload.unshift({ disabled: true, activeClass: 'font-weight-medium text--disabled', text: "Volver a" });
 
         state.breadcrumbs = payload;
     },
