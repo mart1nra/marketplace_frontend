@@ -258,6 +258,12 @@
 import { mapState } from 'vuex';
 
 export default {
+  props: {
+    filters: {
+      type: Object,
+      default: {}
+    }
+  },
   computed: {
     ...mapState({
     	products: state => state.product.products,
@@ -282,9 +288,6 @@ export default {
       sort: '',
 			priceRanges: [1500, 3000, 4500, 6000, 7500],
       priceRange: 1500,
-      filters: {
-        '[vendor_ids]': this.$route.params.id
-      },
       filterPriceApplied: false,
       filterColorApplied: false,
       filterSizeApplied: false,

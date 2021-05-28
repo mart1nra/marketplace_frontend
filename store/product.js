@@ -8,6 +8,8 @@ const client = makeClient({ host: 'http://localhost:3000' });
 const COLOR_TYPE = "1";
 const SIZE_TYPE = "2";
 const LENGTH_TYPE = "3";
+const TAXON_WOMEN = "2";
+const TAXON_MEN = "3";
 const PRODUCTS_PER_PAGE = 9;
 
 export const state = () => ({
