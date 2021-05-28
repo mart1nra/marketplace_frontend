@@ -73,7 +73,7 @@
                           pariatur autem! Eius voluptas nisi ea facilis itaque
                           reprehenderit.
                         </p>
-                        <SpecsTable />
+                        <ProductSpecs />
                       </v-card-text>
                       <v-card-text v-if="i == 3">
                         <ProductReviews />
