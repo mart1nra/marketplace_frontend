@@ -205,7 +205,7 @@
 	                v-for="(image, i) in product.images"
 	                :key="i"
 	                :src="image"
-	                :href="`/product/${product.id}`"
+	                :href="`/product/${product.id}?from=${from}`"
 	              >
 	                <div
 	                  v-if="hover"
@@ -217,7 +217,7 @@
 	                </div>
 	              </v-carousel-item>
 	            </v-carousel>
-	            <NuxtLink :to="`/product/${product.id}`">
+	            <NuxtLink :to="`/product/${product.id}?from=${from}`">
 	              <div
 	                class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
 	                :class="{ 'primary--text': hover }"
@@ -262,6 +262,10 @@ export default {
     filters: {
       type: Object,
       default: {}
+    },
+    from: {
+    	type: String,
+    	default: ''
     }
   },
   computed: {
@@ -311,8 +315,8 @@ export default {
             },
             {
               name: 'Polleras',
-            },
-          ],
+            }
+          ]
         },
         {
           name: 'Hombres',
@@ -322,20 +326,6 @@ export default {
             },
             {
               name: 'Remeras',
-            },
-            {
-              name: 'Pantalones',
-            },
-          ],
-        },
-        {
-          name: 'Infantil',
-          children: [
-            {
-              name: 'Remeras',
-            },
-            {
-              name: 'Polleras',
             },
             {
               name: 'Pantalones',

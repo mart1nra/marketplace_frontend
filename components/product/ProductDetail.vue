@@ -233,11 +233,23 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit('product/setBreadcrumbs',
-      [
-        { text: "Tiendas", to: "/stores" },
-        { text: this.product.vendor.name, to: `/stores/${this.product.vendor.id}` }
-      ]);
+    if (this.$route.query.from === 'stores') {
+      this.$store.commit('product/setBreadcrumbs',
+        [
+          { text: "Tiendas", to: "/stores" },
+          { text: this.product.vendor.name, to: `/stores/${this.product.vendor.id}` }
+        ]);
+    } else if (this.$route.query.from === 'women') {
+      this.$store.commit('product/setBreadcrumbs',
+        [
+          { text: "Mujeres", to: "/women" }
+        ]);      
+    } else if (this.$route.query.from === 'men') {
+      this.$store.commit('product/setBreadcrumbs',
+        [
+          { text: "Hombres", to: "/men" }
+        ]);      
+    }
   },
   methods: {
     displayPrice(p) {
