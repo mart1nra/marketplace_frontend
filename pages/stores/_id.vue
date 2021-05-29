@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container :class="$vuetify.breakpoint.mdAndUp ? 'py-12 my-12' : ''">
-      <Breadcrumb />
+      <Breadcrumb class="mb-n4" />
       <ProductList
         :filters="filters"
         from="stores"

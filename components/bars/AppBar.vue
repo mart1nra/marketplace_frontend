@@ -16,7 +16,7 @@
     <v-text-field
       solo
       hide-details
-      label="Search"
+      label="Buscar"
       class="elevation-0 hidden-sm-and-down"
       prepend-inner-icon="mdi-magnify"
     ></v-text-field>

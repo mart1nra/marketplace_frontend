@@ -149,7 +149,8 @@ export default {
     displayPrice(p) {
       var price = p;
       var dec_pos = price.indexOf('.');
-      return price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     async continueToConfirm() {
     	this.$nuxt.$loading.start();

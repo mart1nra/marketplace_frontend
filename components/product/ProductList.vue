@@ -3,7 +3,6 @@
 	  <v-col v-if="filterOn" cols="12" sm="12" md="4" lg="3" xl="3">
 	    <v-expansion-panels
 	      v-model="panel"
-	      class="elevation-cs"
 	      accordion
 	      multiple
 	      data-aos="fade-zoom-in"
@@ -205,7 +204,7 @@
 	                v-for="(image, i) in product.images"
 	                :key="i"
 	                :src="image"
-	                :href="`/product/${product.id}?from=${from}`"
+	                :href="`/product/${product.slug}?from=${from}`"
 	              >
 	                <div
 	                  v-if="hover"
@@ -217,7 +216,7 @@
 	                </div>
 	              </v-carousel-item>
 	            </v-carousel>
-	            <NuxtLink :to="`/product/${product.id}?from=${from}`">
+	            <NuxtLink :to="`/product/${product.slug}?from=${from}`">
 	              <div
 	                class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
 	                :class="{ 'primary--text': hover }"

@@ -93,7 +93,6 @@ export default {
       this.allVendors = Object.entries(vendors);
       this.allVendors.join();
       this.allVendors.sort();
-      console.log(this.allVendors);
     }
   },
   methods: {

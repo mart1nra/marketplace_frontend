@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <Breadcrumb />
+    <v-divider class="mt-n3 mb-6"></v-divider>
     <v-row justify="center">
       <v-col cols="12" md="12" lg="6" xl="6">
         <div v-if="images.length > 0"
@@ -97,9 +98,9 @@
             >{{ length.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
-        <v-divider class="mt-5 mb-3 py-1"></v-divider>
         <v-text-field
           v-model="quantity"
+          class="mt-8"
           outlined
           dense
           label="Cantidad"

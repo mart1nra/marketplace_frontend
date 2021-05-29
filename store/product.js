@@ -126,7 +126,7 @@ export const mutations = {
 
         data.forEach(p => {
             var product = {};
-            product.id = p.id;
+            product.slug = p.attributes.slug;
             product.title = p.attributes.name;
             product.price = p.attributes.price;
             product.images = [];
