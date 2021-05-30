@@ -3,7 +3,7 @@
     <v-container :class="$vuetify.breakpoint.mdAndUp ? 'py-12 my-12' : ''">
       <Breadcrumb class="mb-n4" />
       <ProductList
-        :filters="filters"
+        :vendor="vendorId"
         from="stores"
       />
     </v-container>
@@ -14,9 +14,7 @@
 export default {
   data() {
     return {
-      filters: {
-        '[vendor_ids]': this.$route.params.id
-      }
+      vendorId: this.$route.params.id
     }
   },
   mounted() {

@@ -28,7 +28,7 @@ export default {
   props: {
     snackbar: {
       type: Object,
-      default: {}
+      default: null
     }
   }
 }
