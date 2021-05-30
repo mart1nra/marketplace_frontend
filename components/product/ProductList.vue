@@ -8,11 +8,12 @@
 	      data-aos="fade-zoom-in"
 	    >
 	      <v-expansion-panel>
-	        <v-expansion-panel-header class="text-subtitle-2">Categorías</v-expansion-panel-header>
+	        <v-expansion-panel-header class="text-subtitle-2 my-n2">Categorías</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <v-treeview
 	            :items="items"
 	            :selected-color="'#fff'"
+	            class="text-body-2"
 	            activatable
 	            open-on-click
 	            dense
@@ -20,7 +21,7 @@
 	        </v-expansion-panel-content>
 	      </v-expansion-panel>
 	      <v-expansion-panel>
-	        <v-expansion-panel-header class="text-subtitle-2">Precio</v-expansion-panel-header>
+	        <v-expansion-panel-header class="text-subtitle-2 my-n2">Precio</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <span v-for="range in priceRanges">
 	            <v-chip
@@ -53,7 +54,7 @@
 	        </v-expansion-panel-content>
 	      </v-expansion-panel-->
 	      <v-expansion-panel>
-	        <v-expansion-panel-header class="text-subtitle-2">Color</v-expansion-panel-header>
+	        <v-expansion-panel-header class="text-subtitle-2 my-n2">Color</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <span v-for="color in productsColors">
 	            <v-hover v-slot="{ hover }">
@@ -81,7 +82,7 @@
 	        </v-expansion-panel-content>
 	      </v-expansion-panel>
 	      <v-expansion-panel>
-	        <v-expansion-panel-header class="text-subtitle-2">Talle</v-expansion-panel-header>
+	        <v-expansion-panel-header class="text-subtitle-2 my-n2">Talle</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <span v-for="size in productsSizes">
 	            <v-chip
@@ -100,7 +101,7 @@
 	        </v-expansion-panel-content>
 	      </v-expansion-panel>
 	      <v-expansion-panel>
-	        <v-expansion-panel-header class="text-subtitle-2">Largo</v-expansion-panel-header>
+	        <v-expansion-panel-header class="text-subtitle-2 my-n2">Largo</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <span v-for="length in productsLengths">
 	            <v-chip
@@ -119,17 +120,19 @@
 	        </v-expansion-panel-content>
 	      </v-expansion-panel>
 	      <v-expansion-panel>
-	        <v-expansion-panel-header class="text-subtitle-2">Tags</v-expansion-panel-header>
+	        <v-expansion-panel-header class="text-subtitle-2 my-n2">Tags</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <v-chip-group column>
 	            <v-chip
 	              v-for="tag in tags"
-	              :key="tag"
-	              active
-	              active-class="primary--text"
+	              :key="tag.name"
 	              small
+	              :close="filterTagApplied && tag === currentTagFilter"
+	              :disabled="filterTagApplied && tag !== currentTagFilter"
+	              @click="filterByTag(tag)"
+	              @click:close="filterByTag()"
 	            >
-	              {{ tag }}
+	              {{ tag.name }}
 	            </v-chip>
 	          </v-chip-group>
 	        </v-expansion-panel-content>
@@ -144,13 +147,13 @@
 	        class="hidden-md-and-up"
 	      ></v-switch>
 
-	      <small class="text--disabled font-weight-medium hidden-sm-and-down"
+	      <small class="text--disabled text-body-2"
 	        >{{ pluralize(totalCount, 'producto') }} </small
 	      >
 	      <v-select
 	        v-model="currentSort"
 	        style="max-width: 250px"
-	        class="pa-0"
+	        class="pa-0 text-body-2"
 	        :items="sortOptions"
 	        flat
 	        solo
@@ -258,9 +261,9 @@ import { mapState } from 'vuex';
 
 export default {
   props: {
-    filters: {
-      type: Object,
-      default: {}
+    taxon: {
+      type: String,
+      default: ''
     },
     from: {
     	type: String,
@@ -286,19 +289,23 @@ export default {
       sortOptions: [
         'Más relevantes',
         'Menor precio',
-        'Mayor precio'
+        'Mayor precio',
+        'Más nuevos'
       ],
       sort: '',
+	    filters: {},
 			priceRanges: [1500, 3000, 4500, 6000, 7500],
       priceRange: 1500,
       filterPriceApplied: false,
       filterColorApplied: false,
       filterSizeApplied: false,
       filterLengthApplied: false,
+      filterTagApplied: false,
       currentPriceFilter: '',
       currentColorFilter: '',
       currentSizeFilter: '',
       currentLengthFilter: '',
+      currentTagFilter: '',
       page: 1,
       currentPage: 1,
       //rating: 4.5,
@@ -332,8 +339,14 @@ export default {
           ]
         }
       ],
-      tags: ['Novedad', 'Tendencia', 'Popular']
+      tags: [
+      	{ name: 'Novedad', type: this.from === 'women' ? 'moda/novedades/mujer' : 'moda/novedades/hombre' },
+      	{ name: 'Popular', type: this.from === 'women' ? 'moda/populares/mujer' : 'moda/populares/hombre' }
+      ]
     }
+  },
+  created() {
+  	this.filters['[taxons]'] = this.taxon;
   },
   mounted() {
     window.addEventListener('resize', this.onResize, {
@@ -386,6 +399,8 @@ export default {
         sort = 'price';
       } else if (this.currentSort === 'Mayor precio') {
         sort = '-price';
+      } else if (this.currentSort === 'Más nuevos') {
+      	sort = '-created_at';
       }
       this.sort = sort;
 
@@ -486,6 +501,31 @@ export default {
       this.page = 1;
       this.currentPage = 1;
       this.filterLengthApplied = !this.filterLengthApplied;
+    },
+    async filterByTag(tag) {
+      window.scrollTo(0, 0);
+      
+      if (!this.filterTagApplied) {
+        this.currentTagFilter = tag;
+        if (tag.type === 'moda/novedades/mujer') {
+        	this.filters['[taxons]'] = '5';
+        } else if (tag.type === 'moda/novedades/hombre') {
+        	this.filters['[taxons]'] = '6';
+        }
+      } else if (!tag) {
+        if (this.from === 'women') {
+        	this.filters['[taxons]'] = '2';
+        } else if (this.from === 'men') {
+        	this.filters['[taxons]'] = '3';
+        }
+        this.currentTagFilter = '';
+      } else return;
+
+      await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
+
+      this.page = 1;
+      this.currentPage = 1;
+      this.filterTagApplied = !this.filterTagApplied;
     }
   }
 }
