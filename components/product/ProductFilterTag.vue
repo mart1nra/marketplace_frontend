@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   props: {
     filters: {
@@ -35,12 +37,25 @@ export default {
     	default: ''
     }
   },
+  computed: {
+    ...mapState({
+      NEWEST_WOMEN: state => state.constants.NEWEST_WOMEN,
+      NEWEST_MEN: state => state.constants.NEWEST_MEN,
+      NEWEST_WOMEN_ID: state => state.constants.NEWEST_WOMEN_ID,
+      NEWEST_MEN_ID: state => state.constants.NEWEST_MEN_ID,
+      NEWEST_WOMEN_MEN_ID: state => state.constants.NEWEST_WOMEN_MEN_ID,
+      POPULAR_WOMEN: state => state.constants.POPULAR_WOMEN,
+      POPULAR_MEN: state => state.constants.POPULAR_MEN
+    }),
+    tags() {
+      return [
+        { name: 'Novedad', permalink: this.from === 'women' ? this.NEWEST_WOMEN : this.NEWEST_MEN },
+        { name: 'Popular', permalink: this.from === 'women' ? this.POPULAR_WOMEN : this.POPULAR_MEN }
+      ]
+    }
+  },
   data() {
     return {
-      tags: [
-      	{ name: 'Novedad', permalink: this.from === 'women' ? 'moda/novedades/mujer' : 'moda/novedades/hombre' },
-      	{ name: 'Popular', permalink: this.from === 'women' ? 'moda/populares/mujer' : 'moda/populares/hombre' }
-      ],
       filterTagApplied: false,
       currentTagFilter: ''
     }
@@ -53,14 +68,14 @@ export default {
         this.currentTagFilter = tag;
 
         if (this.from === 'stores') {
-        	if (tag.permalink === 'moda/novedades/hombre') {
-        		this.$emit('tagClicked', '5,6');
+        	if (tag.permalink === this.NEWEST_MEN) {
+        		this.$emit('tagClicked', this.NEWEST_WOMEN_MEN_ID);
         	}
         } else {
-        	if (tag.permalink === 'moda/novedades/mujer') {
-        		this.$emit('tagClicked', '5');
-        	} else if (tag.permalink === 'moda/novedades/hombre') {
-        		this.$emit('tagClicked', '6');
+        	if (tag.permalink === this.NEWEST_WOMEN) {
+        		this.$emit('tagClicked', this.NEWEST_WOMEN_ID);
+        	} else if (tag.permalink === this.NEWEST_MEN) {
+        		this.$emit('tagClicked', this.NEWEST_MEN_ID);
         	}
       	}
       } else if (!tag) {

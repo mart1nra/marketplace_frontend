@@ -1,14 +1,10 @@
-import repository, { serializeQuery } from '~/store/repository.js';
+import repository, { serializeQuery } from '~/store/repository';
 import { baseUrl, frontendUrl } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 import * as emptyImageUrl from '~/assets/img/product-coming-soon.jpg'
+import { COLOR_TYPE, SIZE_TYPE, LENGTH_TYPE, PRODUCTS_PER_PAGE } from '~/store/constants';
 
 const client = makeClient({ host: 'http://localhost:3000' });
-
-const COLOR_TYPE = "1";
-const SIZE_TYPE = "2";
-const LENGTH_TYPE = "3";
-const PRODUCTS_PER_PAGE = 3;
 
 export const state = () => ({
     product: null,

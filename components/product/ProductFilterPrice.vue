@@ -2,7 +2,7 @@
   <v-expansion-panel>
     <v-expansion-panel-header class="text-subtitle-2 my-n2">Precio</v-expansion-panel-header>
     <v-expansion-panel-content>
-      <span v-for="range in priceRanges">
+      <span v-for="range in PRICE_RANGES">
         <v-chip
           class="ma-1 pa-1"
           color="#757575"
@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   props: {
     filters: {
@@ -33,10 +35,14 @@ export default {
     	default: ''
     }
   },
+  computed: {
+    ...mapState({
+      PRICE_RANGES: state => state.constants.PRICE_RANGES,
+      PRICE_RANGE: state => state.constants.PRICE_RANGE
+    })
+  },
   data() {
     return {
-			priceRanges: [1500, 3000, 4500, 6000, 7500],
-      priceRange: 1500,
       filterPriceApplied: false,
       currentPriceFilter: ''
     }
@@ -50,13 +56,13 @@ export default {
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     priceRangesLabel(range) {
-      if (range === this.priceRanges[0]) {
+      if (range === this.PRICE_RANGES[0]) {
         return 'Hasta ' + this.displayPrice(range);
       }
-      if (range === this.priceRanges[this.priceRanges.length - 1]) {
-        return 'Más de ' + this.displayPrice(range - this.priceRange);
+      if (range === this.PRICE_RANGES[this.PRICE_RANGES.length - 1]) {
+        return 'Más de ' + this.displayPrice(range - this.PRICE_RANGE);
       }
-      return this.displayPrice(range - this.priceRange) + ' a ' + this.displayPrice(range);
+      return this.displayPrice(range - this.PRICE_RANGE) + ' a ' + this.displayPrice(range);
     },
     async filterByPriceRange(r) {
       window.scrollTo(0, 0);
@@ -65,12 +71,12 @@ export default {
         this.currentPriceFilter = r;
         var range = '';
 
-        if (r === this.priceRanges[0]) {
+        if (r === this.PRICE_RANGES[0]) {
           range = `,${r}`;
-        } else if (r === this.priceRanges[this.priceRanges.length - 1]) {
-          range = `${r - this.priceRange},9999999999999`;
+        } else if (r === this.PRICE_RANGES[this.PRICE_RANGES.length - 1]) {
+          range = `${r - this.PRICE_RANGE},${Number.MAX_SAFE_INTEGER}`;
         } else {
-          range = `${r - this.priceRange},${r}`;
+          range = `${r - this.PRICE_RANGE},${r}`;
         }
         this.filters['[price]'] = range;
       } else if (!r) {

@@ -8,7 +8,7 @@
     ></v-switch>
 
     <small class="text--disabled text-body-2"
-      >{{ pluralize(totalCount, 'producto') }} </small
+      >{{ pluralize(totalCount, 'producto') }} ({{ filters }})</small
     >
     <v-select
       v-model="currentSort"
