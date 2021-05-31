@@ -51,9 +51,7 @@ export default {
   data() {
     return {
 			filterColorApplied: false,
-      currentColorFilter: '',
-      page: 1,
-      currentPage: 1
+      currentColorFilter: ''
     }
   },
   methods: {
@@ -66,8 +64,7 @@ export default {
 
         await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
-        this.page = 1;
-        this.currentPage = 1;
+        this.$emit('colorClicked');
         this.filterColorApplied = true;
       }
     },
@@ -78,8 +75,7 @@ export default {
 
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
-      this.page = 1;
-      this.currentPage = 1;
+      this.$emit('colorClicked');
       this.filterColorApplied = false;
       this.currentColorFilter = '';
     }

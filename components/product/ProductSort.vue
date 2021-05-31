@@ -98,8 +98,6 @@ export default {
       this.$emit('sortClicked', sort);
 
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': sort });
-      this.page = 1;
-      this.currentPage = 1;
     }
   }
 }

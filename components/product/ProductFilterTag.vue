@@ -42,9 +42,7 @@ export default {
       	{ name: 'Popular', permalink: this.from === 'women' ? 'moda/populares/mujer' : 'moda/populares/hombre' }
       ],
       filterTagApplied: false,
-      currentTagFilter: '',
-      page: 1,
-      currentPage: 1
+      currentTagFilter: ''
     }
   },
   methods: {
@@ -72,8 +70,6 @@ export default {
 
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
-      this.page = 1;
-      this.currentPage = 1;
       this.filterTagApplied = !this.filterTagApplied;
     }
   }

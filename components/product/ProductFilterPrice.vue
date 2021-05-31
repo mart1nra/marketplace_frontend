@@ -33,17 +33,12 @@ export default {
     	default: ''
     }
   },
-  computed: {
-
-  },
   data() {
     return {
 			priceRanges: [1500, 3000, 4500, 6000, 7500],
       priceRange: 1500,
       filterPriceApplied: false,
-      currentPriceFilter: '',
-      page: 1,
-      currentPage: 1
+      currentPriceFilter: ''
     }
   },
   methods: {
@@ -85,8 +80,7 @@ export default {
 
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
-      this.page = 1;
-      this.currentPage = 1;
+      this.$emit('priceClicked');
       this.filterPriceApplied = !this.filterPriceApplied;
     }
   }

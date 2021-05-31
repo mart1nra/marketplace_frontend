@@ -24,21 +24,25 @@
 	      <ProductFilterPrice
 	      	:filters="filters"
 	      	:sort="sort"
+	      	@priceClicked="resetPage"
 	      />
 
 	      <ProductFilterColor
 	      	:filters="filters"
 	      	:sort="sort"
+	      	@colorClicked="resetPage"
 	      />
 
 	      <ProductFilterSize
 	      	:filters="filters"
 	      	:sort="sort"
+	      	@sizeClicked="resetPage"
 	      />
 
 	      <ProductFilterLength
 	      	:filters="filters"
 	      	:sort="sort"
+	      	@lengthClicked="resetPage"
 	      />
 
 	      <ProductFilterTag
@@ -267,6 +271,7 @@ export default {
     },
     handleTag(tag) {
     	this.filters['[taxons]'] = tag;
+    	this.resetPage();
     },
     handleRemoveTag(tag) {
     	if (tag === 'women' || tag === 'men') {
@@ -275,10 +280,11 @@ export default {
     		this.filters['[vendor_ids]'] = this.vendor;
     		delete this.filters[Object.keys(this.filters).find(k => k === '[taxons]')];
     	}
-    	
+    	this.resetPage();
     },
     handleSort(sort) {
     	this.sort = sort;
+    	this.resetPage();
     },
     async goToPage(pageNumber) {
       if (this.currentPage !== this.page) {
@@ -287,6 +293,10 @@ export default {
         await this.$store.dispatch('product/getProductsByPage', pageNumber);
         this.currentPage = pageNumber;
       }
+    },
+    resetPage() {
+    	this.page = 1;
+    	this.currentPage = 1;
     }
   }
 }

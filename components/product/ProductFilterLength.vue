@@ -42,9 +42,7 @@ export default {
   data() {
     return {
       filterLengthApplied: false,
-      currentLengthFilter: '',
-      page: 1,
-      currentPage: 1
+      currentLengthFilter: ''
     }
   },
   methods: {
@@ -61,8 +59,7 @@ export default {
 
       await this.$store.dispatch('product/getProductsByFilters', { 'filter': this.filters, 'sort': this.sort });
 
-      this.page = 1;
-      this.currentPage = 1;
+      this.$emit('lengthClicked');
       this.filterLengthApplied = !this.filterLengthApplied;
     }
   }

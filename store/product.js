@@ -8,7 +8,7 @@ const client = makeClient({ host: 'http://localhost:3000' });
 const COLOR_TYPE = "1";
 const SIZE_TYPE = "2";
 const LENGTH_TYPE = "3";
-const PRODUCTS_PER_PAGE = 9;
+const PRODUCTS_PER_PAGE = 3;
 
 export const state = () => ({
     product: null,
