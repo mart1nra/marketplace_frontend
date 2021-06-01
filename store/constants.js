@@ -4,11 +4,15 @@ export const LENGTH_TYPE = "3";
 export const PRODUCTS_PER_PAGE = 9;
 
 export const state = () => ({
+	STORE_NAME: "Nueva Tienda",
+
 	// Filter - Price
 	PRICE_RANGES: [1500, 3000, 4500, 6000, 7500],
 	PRICE_RANGE: 	1500,
 
 	// Filter - Tag
+	WOMEN_ID: 						"2",
+	MEN_ID: 							"3" ,
 	NEWEST_WOMEN: 				"moda/novedades/mujer",
 	NEWEST_MEN: 					"moda/novedades/hombre",
 	NEWEST_WOMEN_ID:			"5",

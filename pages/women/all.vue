@@ -5,10 +5,10 @@
 
       <div class="d-flex align-center justify-space-between">
         <p class="text-h5 font-weight-light">
-          {{ vendorName }}
+          Todo para Ellas
           <br>
           <span class="text-caption font-weight-light">
-            "Descripción de la tienda".
+            Todas las variedades de todas las tiendas disponibles sólo para las mujeres.
           </span>
         </p>
         <p class="text-caption font-weight-light">
@@ -17,8 +17,8 @@
       </div>
 
       <ProductList
-        :vendor="vendorId"
-        from="stores"
+        :taxon="WOMEN_ID"
+        from="women"
       />
     </v-container>
   </div>
@@ -30,21 +30,16 @@ import { mapState } from 'vuex';
 export default {
   computed: {
     ...mapState({
+      WOMEN_ID: state => state.constants.WOMEN_ID,
       STORE_NAME: state => state.constants.STORE_NAME,
       totalCount: state => state.product.totalCount
     })
-  },
-  data() {
-    return {
-      vendorId: this.$route.params.id,
-      vendorName: this.$route.query.name
-    }
   },
   mounted() {
     this.$store.commit('product/setBreadcrumbs',
       [
         { text: this.STORE_NAME, to: '/' },
-        { text: 'Tiendas', to: '/stores' }
+        { text: 'Mujeres', to: '/women' }
       ]);
   },
   methods: {

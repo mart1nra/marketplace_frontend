@@ -7,9 +7,10 @@
       @change="emitFilterOn()"
     ></v-switch>
 
-    <small class="text--disabled text-body-2"
-      >{{ pluralize(totalCount, 'producto') }} ({{ filters }})</small
-    >
+    <div>
+      Filters
+    </div>
+
     <v-select
       v-model="currentSort"
       style="max-width: 250px"
@@ -68,10 +69,6 @@ export default {
     })
   },
   methods: {
-    pluralize(c, n) {
-      const _pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
-      return _pluralize(c, n);
-    },
     emitFilterOn() {
     	this.$emit('filterOnClicked');
     },

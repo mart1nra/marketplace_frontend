@@ -34,7 +34,7 @@
                   hover
                   tile
                   color="transparent"
-                  :to="`/stores/${vendor.id}`"
+                  :to="`/stores/${vendor.id}?name=${vendor.title}`"
                 >
                   <v-img height="125" width="100%" contain :src="vendor.image">
                     <template #placeholder>

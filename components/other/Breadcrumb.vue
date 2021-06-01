@@ -1,9 +1,6 @@
 <template>
   <v-row>
-    <v-breadcrumbs class="font-weight-bold text--secondary" :items="breadcrumbs">
-      <template v-slot:divider>
-        <v-icon>mdi-menu-right</v-icon>
-      </template>
+    <v-breadcrumbs class="text--disabled font-weight-light" :items="breadcrumbs">
     </v-breadcrumbs>
   </v-row>
 </template>

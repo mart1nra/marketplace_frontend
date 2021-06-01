@@ -174,6 +174,7 @@
                 v-bind="attrs"
                 class="secondary--text font-weight-light pt-4 pb-6"
                 v-on="on"
+                to="/women"
                 nuxt
                 exact
               >
@@ -185,7 +186,7 @@
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
                   <p class="text-break ml-6" style="max-width: 10rem;">
-                    <NuxtLink to="/women" class="secondary--text text-caption text-uppercase">Todos los productos ></NuxtLink>
+                    <NuxtLink to="/women/all" class="secondary--text text-caption text-uppercase">Todos los productos ></NuxtLink>
                     <NuxtLink to="/women/newest" class="secondary--text text-caption text-uppercase">Los recién llegados ></NuxtLink>
                     <NuxtLink to="/women/popular" class="secondary--text text-caption text-uppercase">Los más buscados ></NuxtLink>
                   </p>
@@ -227,6 +228,7 @@
                 v-bind="attrs"
                 class="secondary--text font-weight-light pt-4 pb-6"
                 v-on="on"
+                to="/men"
                 nuxt
                 exact
               >
@@ -238,7 +240,7 @@
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
                   <p class="text-break ml-6" style="max-width: 10rem;">
-                    <NuxtLink to="/men" class="secondary--text text-caption text-uppercase">Todos los productos ></NuxtLink>
+                    <NuxtLink to="/men/all" class="secondary--text text-caption text-uppercase">Todos los productos ></NuxtLink>
                     <NuxtLink to="/men/newest" class="secondary--text text-caption text-uppercase">Los recién llegados ></NuxtLink>
                     <NuxtLink to="/men/popular" class="secondary--text text-caption text-uppercase">Los más buscados ></NuxtLink>
                   </p>

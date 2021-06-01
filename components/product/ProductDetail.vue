@@ -192,7 +192,8 @@ export default {
     ...mapState({
       signedIn: state => state.auth.signedIn,
       productImagesByColor: state => state.product.productImagesByColor,
-      emptyImage: state => state.product.emptyImage
+      emptyImage: state => state.product.emptyImage,
+      STORE_NAME: state => state.constants.STORE_NAME
     }),
     variantId() {
       return this.$store.state.product.product.currentVariant;
@@ -237,17 +238,20 @@ export default {
     if (this.$route.query.from === 'stores') {
       this.$store.commit('product/setBreadcrumbs',
         [
+          { text: this.STORE_NAME, to: '/' },
           { text: "Tiendas", to: "/stores" },
           { text: this.product.vendor.name, to: `/stores/${this.product.vendor.id}` }
         ]);
     } else if (this.$route.query.from === 'women') {
       this.$store.commit('product/setBreadcrumbs',
         [
+          { text: this.STORE_NAME, to: '/' },
           { text: "Mujeres", to: "/women" }
         ]);      
     } else if (this.$route.query.from === 'men') {
       this.$store.commit('product/setBreadcrumbs',
         [
+          { text: this.STORE_NAME, to: '/' },
           { text: "Hombres", to: "/men" }
         ]);      
     }
