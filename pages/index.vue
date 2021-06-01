@@ -1,12 +1,12 @@
 <template>
   <div>
-    <v-container>
+    <v-container fluid no-gutters class="mt-n4">
       <v-row justify="center">
-        <v-col cols="12" sm="12" md="12" lg="12" xl="9">
-          <v-sheet width="100%" class="my-4">
+        <v-col cols="12" sm="12" md="12" lg="12" xl="12">
+          <v-sheet width="100%">
             <FeaturedCarousel />
           </v-sheet>
-          <v-container no-gutters>
+          <v-container>
             <v-row>
               <v-col cols="12" sm="6" md="5" lg="5" xl="4">
                 <ProductCard />

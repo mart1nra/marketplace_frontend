@@ -1,7 +1,7 @@
 <template>
   <div class="my-12">
     <h2 class="text-center display-1 font-weight-light">Deals & Outlet</h2>
-    <v-container no-gutters class="mb-12 mt-9">
+    <v-container class="mb-12 mt-9">
       <v-row align="center" justify="center">
         <v-hover v-slot="{ hover }">
           <v-col cols="12" sm="6" md="6" lg="6" xl="6">

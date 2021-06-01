@@ -2,12 +2,12 @@
   <v-window v-model="window" continuous>
     <v-window-item v-for="(url, i) in images" :key="i">
       <v-hover v-slot="{ hover }">
-        <v-card class="elevation-cs-2" height="350">
+        <v-card class="elevation-cs-2" height="640">
           <v-img :src="url" width="100%" height="100%" cover>
             <v-fade-transition>
               <div
                 v-if="hover"
-                class="fill-height w-100 gradient-dark white--text d-grid text-center align-center"
+                class="fill-height w-100 white--text d-grid text-center align-center"
                 @mouseenter="autorun = false"
                 @mouseleave="autorun = true"
               >

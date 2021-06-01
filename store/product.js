@@ -9,12 +9,7 @@ const client = makeClient({ host: 'http://localhost:3000' });
 export const state = () => ({
     product: null,
     products: null,
-    //searchResults: null,
     cartProducts: null,
-    //wishlistItems: null,
-    //compareItems: null,
-    //brands: null,
-    //categories: null,
     totalCount: 0,
     totalPages: 0,
     selfPageUrl: '',
@@ -26,6 +21,11 @@ export const state = () => ({
     emptyImage: emptyImageUrl,
     breadcrumbs: [],
     loading: false
+    //searchResults: null,
+    //wishlistItems: null,
+    //compareItems: null,
+    //brands: null,
+    //categories: null
 });
 
 export const mutations = {

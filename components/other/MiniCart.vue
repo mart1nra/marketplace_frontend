@@ -19,7 +19,7 @@
             v-bind="attrs"
             v-on="on"
           >
-            <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
+            <v-icon size="25" color="primary">mdi-shopping</v-icon>
           </v-btn>
         </v-badge>
       </template>
@@ -91,7 +91,7 @@
       exact
       nuxt
     >
-      <v-icon size="25" color="primary">mdi-cart-outline</v-icon>
+      <v-icon size="25" color="primary">mdi-shopping</v-icon>
     </v-btn>
 
     <Notification :snackbar="snackbar" />

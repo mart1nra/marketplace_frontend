@@ -16,9 +16,9 @@
                   class="mb-5"
                   contain
                 />
-                <span class="title mx-4 white--text"
-                  >ENDTECH
-                  <span class="font-weight-light">Ecommerce</span></span
+                <span class="title white--text"
+                  >Nueva
+                  <span class="font-weight-light">Tienda</span></span
                 >
               </div>
               <h3
