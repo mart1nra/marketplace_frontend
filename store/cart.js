@@ -1,6 +1,7 @@
+import { baseUrl } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 
-const client = makeClient({ host: 'http://localhost:3000' });
+const client = makeClient({ host: baseUrl });
 
 const calculateAmount = obj =>
     Object.values(obj)

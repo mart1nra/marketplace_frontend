@@ -26,7 +26,7 @@
           <NuxtLink to="/" class="align-center">
             <!--v-img alt="Vuetify Logo" src="/v.png" max-width="60" contain /-->
             <span class="text-h4 font-weight-light"
-              >Nueva <span>Tienda</span></span
+              >{{ STORE_NAME }}</span
             >
           </NuxtLink>
         </div>
@@ -185,10 +185,10 @@
             <v-list class="primary--text" color="grey lighten-2">
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
-                  <p class="text-break ml-6" style="max-width: 10rem;">
-                    <NuxtLink to="/women/all" class="secondary--text text-caption text-uppercase">Todos los productos ></NuxtLink>
-                    <NuxtLink to="/women/newest" class="secondary--text text-caption text-uppercase">Los recién llegados ></NuxtLink>
-                    <NuxtLink to="/women/popular" class="secondary--text text-caption text-uppercase">Los más buscados ></NuxtLink>
+                  <p class="text-break ml-6" style="max-width: 11rem;">
+                    <NuxtLink to="/women/all" class="secondary--text text-caption text-uppercase">Todos los productos<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
+                    <NuxtLink to="/women/newest" class="secondary--text text-caption text-uppercase">Los recién llegados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
+                    <NuxtLink to="/women/popular" class="secondary--text text-caption text-uppercase">Los más buscados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
                   </p>
                 </v-col>
                   <v-divider vertical></v-divider>
@@ -239,10 +239,10 @@
             <v-list class="primary--text" color="grey lighten-2">
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
-                  <p class="text-break ml-6" style="max-width: 10rem;">
-                    <NuxtLink to="/men/all" class="secondary--text text-caption text-uppercase">Todos los productos ></NuxtLink>
-                    <NuxtLink to="/men/newest" class="secondary--text text-caption text-uppercase">Los recién llegados ></NuxtLink>
-                    <NuxtLink to="/men/popular" class="secondary--text text-caption text-uppercase">Los más buscados ></NuxtLink>
+                  <p class="text-break ml-6" style="max-width: 11rem;">
+                    <NuxtLink to="/men/all" class="secondary--text text-caption text-uppercase">Todos los productos<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
+                    <NuxtLink to="/men/newest" class="secondary--text text-caption text-uppercase">Los recién llegados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
+                    <NuxtLink to="/men/popular" class="secondary--text text-caption text-uppercase">Los más buscados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
                   </p>
                 </v-col>
                   <v-divider vertical></v-divider>
@@ -291,15 +291,15 @@
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
                   <p class="text-break ml-6" style="max-width: 10rem;">
-                    <NuxtLink to="/stores" class="secondary--text text-caption text-uppercase">Todas las tiendas ></NuxtLink>
+                    <NuxtLink to="/stores" class="secondary--text text-caption text-uppercase">Todas las tiendas<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
                   </p>
                 </v-col>
                   <v-divider vertical></v-divider>
                 <v-col cols="12" md="5" sm="5" xs="5">
                   <p class="text-break" style="max-width: 6rem;">
                     <span class="secondary--text text-caption text-uppercase">Tiendas destacadas</span>
-                    <NuxtLink to="/stores/1" class="secondary--text text-caption font-weight-light">Primera Tienda</NuxtLink>
-                    <NuxtLink to="/stores/2" class="secondary--text text-caption font-weight-light">La Mejor Moda</NuxtLink>
+                    <NuxtLink to="/stores/primera-tienda" class="secondary--text text-caption font-weight-light">Primera Tienda</NuxtLink>
+                    <NuxtLink to="/stores/la-mejor-moda" class="secondary--text text-caption font-weight-light">La Mejor Moda</NuxtLink>
                   </p>
                 </v-col>
               </v-row>
@@ -348,6 +348,7 @@ import { mapState } from 'vuex';
 export default {
   computed: {
     ...mapState({
+      STORE_NAME: state => state.constants.STORE_NAME,
       signedIn: state => state.auth.signedIn,
       user: state => state.account.accountInfo.data,
     })

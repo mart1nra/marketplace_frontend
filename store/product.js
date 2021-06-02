@@ -4,7 +4,7 @@ import { makeClient } from '@spree/storefront-api-v2-sdk'
 import * as emptyImageUrl from '~/assets/img/product-coming-soon.jpg'
 import { COLOR_TYPE, SIZE_TYPE, LENGTH_TYPE, PRODUCTS_PER_PAGE } from '~/store/constants';
 
-const client = makeClient({ host: 'http://localhost:3000' });
+const client = makeClient({ host: baseUrl });
 
 export const state = () => ({
     product: null,

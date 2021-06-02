@@ -5,10 +5,10 @@
 
       <div class="d-flex align-center justify-space-between">
         <p class="text-h5 font-weight-light">
-          {{ vendorName }}
+          {{ vendor.name }}
           <br>
           <span class="text-caption font-weight-light">
-            "Descripción de la tienda".
+            {{ vendor.aboutUs }}
           </span>
         </p>
         <p class="text-caption font-weight-light">
@@ -17,7 +17,7 @@
       </div>
 
       <ProductList
-        :vendor="vendorId"
+        :vendor="vendor.id"
         from="stores"
       />
     </v-container>
@@ -31,13 +31,12 @@ export default {
   computed: {
     ...mapState({
       STORE_NAME: state => state.constants.STORE_NAME,
+      vendor: state => state.vendor.vendor,
       totalCount: state => state.product.totalCount
     })
   },
   data() {
     return {
-      vendorId: this.$route.params.id,
-      vendorName: this.$route.query.name
     }
   },
   mounted() {
@@ -46,6 +45,9 @@ export default {
         { text: this.STORE_NAME, to: '/' },
         { text: 'Tiendas', to: '/stores' }
       ]);
+  },
+  async fetch() {
+    await this.$store.dispatch('vendor/getVendorInfo', this.$route.params.id);
   },
   methods: {
     pluralize(c, n) {

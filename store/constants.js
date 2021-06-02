@@ -1,10 +1,10 @@
 export const COLOR_TYPE = "1";
 export const SIZE_TYPE = "2";
 export const LENGTH_TYPE = "3";
-export const PRODUCTS_PER_PAGE = 9;
+export const PRODUCTS_PER_PAGE = 0;
 
 export const state = () => ({
-	STORE_NAME: "Nueva Tienda",
+	STORE_NAME: "Martin's Look",
 
 	// Filter - Price
 	PRICE_RANGES: [1500, 3000, 4500, 6000, 7500],

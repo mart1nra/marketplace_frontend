@@ -1,6 +1,6 @@
 <template>
 	<v-row>
-	  <v-col v-if="filterOn" cols="12" sm="12" md="4" lg="3" xl="3">
+	  <!--v-col v-if="filterOn" cols="12" sm="12" md="4" lg="3" xl="3">
 	    <v-expansion-panels
 	      v-model="panel"
 	      accordion
@@ -53,7 +53,7 @@
 	      	@tagRemoveClicked="handleRemoveTag"
 	      />
 
-	      <!--v-expansion-panel>
+	      <v-expansion-panel>
 	        <v-expansion-panel-header>Rating</v-expansion-panel-header>
 	        <v-expansion-panel-content>
 	          <v-rating
@@ -65,10 +65,12 @@
 	          >
 	          </v-rating>
 	        </v-expansion-panel-content>
-	      </v-expansion-panel-->
+	      </v-expansion-panel>
 	    </v-expansion-panels>
-	  </v-col>
-	  <v-col cols="12" sm="12" md="8" lg="9" xl="9">
+	  </v-col-->
+	  <v-col cols="12" sm="12" md="12" lg="12" xl="12">
+			
+			<v-divider></v-divider>
 
 	    <ProductSort
 	    	:filters="filters"
@@ -86,32 +88,32 @@
 	      color="primary"
 	    >
 	    </v-progress-circular>
-	    <v-row v-if="!loading && products" align="center">
+	    <v-row v-if="!loading && products" align="center" class="px-3">
 	      <v-col
 	        v-for="(product, i) in products"
 	        :key="i"
 	        cols="12"
 	        sm="6"
 	        md="6"
-	        lg="4"
+	        lg="3"
 	        xl="3"
+	        class="pa-0 mt-6"
 	      >
 	        <v-hover v-slot="{ hover }">
 	          <v-card
-	            :class="{ 'elevation-cs': hover }"
-	            class="pa-4 mx-auto"
 	            width="300"
 	            height="auto"
 	            flat
 	            hover
 	            tile
+	            outlined
 	            color="transparent"
 	          >
 	            <v-carousel
 	              hide-delimiters
 	              show-arrows-on-hover
-	              :show-arrows="product.images.length > 1"
-	              height="320"
+	              :show-arrows="false"
+	              height="400"
 	            >
 	              <v-carousel-item
 	                v-for="(image, i) in product.images"

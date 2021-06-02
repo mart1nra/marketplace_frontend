@@ -34,7 +34,7 @@
                   hover
                   tile
                   color="transparent"
-                  :to="`/stores/${vendor.id}?name=${vendor.title}`"
+                  :to="`/stores/${vendor.slug}`"
                 >
                   <v-img height="125" width="100%" contain :src="vendor.image">
                     <template #placeholder>
@@ -94,8 +94,6 @@ export default {
       this.allVendors.join();
       this.allVendors.sort();
     }
-  },
-  methods: {
   }
 }
 </script>
