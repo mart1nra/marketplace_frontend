@@ -120,10 +120,11 @@ export const mutations = {
 
         data.forEach(p => {
             var product = {};
+            product.id = p.id;
             product.slug = p.attributes.slug;
             product.title = p.attributes.name;
             product.price = p.attributes.price;
-            product.images = [];
+            product.colors = [];
             var imagesByColor = {};
 
             if (p.relationships.images.data.length > 0) {
@@ -132,52 +133,54 @@ export const mutations = {
 
                     if (variantData.relationships.images.data.length > 0) {
                         variantData.relationships.images.data.forEach(image => {
-                            var img = included.find(i => i.type === 'image' && i.id === image.id);
-                            var imageUrl = baseUrl + img.attributes.styles[4].url;
-                            // Put first the image of color filter if applied
-                            var op = null;
+                            var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
                             variantData.relationships.option_values.data.forEach(option => {
-                                op = included.find(o => o.type === 'option_value' && o.id === option.id);
-                                if (op.relationships.option_type.data.id === COLOR_TYPE) {
-                                    if (op.attributes.name === state.currentFilters['[options][color]']) {
-                                        product.images.unshift(imageUrl);
-                                    } else {
-                                        product.images.push(imageUrl);
+                                var item_option = included.find(o => o.type === 'option_value' && o.id === option.id);
+                                if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
+                                    var color = {};
+                                    color = item_option.attributes;
+                                    color.id = item_option.id;
+
+                                    if (!imagesByColor[item_option.id]) {
+                                        imagesByColor[item_option.id] = imageUrl;
                                     }
-                                    if (!imagesByColor[op.id]) {
-                                        imagesByColor[op.id] = [];
-                                    }
-                                    imagesByColor[op.id].push(imageUrl);
+                                    if (!product.colors.includes(color)) product.colors.push(color);
                                 }
                             });
                         });
                     } else {
-                        // Put first the placeholder image of color filter if applied
-                        var op = null;
                         variantData.relationships.option_values.data.forEach(option => {
-                            op = included.find(o => o.type === 'option_value' && o.id === option.id);
-                            if (op.relationships.option_type.data.id === COLOR_TYPE) {
-                                if (op.attributes.name === state.currentFilters['[options][color]']) {
-                                    if (!imagesByColor[op.id] && product.images.length > 0) {
-                                        product.images.unshift(state.emptyImage);
-                                    }   
-                                }
+                            var item_option = included.find(o => o.type === 'option_value' && o.id === option.id);
+                            if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
+                                var color = {};
+                                color = item_option.attributes;
+                                color.id = item_option.id;
+
+                                if (!product.colors.includes(color)) product.colors.push(color);
                             }
                         });
                     }
                 });
-            } else {
-                product.images.push(state.emptyImage);
             }
 
             if (!imagesByColor.length) {
                 if (p.relationships.images.data.length > 0) {
                     p.relationships.images.data.forEach(image => {
                         var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
-                        product.images.push(imageUrl);
+                        var variant = included.find(v => v.type === 'variant' && v.relationships.product.data.id === product.id)
+                        variant.relationships.option_values.data.forEach(option => {
+                            var item_option = included.find(o => o.type === 'option_value' && o.id === option.id);
+                            if (item_option.relationships.option_type.data.id === COLOR_TYPE) {
+                                if (!imagesByColor[item_option.id]) {
+                                    imagesByColor[item_option.id] = imageUrl;
+                                }
+                            }
+                        });
                     });
                 }                
             }
+            product.imagesByColor = imagesByColor;
+            product.selectedColor = product.colors[0];
 
             products.push(product);
         });
@@ -200,6 +203,9 @@ export const mutations = {
     },
     setCartProducts(state, payload) {
         state.cartProducts = payload;
+    },
+    setSelectedColor(state, payload) {
+        state.products.find(p => p.id === payload.id).selectedColor = payload.color;
     },
     /*setWishlistItems(state, payload) {
         var products = null;

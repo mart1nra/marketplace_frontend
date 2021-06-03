@@ -1,9 +1,9 @@
 <template>
   <div>
-    <v-icon v-for="i in 5" :key="i" color="orange" :size="size" class="mr-1"
+    <v-icon v-for="i in 5" :key="i" color="black" :size="size"
       >mdi-star</v-icon
     >
-    <span v-if="details" class="caption">(5)</span>
+    <span v-if="details" class="text-caption font-weight-light">(5)</span>
   </div>
 </template>
 
@@ -11,7 +11,7 @@
 export default {
   props: {
     size: {
-      default: 15,
+      default: 14,
       required: false,
     },
     details: {

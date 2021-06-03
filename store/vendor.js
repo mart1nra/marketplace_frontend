@@ -21,7 +21,6 @@ export const actions = {
     const response = await repository.get(`${apiEndpoint}/vendors/${payload}`)
       .then(response => {
         commit('setVendor', response.data.data);
-        console.log('hola');
         return response.data.data;
       })
       .catch(error => ({ error: JSON.stringify(error) }));

@@ -88,18 +88,39 @@
 	      color="primary"
 	    >
 	    </v-progress-circular>
-	    <v-row v-if="!loading && products" align="center" class="px-3">
+	    <v-row v-if="!loading && products" align="start" class="px-3">
 	      <v-col
 	        v-for="(product, i) in products"
 	        :key="i"
 	        cols="12"
 	        sm="6"
-	        md="6"
+	        md="4"
 	        lg="3"
 	        xl="3"
 	        class="pa-0 mt-6"
 	      >
-	        <v-hover v-slot="{ hover }">
+          <v-card
+            width="300"
+            height="auto"
+            flat
+            tile
+            outlined
+            color="transparent"
+            :class="$vuetify.breakpoint.smOnly ? 'mx-auto' : ''"
+          >
+            <v-carousel
+              hide-delimiters
+              :show-arrows="false"
+              height="400"
+            >
+              <v-carousel-item
+                :src="productImageUrl(product)"
+                :href="`/product/${product.slug}?from=${from}`"
+              >
+              </v-carousel-item>
+            </v-carousel>
+          </v-card>
+	        <!--v-hover v-slot="{ hover }">
 	          <v-card
 	            width="300"
 	            height="auto"
@@ -131,23 +152,71 @@
 	                </div>
 	              </v-carousel-item>
 	            </v-carousel>
-	            <NuxtLink :to="`/product/${product.slug}?from=${from}`">
-	              <div
-	                class="px-0 text-body-1 font-weight-medium custom-title-text mt-2"
-	                :class="{ 'primary--text': hover }"
-	              ><span class="text-subtitle-1 text-capitalize">{{ product.title }}</span></div>
-	              <div class="d-flex align-center justify-space-between">
-	                <div class="rating d-flex">
-	                  <Stars />
-	                </div>
-	                <span
-	                  class="text-subtitle-1 font-weight-medium fs-13"
-	                  v-html="displayPrice(product.price)"
-	                ></span>
-	              </div>
-	            </NuxtLink>
 	          </v-card>
-	        </v-hover>
+	        </v-hover-->
+	        <div v-if="product.colors.length > 1" class="mx-2 mt-2">
+			      <span v-for="(color, i) in product.colors" class="mx-2">
+			        <v-hover v-slot="{ hover }">
+			          <v-btn v-if="color === product.selectedColor"
+			            class="ma-n1"
+			            max-width="23"
+			            max-height="23"
+			            elevation="0"
+			            fab
+			            outlined
+			          >
+				          <v-btn
+				            class="ma-n1"
+				            max-width="17"
+				            max-height="17"
+				            elevation="0"
+				            fab
+				            :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+				            :outlined="color.presentation === '#FFFFFF'"
+				            @click="selectColor(product, color)"
+				          ></v-btn>
+			          </v-btn>
+			          <v-btn v-else-if="hover"
+			            class="ma-n1"
+			            max-width="23"
+			            max-height="23"
+			            elevation="0"
+			            fab
+			            outlined
+			          >
+				          <v-btn
+				            class="ma-n1"
+				            max-width="17"
+				            max-height="17"
+				            elevation="0"
+				            fab
+				            :color="color.presentation"
+				            @click="selectColor(product, color)"
+				          ></v-btn>
+			          </v-btn>
+			          <v-btn v-else
+			            max-width="17"
+			            max-height="17"
+			            elevation="0"
+			            fab
+			            :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+			            :outlined="color.presentation === '#FFFFFF'"
+			            @click="selectColor(product, color)"
+			          >
+			          </v-btn>
+			        </v-hover>
+			      </span>
+	        </div>
+          <NuxtLink :to="`/product/${product.slug}?from=${from}`">
+          	<div class="mx-3">
+        			<div class="product-title text-caption font-weight-light text-capitalize mt-1">{{ product.title }}</div>
+              <Stars class="mt-n1"/>
+              <div
+                class="text-caption font-weight-bold mt-1"
+                v-html="displayPrice(product.price)"
+              ></div>
+          	</div>
+          </NuxtLink>
 	      </v-col>
 	    </v-row>
 	    <v-row class="row text-center"> </v-row>
@@ -189,6 +258,7 @@ export default {
   computed: {
     ...mapState({
     	products: state => state.product.products,
+    	emptyImage: state => state.product.emptyImage,
     	totalPages: state => state.product.totalPages,
       loading: state => state.product.loading
     })
@@ -255,8 +325,14 @@ export default {
       var price = p.toString();
       var dec_pos = price.indexOf('.');
       if (dec_pos === -1) dec_pos = price.length;
-      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' || dec_pos === price.length ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
+      p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' || dec_pos === price.length ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + ',' + price.substring(dec_pos + 1);
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    productImageUrl(product) {
+    	if (product.selectedColor && product.imagesByColor[product.selectedColor.id]) {
+    		return product.imagesByColor[product.selectedColor.id];
+    	}
+    	return this.emptyImage;
     },
     onResize() {
       var x = window.innerWidth < 960
@@ -267,6 +343,9 @@ export default {
         this.filterOn = true;
         this.panel = [0, 1, 2, 3, 4, 5];
       }
+    },
+    selectColor(product, color) {
+    	this.$store.commit('product/setSelectedColor', { id: product.id, color: color });
     },
     addToFavorite() {
       console.log('Add to favorite')
@@ -303,3 +382,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+	.product-title {
+		line-height: 1rem;
+	}
+</style>

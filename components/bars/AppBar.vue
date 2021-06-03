@@ -34,9 +34,7 @@
       <v-col cols="12" md="2" sm="6" xs="6">
         <div class="toolbar-icons d-flex align-center">
 
-          <MiniCart />
-
-          <v-badge
+          <!--v-badge
             v-if="favItems > 0"
             :content="favItems"
             overlap
@@ -51,10 +49,7 @@
           </v-badge>
           <v-icon v-else size="20" color="red" class="ml-2"
             >mdi-heart-outline</v-icon
-          >
-          <v-btn icon class="hidden-md-and-up ml-2">
-            <v-icon size="20">mdi-magnify</v-icon>
-          </v-btn>
+          -->
 
           <!--v-btn
             icon
@@ -63,6 +58,10 @@
           >
             <v-icon size="20">mdi-theme-light-dark</v-icon>
           </v-btn-->
+
+          <v-btn icon class="hidden-md-and-up ml-2">
+            <v-icon size="20">mdi-magnify</v-icon>
+          </v-btn>
 
           <v-btn
             v-if="!signedIn"
@@ -154,6 +153,9 @@
               </v-list>
             </v-card>
           </v-menu>
+
+          <MiniCart />
+
         </div>
       </v-col>
     </v-row>
