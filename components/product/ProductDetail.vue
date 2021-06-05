@@ -318,6 +318,8 @@ export default {
       this.selectedImage = 0;
       this.selectedSize = null;
       this.selectedLength = null;
+      this.sizeChanged = false;
+      this.lengthChanged = false;
     },
     selectSize() {
       this.sizeChanged = !this.sizeChanged;
@@ -359,13 +361,21 @@ export default {
     },
     optionsValidated() {
       this.sizeChanged = true;
-      
+
       if (this.selectedSize || this.selectedSize == 0) {
         this.lengthChanged = true;
       }
 
-      if (this.product.sizes.length > 0 && this.selectedSize == null) {
-        return false
+      if (this.product.sizes.length > 0) {
+        var variant = this.product.variants.find(variant =>
+          variant.options.color.id === this.product.colors[this.selectedColor].id && variant.options.size);
+
+        if (variant && this.selectedSize == null) {
+
+          return false;
+        } else {
+          this.sizeChanged = false;
+        }
       }
       if (this.product.lengths.length > 0) {
         var variant = this.product.variants.find(variant =>
@@ -373,11 +383,14 @@ export default {
           ((variant.options.size && (this.selectedSize || this.selectedSize === 0)) ? variant.options.size.id === this.product.sizes[this.selectedSize].id : true) && variant.options.length);
 
         if (variant && this.selectedLength == null) {
+          this.lengthChanged = true;
+
           return false;
         } else {
           this.lengthChanged = false;
         }
       }
+
       return true;
     },
     notification(visible, color, icon, title, text) {
