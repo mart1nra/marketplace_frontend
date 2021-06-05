@@ -1,8 +1,10 @@
 <template>
-  <v-container>
-    <v-row align="center" justify="center">
-      <v-col cols="12" md="10" lg="10" xl="10">
-        <v-container class="py-12">
+  <div>
+    <v-container :class="$vuetify.breakpoint.mdAndUp ? 'py-1' : ''">
+      <Breadcrumb />
+
+      <v-row align="center" justify="center" class="mt-n2">
+        <v-col cols="12" md="12" lg="12" xl="12">
 
           <v-progress-circular
             v-if="loading"
@@ -16,7 +18,10 @@
               v-if="!loading && product !== null"
               :product="product"
           />
-          <v-row align="center" justify="center" class="my-12">
+
+          <v-divider></v-divider>
+
+          <!--v-row align="center" justify="center" class="my-12">
             <v-col cols="12" class="elevation-cs-2 no-gutters">
               <v-card flat>
                 <v-tabs v-model="tabs" grow show-arrows>
@@ -83,7 +88,7 @@
                 </v-tabs-items>
               </v-card>
             </v-col>
-          </v-row>
+          </v-row-->
           <v-row align="center" justify="center" class="my-12">
             <v-col cols="12">
               <div>
@@ -94,10 +99,10 @@
               <NewArrivals :title="false" />
             </v-col>
           </v-row>
-        </v-container>
-      </v-col>
-    </v-row>
-  </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>

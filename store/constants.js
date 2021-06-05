@@ -4,7 +4,7 @@ export const LENGTH_TYPE = "3";
 export const PRODUCTS_PER_PAGE = 0;
 
 export const state = () => ({
-	STORE_NAME: "Martin's Look",
+	STORE_NAME: "eStylo",
 
 	// Filter - Price
 	PRICE_RANGES: [1500, 3000, 4500, 6000, 7500],

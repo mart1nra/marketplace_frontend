@@ -74,7 +74,7 @@ export const mutations = {
             }
             if (item_variant.relationships.images.data.length > 0) {
                 item_variant.relationships.images.data.forEach(image => {
-                    var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
+                    var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[11].url;
                     variant.images.push(imageUrl);
                     variantsImages.push(imageUrl);
                     if (!state.productImagesByColor[variant.options.color.id]) {
@@ -90,7 +90,7 @@ export const mutations = {
         if (!variantsImages.length) {
             if (data.relationships.images.data.length > 0) {
                 data.relationships.images.data.forEach(image => {
-                    var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[4].url;
+                    var imageUrl = baseUrl + included.find(i => i.type === 'image' && i.id === image.id).attributes.styles[11].url;
                     product.colors.forEach(color => {
                         if (!state.productImagesByColor[color.id]) {
                             state.productImagesByColor[color.id] = [];

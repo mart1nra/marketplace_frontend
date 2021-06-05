@@ -68,7 +68,7 @@
 	      </v-expansion-panel>
 	    </v-expansion-panels>
 	  </v-col-->
-	  <v-col cols="12" sm="12" md="12" lg="12" xl="12">
+	  <v-col cols="12" sm="12" md="12" lg="12" xl="12" class="mt-n1">
 			
 			<v-divider></v-divider>
 

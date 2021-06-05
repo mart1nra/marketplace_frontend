@@ -1,181 +1,228 @@
 <template>
-  <v-container>
-    <Breadcrumb />
-    <v-divider class="mt-n3 mb-6"></v-divider>
-    <v-row justify="center">
-      <v-col cols="12" md="12" lg="6" xl="6">
-        <div v-if="images.length > 0"
-          class="d-flex flex-column-reverse flex-lg-column-reverse flex-md-row flex-xl-row"
-        >
-          <div
-            class="d-flex flex-lg-row flex-md-column flex-xl-column justify-center"
+  <v-row justify="center">
+    <v-col cols="12" md="12" lg="8" xl="8">
+      <div v-if="images.length > 0">
+        <v-row class="mr-0">
+          <v-col
+            v-for="(image, i) in images" :key="i"
+            class="d-flex child-flex no-gutters"
+            cols="6"
           >
-            <div v-for="(image, i) in images" :key="i" class="mt-3">
-              <v-img
-                :src="image"
-                height="70"
-                width="70"
-                contain
-                class="rounded mx-auto cursor-pointer"
-                @mouseenter="selectedImage = i"
-              ></v-img>
-            </div>
-          </div>
-
-          <v-img
-            max-height="430px"
-            max-width="500px"
-            :src="images[selectedImage]"
-            class="rounded mx-4"
-            :class="$vuetify.breakpoint.smOnly ? 'mx-auto' : ''"
-            contain
-          />
+            <v-img
+              :src="image"
+              :aspect-ratio="23/32"
+              class="mt-2 mb-4 ml-3 mr-n1"
+            >
+            </v-img>
+          </v-col>
+        </v-row>
+      </div>
+    </v-col>
+    <v-col cols="12" md="12" lg="4" xl="4" class="mt-1">
+      <div class="sticky-top">
+        <div class="text-body-2 font-weight-light text-uppercase">{{ product.vendor.name }}</div>
+        <div class="text-h5 font-weight-light text-capitalize">{{ product.title }}</div>
+        <Stars />
+        <div class="text-body-1 mt-4" v-html="displayPrice(product.price)"></div>
+        <div v-if="product.colors.length > 0" class="text--disabled text-caption mt-3 mb-1">Color 
+          <span class="text--primary text-caption font-weight-light">{{ product.colors[selectedColor].name }}</span>
         </div>
-      </v-col>
-      <v-col cols="12" md="12" lg="6" xl="6">
-        <h2 class="text-h5 text-capitalize">{{ product.title }}</h2>
-        <Stars :size="20" />
-        <h2 class="text-h5 font-weight-light" v-html="displayPrice(product.price)"></h2>
-        <h5 v-if="product.colors.length > 0" class="text--secondary mt-3 mb-1">Color: 
-          <span class="text--primary font-weight-light">{{ product.colors[selectedColor].name }}</span>
-        </h5>
         <v-btn-toggle
           v-model="selectedColor"
           mandatory
+          class="ml-n1"
         >
+
+              <!--span v-for="(color, i) in product.colors" class="mx-2">
+                <v-hover v-slot="{ hover }">
+                  <v-btn v-if="color === product.selectedColor"
+                    class="ma-n1"
+                    max-width="23"
+                    max-height="23"
+                    elevation="0"
+                    fab
+                    outlined
+                  >
+                    <v-btn
+                      class="ma-n1"
+                      max-width="17"
+                      max-height="17"
+                      elevation="0"
+                      fab
+                      :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+                      :outlined="color.presentation === '#FFFFFF'"
+                      @click="selectColor(product, color)"
+                    ></v-btn>
+                  </v-btn>
+                  <v-btn v-if="hover"
+                    class="ma-n1"
+                    min-width="33"
+                    min-height="33"
+                    small
+                    tile
+                    outlined
+                  >
+                    <v-btn
+                      class="ma-n1"
+                      min-width="30"
+                      min-height="30"
+                      depressed
+                      small
+                      tile
+                      :color="color.presentation"
+                      @click="selectColor(color)"
+                    ></v-btn>
+                  </v-btn>
+                  <v-btn v-else
+                    min-width="30"
+                    min-height="30"
+                    depressed
+                    small
+                    tile
+                    :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
+                    :outlined="color.presentation === '#FFFFFF'"
+                    @click="selectColor(color)"
+                  >
+                  </v-btn>
+                </v-hover>
+              </span-->
+
           <span v-for="color in product.colors">
             <v-btn v-if="color.presentation === '#FFFFFF'"
               class="mx-1"
-              fab
               outlined
-              x-small
+              small
+              tile
+              min-width="33"
+              min-height="33"
               :color="color.presentation"
               @click="selectColor(color)"
             >
             </v-btn>
             <v-btn v-else
               class="mx-1"
-              fab
               dark
               depressed
-              x-small
+              small
+              tile
+              min-width="33"
+              min-height="33"
               :color="color.presentation"
               @click="selectColor(color)"
             >
             </v-btn>
           </span>
         </v-btn-toggle>
-        <h5 v-if="product.sizes.length > 0" class="mt-3 mb-1">Talle: 
-          <span class="font-weight-light">{{ selectedSize || selectedSize === 0 ? product.sizes[selectedSize].name : '' }}</span>
+        <h5 v-if="product.sizes.length > 0" class="text--disabled text-caption mt-4 mb-1">
+          <span v-if="!sizeChanged || selectedSize || selectedSize === 0">Talle</span><span v-else class="color-gold"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Por favor elegí un Talle</span>
+          <span class="text--primary text-caption font-weight-light">{{ selectedSize || selectedSize === 0 ? product.sizes[selectedSize].name : '' }}</span>
         </h5>
         <v-btn-toggle
           v-model="selectedSize"
+          class="ml-n1"
         >
           <span v-for="size in product.sizes">
             <v-btn
-              class="mx-1"
-              text
+              class="mx-1 text-caption"
               small
               outlined
+              tile
+              min-width="33"
+              min-height="33"
+              max-width="33"
+              max-height="33"
               :disabled="checkSize(size) !== product.colors[selectedColor].id"
               @click="selectSize()"
             >{{ size.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
-        <h5 v-if="product.lengths.length > 0" class="mt-3 mb-1">Largo: 
-          <span class="font-weight-light">{{ selectedLength || selectedLength === 0 ? product.lengths[selectedLength].name : '' }}</span>
+        <h5 v-if="product.lengths.length > 0" class="text--disabled text-caption mt-4 mb-1">
+          <span v-if="!lengthChanged || selectedLength || selectedLength === 0">Largo</span><span v-else class="color-gold"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Por favor elegí un Largo</span>
+          <span class="text--primary text-caption font-weight-light">{{ selectedLength || selectedLength === 0 ? product.lengths[selectedLength].name : '' }}</span>
         </h5>
         <v-btn-toggle
           v-model="selectedLength"
+          class="ml-n1"
         >
           <span v-for="length in product.lengths">
             <v-btn
-              class="mx-1"
-              text
+              class="mx-1 text-caption"
               small
               outlined
+              tile
+              min-width="33"
+              min-height="33"
+              max-width="33"
+              max-height="33"
               :disabled="checkLengthDisabled(length)"
             >{{ length.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
         <v-text-field
           v-model="quantity"
-          class="mt-8"
-          outlined
+          class="text-caption align-center text-center font-weight-light pl-0 mt-8"
+          solo
           dense
-          label="Cantidad"
-          :style="$vuetify.breakpoint.smAndUp ? 'max-width: 150px' : ''"
+          flat
+          hide-details
+          color="grey darken-2"
+          :style="$vuetify.breakpoint.smAndUp ? 'max-width: 120px' : ''"
         >
           <template #prepend>
-            <v-icon
-              color="primary"
-              class="cursor-pointer"
+            <v-btn
+              class="text-h4 font-weight-thin mr-1"
+              small
+              :outlined="quantity !== 1"
+              tile
+              min-width="33"
+              min-height="33"
+              max-width="33"
+              max-height="33"
+              color="grey"
               :disabled="quantity === 1"
               @click="quantity--"
-              >mdi-minus</v-icon
-            >
+            >-</v-btn>
           </template>
 
           <template #append-outer>
-            <v-icon
-              color="primary"
-              class="cursor-pointer"
+            <v-btn
+              class="text-h6 font-weight-light"
+              small
+              :outlined="quantity !== 7"
+              tile
+              min-width="33"
+              min-height="33"
+              max-width="33"
+              max-height="33"
+              color="grey"
+              :disabled="quantity === 7"
               @click="quantity++"
-              >mdi-plus</v-icon
-            >
+            >+</v-btn>
           </template>
         </v-text-field>
 
-        <v-row align="center">
-          <v-col cols="12" sm="8" md="8" lg="8" xl="8">
-            <v-btn
-              color="primary"
-              block
-              :disabled="disableAddToCart"
-              :loading="loading"
-              @click.prevent="handleAddToCart"
-            >Agregar al Carrito <v-icon right small>mdi-cart</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="12" sm="4" md="4" lg="4" xl="4">
-            <v-btn
-              color="grey lighten-1"
-              outlined
-              block
-              @click="wishlist = !wishlist"
-            >Favorito <v-icon
-                right
-                color="red"
-                v-text="wishlist ? 'mdi-heart' : 'mdi-heart-outline'"
-              ></v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- add to cart - wishlist -->
-        <v-divider class="mt-4 py-1"></v-divider>
-        <div
-          class="d-flex flex-column flex-sm-row justify-sm-space-between"
-        >
-          <v-chip-group show-arrows>
-            <v-chip
-              v-for="tag in pro.tags"
-              :key="tag"
-              active
-              active-class="primary--text"
-              small
-            >
-              {{ tag }}
-            </v-chip>
-          </v-chip-group>
-          <div class="d-flex align-center justify-start">
-            <Socials />
-          </div>
+        <div class="mt-6">
+          <v-btn
+            class="text-subtitle-1 font-weight-bold white--text py-5 px-10"
+            color="#D4AF37"
+            tile
+            large
+            elevation="0"
+            :loading="loading"
+            @click.prevent="handleAddToCart"
+          >Agregar al Carrito
+          </v-btn>
         </div>
-      </v-col>
-    </v-row>
+
+        <div>
+          <div class="text-h6 font-weight-light mt-6">Descripción</div>
+          <div class="text-caption mt-1" v-html="productDescription()"></div>
+        </div>
+      </div>
+    </v-col>
 
     <Notification :snackbar="snackbar" />
-  </v-container>
+  </v-row>
 </template>
 
 <script>
@@ -222,6 +269,8 @@ export default {
       selectedColor: 0,
       selectedSize: null,
       selectedLength: null,
+      sizeChanged: false,
+      lengthChanged: false,
       pro: {
         tags: ['Mujer', 'Popular', 'Novedad']
       },
@@ -271,6 +320,8 @@ export default {
       this.selectedLength = null;
     },
     selectSize() {
+      this.sizeChanged = !this.sizeChanged;
+      this.lengthChanged = false;
       this.selectedLength = null;
     },
     checkSize(size) {
@@ -294,6 +345,41 @@ export default {
         return variant ? false : true;
       }
     },
+    productDescription() {
+      var description = '';
+
+      this.product.description.split(/\r\n|\n\r|\n|\r/).forEach(line => {
+        if (line.indexOf('-') === 0) {
+          line = line.replace('-', '<span class="text-h6 mr-1" style="line-height:1.5rem;vertical-align:sub;">&bull;</span>')
+        }
+        description = description + line + '<br>';
+      });
+
+      return description;
+    },
+    optionsValidated() {
+      this.sizeChanged = true;
+      
+      if (this.selectedSize || this.selectedSize == 0) {
+        this.lengthChanged = true;
+      }
+
+      if (this.product.sizes.length > 0 && this.selectedSize == null) {
+        return false
+      }
+      if (this.product.lengths.length > 0) {
+        var variant = this.product.variants.find(variant =>
+          variant.options.color.id === this.product.colors[this.selectedColor].id &&
+          ((variant.options.size && (this.selectedSize || this.selectedSize === 0)) ? variant.options.size.id === this.product.sizes[this.selectedSize].id : true) && variant.options.length);
+
+        if (variant && this.selectedLength == null) {
+          return false;
+        } else {
+          this.lengthChanged = false;
+        }
+      }
+      return true;
+    },
     notification(visible, color, icon, title, text) {
       this.snackbar.visible = visible;
       this.snackbar.color = color;
@@ -305,70 +391,22 @@ export default {
       if (this.signedIn) {
         this.loading = !this.loading;
 
-        const variantId = this.product.variants.find(variant =>
-          (!variant.options.color || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
-          (!variant.options.size || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&
-          (!variant.options.length || variant.options.length.id === this.product.lengths[this.selectedLength].id)
-        ).id
+        if (this.optionsValidated()) {
+          const variantId = this.product.variants.find(variant =>
+            (!variant.options.color || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
+            (!variant.options.size || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&
+            (!variant.options.length || variant.options.length.id === this.product.lengths[this.selectedLength].id)
+          ).id
 
-        let item = {
-          variant_id: variantId,
-          quantity: this.quantity
-        };
+          let item = {
+            variant_id: variantId,
+            quantity: this.quantity
+          };
 
-        this.addItemToCart(item);
-        if (isBuyNow && isBuyNow === true) {
-          setTimeout(
-            function() {
-              this.$router.push('/profile/checkout');
-            }.bind(this),
-            500
-          );
-        }
-        /*const cartItemsOnCookie = this.$cookies.get('cart', {
-          parseJSON: true
-        });
-        let existItem;
-        if (cartItemsOnCookie) {
-          existItem = cartItemsOnCookie.cartItems.find(
-            item => item.id === this.product.id
-          );
-        }
-
-        let item = {
-          id: this.product.id,
-          quantity: this.quantity,
-          price: this.product.price
-        };
-        if (existItem !== undefined) {
-          if (this.quantity + existItem.quantity > 10) {
-            this.$notify({
-              group: 'addCartSuccess',
-              title: 'Agregar al Carrito',
-              text: 'No se pueden agregar más de 10 del mismo producto.'
-            });
-          } else {
-            this.addItemToCart(item);
-            if (isBuyNow && isBuyNow === true) {
-              setTimeout(
-                function() {
-                  this.$router.push('/account/checkout');
-                }.bind(this),
-                500
-              );
-            }
-          }
-        } else {
           this.addItemToCart(item);
-          if (isBuyNow && isBuyNow === true) {
-            setTimeout(
-              function() {
-                this.$router.push('/account/checkout');
-              }.bind(this),
-              500
-            );
-          }
-        }*/
+        } else {
+          this.loading = !this.loading;
+        }
       } else {
         this.$router.push('/profile/login');
       }
@@ -391,3 +429,14 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.sticky-top {
+  position: sticky;
+  top: 10px;
+}
+
+.color-gold {
+  color: #D4AF37;
+}
+</style>
