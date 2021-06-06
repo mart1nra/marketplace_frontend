@@ -125,7 +125,7 @@ export default {
   computed: {
       ...mapState({
         products: state => state.product.cartProducts,
-        cart: state => state.cart.cartItems,
+        cart: state => state.cart.cartItems
       })
   },
   data() {

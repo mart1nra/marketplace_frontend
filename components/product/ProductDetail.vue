@@ -165,6 +165,7 @@
           solo
           dense
           flat
+          readonly
           hide-details
           color="grey darken-2"
           :style="$vuetify.breakpoint.smAndUp ? 'max-width: 120px' : ''"
@@ -196,7 +197,7 @@
               max-width="33"
               max-height="33"
               color="grey"
-              :disabled="quantity === 7"
+              :disabled="quantity >= variantStock || quantity === 7"
               @click="quantity++"
             >+</v-btn>
           </template>
@@ -245,6 +246,7 @@ export default {
     ...mapState({
       signedIn: state => state.auth.signedIn,
       productImagesByColor: state => state.product.productImagesByColor,
+      cart: state => state.cart.cartItems,
       emptyImage: state => state.product.emptyImage,
       STORE_NAME: state => state.constants.STORE_NAME
     }),
@@ -261,7 +263,15 @@ export default {
       }
     },
     variantStock() {
-      return this.findVariant() ? this.product.stock : null;
+      var variant = this.findVariant();
+
+      if (variant) {
+        var cartItem = this.cart.find(item => item.variant_id === variant.id);
+
+        return cartItem ? this.product.stock - cartItem.quantity : this.product.stock;
+      } else {
+        return null;
+      }
     },
     disableAddToCart() {
       return (!this.product.colors.length) ||
