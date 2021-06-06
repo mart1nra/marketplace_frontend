@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <CartDrawer />
     <InfoBar></InfoBar>
     <v-divider></v-divider>
     <AppBar></AppBar>

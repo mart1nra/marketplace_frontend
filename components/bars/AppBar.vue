@@ -79,64 +79,6 @@
                 <li class="my-1"><NuxtLink to="#" @click.native="handleLogout">Salir</NuxtLink></li>                    
               </ul>
             </v-card>
-
-            <!--v-card>
-              <v-list color="primary--text">
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-icon size="20">mdi-account-outline</v-icon>
-                    <v-img v-if="user.image" :src="user.image"></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title>{{ user.email }}</v-list-item-title>
-                    <v-list-item-subtitle>Looking good today!</v-list-item-subtitle>
-                  </v-list-item-content>
-                  <v-list-item-action>🔥</v-list-item-action>
-                </v-list-item>
-                <v-divider></v-divider>
-
-                <div v-if="user" class="pt-0">
-                  <v-list-item link to="/profile" exact nuxt>
-                    <v-list-item-icon>
-                      <v-icon size="20">mdi-account</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>Profile</v-list-item-title>
-                      <v-list-item-subtitle class="caption"
-                        >Edit your profile</v-list-item-subtitle
-                      >
-                    </v-list-item-content>
-                  </v-list-item>
-
-                  <v-list-item link to="/profile/orders" exact nuxt>
-                    <v-list-item-icon>
-                      <v-icon size="20">mdi-view-list</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>My Orders</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-
-                  <v-list-item link to="/profile/data" exact nuxt>
-                    <v-list-item-icon>
-                      <v-icon size="20">mdi-cog</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>Settings</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-
-                  <v-list-item @click="handleLogout">
-                    <v-list-item-icon>
-                      <v-icon color="red darken-2" size="20">mdi-exit-to-app</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="`Sign out`"></v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </div>
-              </v-list>
-            </v-card-->
           </v-menu>
 
           <v-btn
@@ -144,12 +86,11 @@
             plain
             small
             class="mx-2"
-            href="/checkout"
-            exact
-            nuxt
+            @click.stop="showCart()"
           >
             <v-icon>mdi-shopping</v-icon>
           </v-btn>
+          <span class="text-caption font-weight-medium ml-n1 pt-1">{{ cartTotal }}</span>
 
         </div>
       </v-col>
@@ -347,6 +288,7 @@ export default {
       STORE_NAME: state => state.constants.STORE_NAME,
       signedIn: state => state.auth.signedIn,
       user: state => state.account.accountInfo.data,
+      cartTotal: state => state.cart.total
     })
   },
   data() {
@@ -363,6 +305,9 @@ export default {
     }
   },
   methods: {
+    showCart() {
+      this.$store.commit('cart/setDrawer', true);
+    },
     handleLogout() {
       this.$store.commit('account/setAccountInfo', null);
       this.$store.dispatch('auth/setAuthStatus', false);

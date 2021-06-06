@@ -221,14 +221,14 @@
 
         <div class="mt-6">
           <v-btn
-            class="text-subtitle-1 font-weight-bold white--text py-5 px-10"
+            class="text-h6 font-weight-medium white--text ff-fira-condensed py-5 px-10"
             color="#D4AF37"
             tile
             large
             elevation="0"
             :loading="loading"
             @click.prevent="handleAddToCart"
-          >Agregar al Carrito
+          >Agregar Al Carrito
           </v-btn>
         </div>
 
@@ -512,6 +512,11 @@ export default {
   .sticky-top {
     position: sticky;
     top: 10px;
+  }
+
+  .ff-fira-condensed {
+    font-family: 'Fira Sans Extra Condensed', sans-serif !important;
+    letter-spacing: 3px !important;
   }
 
   .color-gold {
