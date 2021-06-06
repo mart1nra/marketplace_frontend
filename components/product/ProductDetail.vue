@@ -120,6 +120,7 @@
         <v-btn-toggle
           v-model="selectedSize"
           class="ml-n1"
+          @change="selectSize()"
         >
           <span v-for="size in product.sizes">
             <v-btn
@@ -132,7 +133,6 @@
               max-width="33"
               max-height="33"
               :disabled="checkSize(size) !== product.colors[selectedColor].id"
-              @click="selectSize()"
             >{{ size.presentation }}</v-btn>
           </span>
         </v-btn-toggle>
@@ -143,6 +143,7 @@
         <v-btn-toggle
           v-model="selectedLength"
           class="ml-n1"
+          @change="selectLength()"
         >
           <span v-for="length in product.lengths">
             <v-btn
@@ -201,6 +202,11 @@
           </template>
         </v-text-field>
 
+        <div class="text-caption my-3">
+          <span v-if="variantStock > 0" class="color-gold">Stock disponible ({{ variantStock }})</span>
+          <span v-else-if="variantStock === 0" class="text--disabled">Sin stock</span>
+        </div>
+
         <div class="mt-6">
           <v-btn
             class="text-subtitle-1 font-weight-bold white--text py-5 px-10"
@@ -247,11 +253,15 @@ export default {
     },
     images() {
       const variant = this.product.variants.find(variant => variant.id === this.variantId);
+
       if (variant && variant.images.length) {
         return variant.images;
       } else {
         return (this.product.colors.length > 0 && this.productImagesByColor[this.product.colors[this.selectedColor].id]) ? this.productImagesByColor[this.product.colors[this.selectedColor].id] : [this.emptyImage];
       }
+    },
+    variantStock() {
+      return this.findVariant() ? this.product.stock : null;
     },
     disableAddToCart() {
       return (!this.product.colors.length) ||
@@ -263,14 +273,13 @@ export default {
   data() {
     return {
       loading: false,
-      wishlist: false,
       quantity: 1,
-      selectedImage: 0,
       selectedColor: 0,
       selectedSize: null,
       selectedLength: null,
       sizeChanged: false,
       lengthChanged: false,
+      addToCartSubmited: false,
       pro: {
         tags: ['Mujer', 'Popular', 'Novedad']
       },
@@ -305,6 +314,11 @@ export default {
         ]);      
     }
   },
+  async fetch() {
+    if (this.product.sizes.length === 0 && this.product.lengths.length === 0) {
+      await this.$store.dispatch('product/getStockItem', { item: this.product.variants[0].id, vendor: this.product.vendor.id });
+    }
+  },
   methods: {
     displayPrice(p) {
       var price = p;
@@ -312,19 +326,48 @@ export default {
       p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
-    selectColor(color) {
-      const item = this.product.variants.find(variant => variant.options.color.id === color.id)
-      this.$store.commit('product/setProductCurrentVariant', item.id);
-      this.selectedImage = 0;
+    findVariant() {
+      return this.product.variants.find(variant =>
+               (!variant.options.color || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
+               (!variant.options.size || ((this.selectedSize || this.selectedSize === 0) && variant.options.size.id === this.product.sizes[this.selectedSize].id)) &&
+               (!variant.options.length || ((this.selectedLength || this.selectedLength === 0) && variant.options.length.id === this.product.lengths[this.selectedLength].id))
+             );
+    },
+    async selectColor(color) {
       this.selectedSize = null;
       this.selectedLength = null;
       this.sizeChanged = false;
       this.lengthChanged = false;
+      this.addToCartSubmited = false;
+
+      const item = this.product.variants.find(variant => variant.options.color.id === color.id);
+
+      this.$store.commit('product/setProductCurrentVariant', item.id);
+
+      if (this.product.sizes.length === 0 && this.product.lengths.length === 0) {
+        await this.$store.dispatch('product/getStockItem', { item: item.id, vendor: this.product.vendor.id });
+      }
     },
-    selectSize() {
+    async selectSize() {
       this.sizeChanged = !this.sizeChanged;
       this.lengthChanged = false;
       this.selectedLength = null;
+      this.addToCartSubmited = false;
+
+      var variant = this.findVariant();
+
+      if (variant) {
+        await this.$store.dispatch('product/getStockItem', { item: variant.id, vendor: this.product.vendor.id });
+      }
+    },
+    async selectLength() {
+      this.addToCartSubmited = false;
+
+      var variant = this.findVariant();
+
+      if (variant) {
+        await this.$store.dispatch('product/getStockItem', { item: variant.id, vendor: this.product.vendor.id });
+      }
     },
     checkSize(size) {
       const item = this.product.variants.find(variant =>
@@ -400,11 +443,12 @@ export default {
       this.snackbar.title = title;
       this.snackbar.text = text;
     },
-    handleAddToCart(isBuyNow) {
+    handleAddToCart() {
       if (this.signedIn) {
         this.loading = !this.loading;
+        this.addToCartSubmited = true;
 
-        if (this.optionsValidated()) {
+        if (this.optionsValidated() && this.variantStock > 0) {
           const variantId = this.product.variants.find(variant =>
             (!variant.options.color || variant.options.color.id === this.product.colors[this.selectedColor].id) &&
             (!variant.options.size || variant.options.size.id === this.product.sizes[this.selectedSize].id) &&

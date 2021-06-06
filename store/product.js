@@ -1,5 +1,5 @@
 import repository, { serializeQuery } from '~/store/repository';
-import { baseUrl, frontendUrl } from '~/store/repository';
+import { baseUrl, frontendUrl, apiEndpointV1 } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 import * as emptyImageUrl from '~/assets/img/product-coming-soon.jpg'
 import { COLOR_TYPE, SIZE_TYPE, LENGTH_TYPE, PRODUCTS_PER_PAGE } from '~/store/constants';
@@ -43,6 +43,7 @@ export const mutations = {
         product.sizes = [];
         product.lengths = [];
         product.vendor = {};
+        product.stock = 0;
         var variantsImages = [];
 
         data.relationships.variants.data.forEach(v => {
@@ -229,6 +230,9 @@ export const mutations = {
     setProductCurrentVariant(state, payload) {
         state.product.currentVariant = payload;
     },
+    setStockItem(state, payload) {
+        state.product.stock = payload.data.stock_items.length > 0 ? payload.data.stock_items[0].count_on_hand : 0;
+    },
     setCurrentFilters(state, payload) {
         state.currentFilters = payload;
     },
@@ -292,6 +296,18 @@ export const actions = {
                 commit('setProduct', response);
                 commit('setLoading', false);
                 return response.success();
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
+        return response;
+    },
+    async getStockItem({ commit }, payload) {
+        commit('setLoading', true);
+
+        const response = await repository.get(`${apiEndpointV1}/stock_locations/${parseInt(payload.vendor) + 1}/stock_items?token=2cb5b3b4e78b83df4fd0dfa0046cfa9de4da862103c60642&q[variant_id_eq]=${payload.item}`)
+            .then(response => {
+                commit('setStockItem', response);
+                commit('setLoading', false);
+                return response.data;
             })
             .catch(error => ({ error: JSON.stringify(error) }));
         return response;

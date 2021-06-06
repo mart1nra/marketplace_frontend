@@ -12,7 +12,8 @@ export const customHeaders = {
 
 export const baseUrl = 'http://localhost:3000';
 export const frontendUrl = 'http://localhost:8000';
-export const apiEndpoint = `${baseUrl}/api/v2/storefront`
+export const apiEndpointV2 = `${baseUrl}/api/v2/storefront`;
+export const apiEndpointV1 = `${baseUrl}/api/v1`;
 
 export default axios.create({
     baseUrl,

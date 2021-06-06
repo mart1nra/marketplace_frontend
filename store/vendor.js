@@ -1,5 +1,5 @@
 import repository from '~/store/repository';
-import { baseUrl, apiEndpoint } from '~/store/repository';
+import { baseUrl, apiEndpointV2 } from '~/store/repository';
 import { makeClient } from '@spree/storefront-api-v2-sdk'
 
 const client = makeClient({ host: baseUrl });
@@ -18,7 +18,7 @@ export const mutations = {
 
 export const actions = {
   async getVendorInfo({ commit }, payload) {
-    const response = await repository.get(`${apiEndpoint}/vendors/${payload}`)
+    const response = await repository.get(`${apiEndpointV2}/vendors/${payload}`)
       .then(response => {
         commit('setVendor', response.data.data);
         return response.data.data;
