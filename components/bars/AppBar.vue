@@ -34,79 +34,64 @@
       <v-col cols="12" md="2" sm="6" xs="6">
         <div class="toolbar-icons d-flex align-center">
 
-          <!--v-badge
-            v-if="favItems > 0"
-            :content="favItems"
-            overlap
-            offset-x="18"
-            offset-y="18"
-            color="red"
-            class="ml-2"
-          >
-            <v-btn icon>
-              <v-icon size="20" color="red">mdi-heart-outline</v-icon>
-            </v-btn>
-          </v-badge>
-          <v-icon v-else size="20" color="red" class="ml-2"
-            >mdi-heart-outline</v-icon
-          -->
-
-          <!--v-btn
-            icon
-            class="ml-2"
-            @click="$vuetify.theme.dark = !$vuetify.theme.dark"
-          >
-            <v-icon size="20">mdi-theme-light-dark</v-icon>
-          </v-btn-->
-
           <v-btn icon class="hidden-md-and-up ml-2">
             <v-icon size="20">mdi-magnify</v-icon>
           </v-btn>
 
           <v-btn
             v-if="!signedIn"
-            outlined
+            icon
+            plain
             small
-            class="mx-4"
-            color="grey"
-            to="/profile/login"
+            class="mx-2"
+            href="/profile/login"
             exact
             nuxt
           >
-            <v-icon left size="20">mdi-account-circle-outline</v-icon> Ingresar
+            <v-icon>mdi-account</v-icon>
           </v-btn>
 
-          <v-menu v-if="signedIn">
+          <v-menu v-if="signedIn"
+            offset-y
+            open-on-hover
+            tile
+            content-class="elevation-0"
+          >
             <template #activator="{ on, attrs }">
               <v-btn
-                text
-                :ripple="false"
-                class="px-1 ml-2 mr-n2 rounded-pill"
                 v-bind="attrs"
                 v-on="on"
+                icon
+                small
+                class="mx-2"
+                color="#D4AF37"
               >
-                <v-avatar size="20">
-                  <v-icon dark>mdi-account-circle</v-icon>
-                  <!--v-img v-if="user && user.image" :src="user.image"></v-img-->
-                </v-avatar>
-                <span class="text-none font-weight-regular ml-3 hidden-sm-and-down"
-                  >Hola, {{ user.name }}</span
-                >
-                <v-icon>mdi-chevron-down</v-icon>
+                <v-icon>mdi-account</v-icon>
+                <v-icon color="black" small class="ml-n1">mdi-chevron-down</v-icon>
               </v-btn>
             </template>
-            <v-card>
+
+            <v-card tile class="mt-2">
+              <ul class="no-bullet secondary--text text-caption">
+                <li class="my-1"><NuxtLink to="/profile">Mi Cuenta</NuxtLink></li>
+                <li class="my-1"><NuxtLink to="/profile/orders">Mis Pedidos</NuxtLink></li>
+                <li class="my-1"><NuxtLink to="/profile/invoices">Mis Compras</NuxtLink></li>
+                <li class="my-1"><NuxtLink to="#" @click.native="handleLogout">Salir</NuxtLink></li>                    
+              </ul>
+            </v-card>
+
+            <!--v-card>
               <v-list color="primary--text">
                 <v-list-item>
                   <v-list-item-avatar>
                     <v-icon size="20">mdi-account-outline</v-icon>
-                    <!--v-img v-if="user.image" :src="user.image"></v-img-->
+                    <v-img v-if="user.image" :src="user.image"></v-img>
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title>{{ user.email }}</v-list-item-title>
                     <v-list-item-subtitle>Looking good today!</v-list-item-subtitle>
                   </v-list-item-content>
-                  <!--v-list-item-action>🔥</v-list-item-action-->
+                  <v-list-item-action>🔥</v-list-item-action>
                 </v-list-item>
                 <v-divider></v-divider>
 
@@ -151,10 +136,20 @@
                   </v-list-item>
                 </div>
               </v-list>
-            </v-card>
+            </v-card-->
           </v-menu>
 
-          <MiniCart />
+          <v-btn
+            icon
+            plain
+            small
+            class="mx-2"
+            href="/checkout"
+            exact
+            nuxt
+          >
+            <v-icon>mdi-shopping</v-icon>
+          </v-btn>
 
         </div>
       </v-col>
@@ -211,7 +206,6 @@
                   </p>
                 </v-col>
               </v-row>
-
             </v-list>
           </v-menu>
         </div>
@@ -378,12 +372,23 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   .v-input__icon--prepend-inner .v-icon { 
     font-size: 16px;
   }
 
   .v-text-field__slot input::placeholder {
     font-size: 13px;
+  }
+
+  ul.no-bullet {
+    list-style-type: none;
+    margin: 0;
+    padding-left : 1.2rem;
+    padding-right: 1.2rem;
+    padding-top : 0.7rem;
+    padding-bottom: 0.7rem;
+    border-style: solid;
+    border-width: 1px;
   }
 </style>

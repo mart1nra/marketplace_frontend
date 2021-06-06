@@ -3,7 +3,18 @@
     <v-col cols="12" md="12" lg="8" xl="8">
       <div v-if="images.length > 0">
         <v-row class="mr-0">
-          <v-col
+          <v-col v-if="images.length === 1"
+            class="d-flex child-flex no-gutters"
+            cols="12"
+          >
+            <v-img
+              :src="images[0]"
+              :aspect-ratio="23/32"
+              class="mt-2 mb-4 ml-3 mr-n1"
+            >
+            </v-img>
+          </v-col>          
+          <v-col v-else
             v-for="(image, i) in images" :key="i"
             class="d-flex child-flex no-gutters"
             cols="6"
@@ -498,12 +509,12 @@ export default {
 </script>
 
 <style scoped>
-.sticky-top {
-  position: sticky;
-  top: 10px;
-}
+  .sticky-top {
+    position: sticky;
+    top: 10px;
+  }
 
-.color-gold {
-  color: #D4AF37;
-}
+  .color-gold {
+    color: #D4AF37;
+  }
 </style>
