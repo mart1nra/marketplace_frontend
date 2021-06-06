@@ -1,50 +1,84 @@
 <template>
-  <v-container v-if="!signedIn">
-    <v-row justify="center" class="py-12">
-      <v-col cols="12" xs="10" sm="8" md="8" lg="6" xl="6">
-        <h2 class="primary--text">Ingrese su Usuario y Contraseña</h2>
-        <v-divider class="my-3"></v-divider>
-        <v-row>
-          <v-col>
-            <v-card
-              flat
-              class="elevation-cs ml-0 d-flex align-center pa-6 justify-center justify-lg-space-between rounded-lg"
-            >
-              <v-card-text class="pt-4">
-                <v-alert v-if="loginError" type="error">
-                  E-mail o contraseña incorrecta. Por favor verificar.
-                </v-alert>
-                <div>
-                  <v-form v-model="valid" ref="form">
-                    <v-text-field
-                      label="E-mail"
-                      v-model="email"
-                      :rules="emailRules"
-                      required
-                    ></v-text-field>
-                    <v-text-field
-                      label="Contraseña"
-                      v-model="password"
-                      min="8"
-                      type="password"
-                      :rules="passwordRules"
-                      required
-                    ></v-text-field>
-                    <v-layout justify-space-between>
-                        <v-btn
-                          class="mt-2"
-                          color="primary"
-                          :disabled="!valid"
-                          @click.prevent="handleSubmit"
-                        >Ingresar</v-btn>
-                        <NuxtLink to="/">Olvidé mi contraseña</NuxtLink>
-                    </v-layout>
-                  </v-form>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+  <v-container>
+    <v-row>
+      <v-col
+        md="5"
+        offset-md="1"
+      >
+        <div class="text-h5 font-weight-light">Iniciar sesión</div>
+        <v-divider color="grey" class="my-5"></v-divider>
+
+        <div v-if="loginError" class="error-message text-caption color-gold mt-8">
+          <v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>
+          No reconocemos esta información de acceso. Por favor, intentá de nuevo.
+        </div>
+        <div class="mt-8">
+          <v-form v-model="valid" ref="form">
+            <v-text-field
+              label="Dirección de email"
+              v-model="email"
+              :rules="emailRules"
+              color="grey lighten-1"
+              required
+              outlined
+            ></v-text-field>
+            <v-text-field
+              label="Contraseña"
+              v-model="password"
+              min="8"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showPassword ? 'text' : 'password'"
+              :rules="passwordRules"
+              color="grey lighten-1"
+              required
+              outlined
+              @click:append="showPassword = !showPassword"
+            ></v-text-field>
+            <div class="text-caption font-weight-light mt-0">
+              <NuxtLink to="/">¿Olvidaste tu contraseña?<v-icon size="18">mdi-chevron-right</v-icon></NuxtLink>
+            </div>
+            <div class="mt-4">
+              <v-btn
+                class="text-h6 font-weight-medium white--text ff-fira-condensed py-5 px-10"
+                color="#D4AF37"
+                tile
+                large
+                elevation="0"
+                @click.stop="handleSubmit"
+              >Inicio de Sesión Seguro
+              </v-btn>
+            </div>
+          </v-form>
+        </div>
+      </v-col>
+
+      <v-col md="5">
+        <div class="text-h5 font-weight-light">Crear una cuenta</div>
+        <v-divider color="grey" class="my-5"></v-divider>
+
+        <div class="text-caption font-weight-light mt-7">
+          Regístrate en eStylo para disfrutar de servicios personalizados,<br>entre los que se incluyen:
+        </div>
+        <div class="text-caption font-weight-light mt-3">
+          <span class="text-h6 mr-1" style="line-height:1rem;vertical-align:sub;">&bull;</span>
+          Estado del pedido en línea<br>
+          <span class="text-h6 mr-1" style="line-height:1rem;vertical-align:sub;">&bull;</span>
+          Emails exclusivos<br>
+          <span class="text-h6 mr-1" style="line-height:1rem;vertical-align:sub;">&bull;</span>
+          Guardar direcciones de envío<br>
+        </div>
+        <div class="mt-4">
+          <v-btn
+            class="text-h6 font-weight-medium white--text ff-fira-condensed py-5 px-10"
+            color="grey darken-4"
+            tile
+            large
+            outlined
+            elevation="0"
+            @click.stop=""
+          >Crear Una Cuenta
+          </v-btn>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -65,13 +99,14 @@ export default {
       loginError: false,
       password: '',
       passwordRules: [
-        (v) => !!v || 'Contraseña es obligatoria',
+        (v) => !!v || 'Ingresá una contraseña',
       ],
       email: '',
       emailRules: [
-        (v) => !!v || 'E-mail es obligatorio',
-        (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail debe ser válido'
+        (v) => !!v || 'Ingresa una dirección de email',
+        (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Ingresa una dirección de email correcta'
       ],
+      showPassword: false
     }
   },
   created() {
@@ -94,3 +129,23 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .color-gold {
+    color: #D4AF37;
+  }
+
+  .error-message {
+    padding-left : 0.5rem;
+    padding-right: 0.5rem;
+    padding-top : 0.5rem;
+    padding-bottom: 0.4rem;
+    border-style: solid;
+    border-width: 1px;
+  }
+
+  .ff-fira-condensed {
+    font-family: 'Fira Sans Extra Condensed', sans-serif !important;
+    letter-spacing: 3px !important;
+  }
+</style>
