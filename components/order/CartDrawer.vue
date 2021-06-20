@@ -59,112 +59,114 @@
         </div>
       </div>
 
-      <div v-for="(lineItem, i) in cart" :key="i" class="mb-2">
-        <v-progress-circular
-          v-if="loading && lineItem.id === deletedLineItemId"
-          class="w-100 text-center"
-          indeterminate
-          color="primary"
-        >
-        </v-progress-circular>
-
-        <div v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)" class="item-close mr-2">
-          <v-icon
-            size="30"
-            @click.prevent="handleRemoveProductFromCart(lineItem, products[i])"
-          >mdi-close</v-icon>
-        </div>
-
-        <v-list-item >
-          <NuxtLink v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
-            :to="`/product/${products[i].id}`"
-            class="mr-n4"
+      <div v-if="products && products !== undefined">
+        <div v-for="(lineItem, i) in cart" :key="i" class="mb-2">
+          <v-progress-circular
+            v-if="loading && lineItem.id === deletedLineItemId"
+            class="w-100 text-center"
+            indeterminate
+            color="primary"
           >
-            <v-img
-              class="ml-n4 mb-4"
-              :src="products[i].image ? products[i].image : emptyImage"
-              style="width: 170px; height: 170px;"
-            ></v-img>
-          </NuxtLink>
+          </v-progress-circular>
 
-          <v-list-item-content v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
-            class="item-info"
-          >
-            <v-list-item-title v-text="products[i].vendor.name"
-              class="text-overline font-weight-light"></v-list-item-title>
-            <v-list-item-title v-text="products[i].title"
-              class="text-body-2"></v-list-item-title>
-            <v-list-item-subtitle
-              class="text-caption mt-1 mb-3">Stock disponible</v-list-item-subtitle>
-            <v-list-item-subtitle
-              class="text-caption">
-              <v-row class="no-gutters">
-                <v-col cols="3" class="font-weight-light">Color</v-col>
-                <v-col cols="9">{{ products[i].options.color.name }}</v-col>
-              </v-row>
-              <v-row v-if="products[i].options.size" class="no-gutters">
-                <v-col cols="3" class="font-weight-light">Talle</v-col>
-                <v-col cols="9">{{ products[i].options.size.presentation }}</v-col>
-              </v-row>
-              <v-row v-if="products[i].options.length" class="no-gutters">
-                <v-col cols="3" class="font-weight-light">Largo</v-col>
-                <v-col cols="9">{{ products[i].options.length.presentation }}</v-col>
-              </v-row>
-              <v-row class="no-gutters">
-                <v-col cols="3" class="font-weight-light">Cant.</v-col>
-                <v-col cols="9">{{ lineItem.quantity }}</v-col>
-              </v-row>
-            </v-list-item-subtitle>
-            <v-list-item-subtitle
-              class="text-caption font-weight-bold text-uppercase mt-3 mb-2">Editar<v-icon size="14">mdi-chevron-right</v-icon></v-list-item-subtitle>
-            <v-list-item-subtitle>
-              <span class="text-h6 font-weight-light color-gold" v-html="displayPrice(products[i].price)"></span>
-            </v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
+          <div v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)" class="item-close mr-2">
+            <v-icon
+              size="30"
+              @click.prevent="handleRemoveProductFromCart(lineItem, products[i])"
+            >mdi-close</v-icon>
+          </div>
 
-        <v-divider v-if="i < products.length - 1" class="mx-3 mt-3"></v-divider>
-      </div>
+          <v-list-item >
+            <NuxtLink v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
+              :to="`/product/${products[i].id}`"
+              class="mr-n4"
+            >
+              <v-img
+                class="ml-n4 mb-4"
+                :src="products[i].image ? products[i].image : emptyImage"
+                style="width: 170px; height: 170px;"
+              ></v-img>
+            </NuxtLink>
 
-      <div v-if="products.length > 2">
-        <v-divider class="mt-3 mb-2"></v-divider>
+            <v-list-item-content v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
+              class="item-info"
+            >
+              <v-list-item-title v-text="products[i].vendor.name"
+                class="text-overline font-weight-light"></v-list-item-title>
+              <v-list-item-title v-text="products[i].title"
+                class="text-body-2"></v-list-item-title>
+              <v-list-item-subtitle
+                class="text-caption mt-1 mb-3">Stock disponible</v-list-item-subtitle>
+              <v-list-item-subtitle
+                class="text-caption">
+                <v-row class="no-gutters">
+                  <v-col cols="3" class="font-weight-light">Color</v-col>
+                  <v-col cols="9">{{ products[i].options.color.name }}</v-col>
+                </v-row>
+                <v-row v-if="products[i].options.size" class="no-gutters">
+                  <v-col cols="3" class="font-weight-light">Talle</v-col>
+                  <v-col cols="9">{{ products[i].options.size.presentation }}</v-col>
+                </v-row>
+                <v-row v-if="products[i].options.length" class="no-gutters">
+                  <v-col cols="3" class="font-weight-light">Largo</v-col>
+                  <v-col cols="9">{{ products[i].options.length.presentation }}</v-col>
+                </v-row>
+                <v-row class="no-gutters">
+                  <v-col cols="3" class="font-weight-light">Cant.</v-col>
+                  <v-col cols="9">{{ lineItem.quantity }}</v-col>
+                </v-row>
+              </v-list-item-subtitle>
+              <v-list-item-subtitle
+                class="text-caption font-weight-bold text-uppercase mt-3 mb-2">Editar<v-icon size="14">mdi-chevron-right</v-icon></v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <span class="text-h6 font-weight-light color-gold" v-html="displayPrice(products[i].price)"></span>
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
 
-        <div class="d-flex justify-space-between align-center mx-3 mt-1">
-          <span class="text--primary text-body-1">Subtotal de la compra</span>
-          <span class="text-h5 font-weight-light color-gold" v-html="displayPrice(cartAmount)"></span>
+          <v-divider v-if="i < products.length - 1" class="mx-3 mt-3"></v-divider>
+        </div>        
+
+        <div v-if="products.length > 2">
+          <v-divider class="mt-3 mb-2"></v-divider>
+
+          <div class="d-flex justify-space-between align-center mx-3 mt-1">
+            <span class="text--primary text-body-1">Subtotal de la compra</span>
+            <span class="text-h5 font-weight-light color-gold" v-html="displayPrice(cartAmount)"></span>
+          </div>
+          
+          <v-divider class="mt-2 mb-2"></v-divider>
+
+          <v-list-item>
+            <v-list-item-content class="mx-n1">
+              <v-list-item-icon class="ma-0">
+                <v-btn
+                  block
+                  class="text-h6 font-weight-medium white--text ff-fira-condensed px-10"
+                  color="#D4AF37"
+                  tile
+                  large
+                  elevation="0"
+                  to="/checkout"
+                  exact
+                  nuxt
+                >Pagar</v-btn>
+              </v-list-item-icon>
+              <v-list-item-icon class="ma-0 mt-3">
+                <v-btn
+                  block
+                  class="text-capitalize text-body-2 font-weight-bold white--text px-10"
+                  color="#212121"
+                  large
+                  elevation="0"
+                  to="/checkout"
+                  exact
+                  nuxt
+                >Pagar <span class="text-lowercase">con</span><span class="text-h6 font-weight-bold ml-1">mercado pago</span></v-btn>
+              </v-list-item-icon>
+            </v-list-item-content>
+          </v-list-item>
         </div>
-        
-        <v-divider class="mt-2 mb-2"></v-divider>
-
-        <v-list-item>
-          <v-list-item-content class="mx-n1">
-            <v-list-item-icon class="ma-0">
-              <v-btn
-                block
-                class="text-h6 font-weight-medium white--text ff-fira-condensed px-10"
-                color="#D4AF37"
-                tile
-                large
-                elevation="0"
-                to="/checkout"
-                exact
-                nuxt
-              >Pagar</v-btn>
-            </v-list-item-icon>
-            <v-list-item-icon class="ma-0 mt-3">
-              <v-btn
-                block
-                class="text-capitalize text-body-2 font-weight-bold white--text px-10"
-                color="#212121"
-                large
-                elevation="0"
-                to="/checkout"
-                exact
-                nuxt
-              >Pagar <span class="text-lowercase">con</span><span class="text-h6 font-weight-bold ml-1">mercado pago</span></v-btn>
-            </v-list-item-icon>
-          </v-list-item-content>
-        </v-list-item>
       </div>
     </v-list>
 
@@ -245,13 +247,6 @@ export default {
       p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
-    notification(visible, color, icon, title, text) {
-      this.snackbar.visible = visible;
-      this.snackbar.color = color;
-      this.snackbar.icon = icon;
-      this.snackbar.title = title;
-      this.snackbar.text = text;
-    },
     async handleRemoveProductFromCart(lineItem, product) {
       this.loading = true;
       this.deletedLineItemId = lineItem.id;
@@ -259,10 +254,6 @@ export default {
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
-        var itemOptions = product.options.color.name;
-        if (Object.keys(product.options.size).length) itemOptions = itemOptions + '/' + product.options.size.presentation;
-        if (Object.keys(product.options.length).length) itemOptions = itemOptions + '/' + product.options.length.presentation;
-        this.notification(true, 'success', 'mdi-check-circle', `${lineItem.quantity} ${product.title} (${itemOptions})`, 'Fue borrado del carrito de compras!');
       }
       this.loading = false;
     }
