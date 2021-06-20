@@ -90,7 +90,7 @@
           >
             <v-icon>mdi-shopping</v-icon>
           </v-btn>
-          <span class="text-caption font-weight-medium ml-n1 pt-1">{{ cartTotal }}</span>
+          <span v-if="cartTotal > 0" class="text-caption font-weight-medium ml-n1 pt-1">{{ cartTotal }}</span>
 
         </div>
       </v-col>
@@ -103,14 +103,14 @@
             offset-y
             open-on-hover
             close-delay="100"
-            min-width="500"
+            min-width="700"
             tile
             content-class="elevation-0"
           >
             <template #activator="{ on, attrs }">
               <v-tab
                 v-bind="attrs"
-                class="secondary--text font-weight-light pt-4 pb-6"
+                class="text--primary font-weight-light pt-4 pb-6"
                 v-on="on"
                 to="/women"
                 nuxt
@@ -123,28 +123,28 @@
             <v-list class="primary--text" color="grey lighten-2">
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
-                  <p class="text-break ml-6" style="max-width: 11rem;">
-                    <NuxtLink to="/women/all" class="secondary--text text-caption text-uppercase">Todos los productos<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                    <NuxtLink to="/women/newest" class="secondary--text text-caption text-uppercase">Los recién llegados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                    <NuxtLink to="/women/popular" class="secondary--text text-caption text-uppercase">Los más buscados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                  </p>
+                  <div class="mx-12">
+                    <NuxtLink to="/women/all" class="text--primary overline">Todos los productos<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink><br>
+                    <NuxtLink to="/women/newest" class="text--primary overline">Los recién llegados<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink><br>
+                    <NuxtLink to="/women/popular" class="text--primary overline">Los más buscados<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink>
+                  </div>
                 </v-col>
                   <v-divider vertical></v-divider>
                 <v-col cols="12" md="5" sm="5" xs="5">
-                  <p class="text-break" style="max-width: 5rem;">
-                    <span class="secondary--text text-caption text-uppercase">Categorías</span>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Abrigos</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Blusas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Calzas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Camisas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Chombas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Jeans</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Musculosas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Patalones</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Polleras</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Remeras</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Vestidos</NuxtLink>
-                  </p>
+                  <div class="ml-2">
+                    <span class="text--primary overline">Categorías</span><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Abrigos</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Blusas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Calzas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Camisas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Chombas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Jeans</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Musculosas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Patalones</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Polleras</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Remeras</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Vestidos</NuxtLink><br>
+                  </div>
                 </v-col>
               </v-row>
             </v-list>
@@ -156,14 +156,14 @@
             offset-y
             open-on-hover
             close-delay="100"
-            min-width="500"
+            min-width="700"
             tile
             content-class="elevation-0"
           >
             <template #activator="{ on, attrs }">
               <v-tab
                 v-bind="attrs"
-                class="secondary--text font-weight-light pt-4 pb-6"
+                class="text--primary font-weight-light pt-4 pb-6"
                 v-on="on"
                 to="/men"
                 nuxt
@@ -176,29 +176,28 @@
             <v-list class="primary--text" color="grey lighten-2">
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
-                  <p class="text-break ml-6" style="max-width: 11rem;">
-                    <NuxtLink to="/men/all" class="secondary--text text-caption text-uppercase">Todos los productos<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                    <NuxtLink to="/men/newest" class="secondary--text text-caption text-uppercase">Los recién llegados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                    <NuxtLink to="/men/popular" class="secondary--text text-caption text-uppercase">Los más buscados<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                  </p>
+                  <div class="mx-12">
+                    <NuxtLink to="/men/all" class="text--primary overline">Todos los productos<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink><br>
+                    <NuxtLink to="/men/newest" class="text--primary overline">Los recién llegados<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink><br>
+                    <NuxtLink to="/men/popular" class="text--primary overline">Los más buscados<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink>
+                  </div>
                 </v-col>
                   <v-divider vertical></v-divider>
                 <v-col cols="12" md="5" sm="5" xs="5">
-                  <p class="text-break" style="max-width: 5rem;">
-                    <span class="secondary--text text-caption text-uppercase">Categorías</span>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Abrigos</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Calzas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Camisas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Chombas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Jeans</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Musculosas</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Patalones</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Remeras</NuxtLink>
-                    <NuxtLink to="/" class="secondary--text text-caption font-weight-light">Trajes</NuxtLink>
-                  </p>
+                  <div class="ml-2">
+                    <span class="text--primary overline">Categorías</span><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Abrigos</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Calzas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Camisas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Chombas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Jeans</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Musculosas</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Patalones</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Remeras</NuxtLink><br>
+                    <NuxtLink to="/" class="text--primary text-caption font-weight-light">Trajes</NuxtLink><br>
+                  </div>
                 </v-col>
               </v-row>
-
             </v-list>
           </v-menu>
         </div>
@@ -208,14 +207,14 @@
             offset-y
             open-on-hover
             close-delay="100"
-            min-width="500"
+            min-width="700"
             tile
             content-class="elevation-0"
           >
             <template #activator="{ on, attrs }">
               <v-tab
                 v-bind="attrs"
-                class="secondary--text font-weight-light pt-4 pb-6"
+                class="text--primary font-weight-light pt-4 pb-6"
                 v-on="on"
                 nuxt
                 exact
@@ -227,26 +226,25 @@
             <v-list class="primary--text" color="grey lighten-2">
               <v-row>
                 <v-col cols="12" md="6" sm="6" xs="6">
-                  <p class="text-break ml-6" style="max-width: 10rem;">
-                    <NuxtLink to="/stores" class="secondary--text text-caption text-uppercase">Todas las tiendas<v-icon size="20">mdi-chevron-right</v-icon></NuxtLink>
-                  </p>
+                  <div class="mx-12">
+                    <NuxtLink to="/stores" class="text--primary overline">Todas las tiendas<v-icon size="16">mdi-chevron-right</v-icon></NuxtLink><br>
+                  </div>
                 </v-col>
                   <v-divider vertical></v-divider>
                 <v-col cols="12" md="5" sm="5" xs="5">
-                  <p class="text-break" style="max-width: 6rem;">
-                    <span class="secondary--text text-caption text-uppercase">Tiendas destacadas</span>
-                    <NuxtLink to="/stores/primera-tienda" class="secondary--text text-caption font-weight-light">Primera Tienda</NuxtLink>
-                    <NuxtLink to="/stores/la-mejor-moda" class="secondary--text text-caption font-weight-light">La Mejor Moda</NuxtLink>
-                  </p>
+                  <div class="ml-2">
+                    <span class="text--primary overline">Tiendas destacadas</span><br>
+                    <NuxtLink to="/stores/primera-tienda" class="text--primary text-caption font-weight-light">Primera Tienda</NuxtLink><br>
+                    <NuxtLink to="/stores/la-mejor-moda" class="text--primary text-caption font-weight-light">La Mejor Moda</NuxtLink><br>
+                  </div>
                 </v-col>
               </v-row>
-
             </v-list>
           </v-menu>
         </div>
 
-        <v-tab class="secondary--text font-weight-light" to="/new" nuxt exact>New!</v-tab>
-        <v-tab class="secondary--text font-weight-light" to="/sale" nuxt exact>Sale</v-tab>
+        <v-tab class="text--primary font-weight-light" to="/new" nuxt exact>New!</v-tab>
+        <v-tab class="text--primary font-weight-light" to="/sale" nuxt exact>Sale</v-tab>
         <!--v-menu offset-y open-on-hover close-delay="500">
           <template #activator="{ on, attrs }">
             <v-tab v-bind="attrs" class="primary--text" v-on="on">

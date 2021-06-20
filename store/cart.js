@@ -65,7 +65,7 @@ export const mutations = {
 export const actions = {
     async getCartInfo({ commit, state }) {
         const account = this.$cookies.get('account', { parseJSON: true });
-        const response = await client.cart.create({ bearerToken: account.token }, { include: 'line_items,variants,variants.images,variants.option_values' })
+        const response = await client.cart.create({ bearerToken: account.token }, { include: 'line_items,variants,variants.images,variants.option_values,vendors' })
             .then(response => {
                 const cartInfo = response.success();
                 commit('setCart', cartInfo);

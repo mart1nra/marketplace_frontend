@@ -66,6 +66,8 @@
           Emails exclusivos<br>
           <span class="text-h6 mr-1" style="line-height:1rem;vertical-align:sub;">&bull;</span>
           Guardar direcciones de envío<br>
+          <span class="text-h6 mr-1" style="line-height:1rem;vertical-align:sub;">&bull;</span>
+          Facilidad en el proceso de checkout
         </div>
         <div class="mt-4">
           <v-btn

@@ -108,7 +108,7 @@ export default {
       products: state => state.product.cartProducts,
       cartTotal: state => state.cart.total,
       cartAmount: state => state.cart.amount,
-      cart: state => state.cart.cartItems,
+      cart: state => state.cart.cartItems
     })
   },
   data() {

@@ -105,7 +105,7 @@ export const mutations = {
         product.sizes.sort((a, b) => a.position - b.position);
         product.lengths.sort((a, b) => a.position - b.position);
 
-        var vendor = included.find(item => item.type == 'vendor' && item.id === data.relationships.vendor.data.id);
+        var vendor = included.find(item => item.type ==='vendor' && item.id === data.relationships.vendor.data.id);
         product.vendor.id = vendor.id;
         product.vendor.name = vendor.attributes.name;
 
@@ -332,36 +332,37 @@ export const actions = {
                 if (item.type === 'variant') {
                     const lineItem = payload.find(i => i.type === 'line_item' && i.relationships.variant.data.id === item.id);
                     const image = payload.find(i => i.type === 'image' && i.attributes.viewable_id.toString() === item.id )
-                    item['image'] = image ? baseUrl + image.attributes.styles[2].url : '';
-                    item['lineItemId'] = lineItem.id;
-                    item['id'] = item.relationships.product.data.id;
-                    item['title'] = lineItem.attributes.name;
-                    item['price'] = lineItem.attributes.price;
-                    item['options'] = {};
-                    item['options']['color'] = {};
-                    item['options']['size'] = {};
-                    item['options']['length'] = {};
+                    item.image = image ? baseUrl + image.attributes.styles[2].url : '';
+                    item.lineItemId = lineItem.id;
+                    item.id = item.relationships.product.data.id;
+                    item.title = lineItem.attributes.name;
+                    item.price = lineItem.attributes.price;
+                    item.options = {};
+                    item.options.color = null;
+                    item.options.size = null;
+                    item.options.length = null;
+                    item.vendor = {};
+
+                    item.relationships.option_values.data.forEach(option_value => {
+                        var ov_item = payload.find(ov => ov.type === 'option_value' && ov.id === option_value.id)
+                        var option = ov_item.attributes;
+                        option.id = ov_item.id;
+
+                        if (ov_item.relationships.option_type.data.id === COLOR_TYPE) {
+                            item.options.color = option;
+                        } else if (ov_item.relationships.option_type.data.id === SIZE_TYPE) {
+                            item.options.size = option;
+                        } else if (ov_item.relationships.option_type.data.id === LENGTH_TYPE) {
+                            item.options.length = option;
+                        }
+                    })
+
+                    var vendor = payload.find(i => i.type === 'vendor' && i.id === item.relationships.vendor.data.id);
+                    item.vendor.id = vendor.id;
+                    item.vendor.name = vendor.attributes.name;
+
                     products.push(item);
                 };
-            });
-            payload.forEach(item => {
-                if (item.type === 'option_value') {
-                    products.forEach(variant => {
-                        variant.relationships.option_values.data.forEach(option_value => {
-                            if (item.id === option_value.id) {
-                                var option = item.attributes;
-                                option.id = item.id;
-                                if (item.relationships.option_type.data.id === '1') {
-                                    variant.options.color = option;
-                                } else if (item.relationships.option_type.data.id === '2') {
-                                    variant.options.length = option;
-                                } else if (item.relationships.option_type.data.id === '3') {
-                                    variant.options.size = option;
-                                }
-                            }
-                        });
-                    });
-                }
             });
         }
         commit('setCartProducts', products);

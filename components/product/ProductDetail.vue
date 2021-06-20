@@ -31,7 +31,7 @@
     </v-col>
     <v-col cols="12" md="12" lg="4" xl="4" class="mt-1">
       <div class="sticky-top">
-        <div class="text-body-2 font-weight-light text-uppercase">{{ product.vendor.name }}</div>
+        <div class="text-overline font-weight-light my-n1">{{ product.vendor.name }}</div>
         <div class="text-h5 font-weight-light text-capitalize">{{ product.title }}</div>
         <Stars />
         <div class="text-body-1 mt-4" v-html="displayPrice(product.price)"></div>
@@ -517,9 +517,5 @@ export default {
   .ff-fira-condensed {
     font-family: 'Fira Sans Extra Condensed', sans-serif !important;
     letter-spacing: 3px !important;
-  }
-
-  .color-gold {
-    color: #D4AF37;
   }
 </style>
