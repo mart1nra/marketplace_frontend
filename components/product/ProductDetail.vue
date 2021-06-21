@@ -1,5 +1,12 @@
 <template>
   <v-row justify="center">
+
+    <CartAddedDrawer
+      :image="images[0]"
+      :product="product"
+      :options="addedProductOptions"
+    />
+
     <v-col cols="12" md="12" lg="8" xl="8">
       <div v-if="images.length > 0">
         <v-row class="mr-0">
@@ -238,8 +245,6 @@
         </div>
       </div>
     </v-col>
-
-    <Notification :snackbar="snackbar" />
   </v-row>
 </template>
 
@@ -301,16 +306,13 @@ export default {
       sizeChanged: false,
       lengthChanged: false,
       addToCartSubmited: false,
-      pro: {
-        tags: ['Mujer', 'Popular', 'Novedad']
+      addedProductOptions: {
+        'quantity': 0,
+        'color': '',
+        'size': '',
+        'length': ''
       },
-      snackbar: {
-        visible: false,
-        color: '',
-        title: '',
-        text: '',
-        icon: ''
-      }
+      drawerOn: false
     }
   },
   mounted() {
@@ -457,13 +459,6 @@ export default {
 
       return true;
     },
-    notification(visible, color, icon, title, text) {
-      this.snackbar.visible = visible;
-      this.snackbar.color = color;
-      this.snackbar.icon = icon;
-      this.snackbar.title = title;
-      this.snackbar.text = text;
-    },
     handleAddToCart() {
       if (this.signedIn) {
         this.loading = !this.loading;
@@ -490,17 +485,21 @@ export default {
       }
     },
     async addItemToCart(payload) {
-      var variant = this.product.variants.find(variant => variant.id === payload.variant_id);
-      var itemOptions = variant.options.color.name;
-      if (variant.options.size) itemOptions = itemOptions + '/' + variant.options.size.presentation;
-      if (variant.options.length) itemOptions = itemOptions + '/' + variant.options.length.presentation;
-
       const cartItems = await this.$store.dispatch('cart/addProductToCart', payload);
       if (!cartItems.error) {
         this.$store.dispatch('product/getCartProducts', cartItems);
-        this.notification(true, 'success', 'mdi-check-circle', `${this.quantity} ${this.product.title} (${itemOptions})`, 'Fue agregado al carrito de compras!');
-      } else {
-        this.notification(true, 'warning', 'mdi-alert', `${this.quantity} ${this.product.title} (${itemOptions})`, 'No hay stock disponible!');
+
+        var variant = this.product.variants.find(variant => variant.id === payload.variant_id);
+
+        this.addedProductOptions.quantity = payload.quantity;
+        this.addedProductOptions.color = variant.options.color.name;
+        if (variant.options.size) {
+          this.addedProductOptions.size = variant.options.size.presentation;
+        }
+        if (variant.options.length) {
+          this.addedProductOptions.length = variant.options.length.presentation;
+        }
+        this.$store.commit('cart/setDrawerAddItemOn', true);
       }
       this.loading = !this.loading;
     }
@@ -517,5 +516,9 @@ export default {
   .ff-fira-condensed {
     font-family: 'Fira Sans Extra Condensed', sans-serif !important;
     letter-spacing: 3px !important;
+  }
+
+  .color-gold {
+    color: #D4AF37;
   }
 </style>

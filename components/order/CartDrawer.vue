@@ -76,7 +76,7 @@
             >mdi-close</v-icon>
           </div>
 
-          <v-list-item >
+          <v-list-item>
             <NuxtLink v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
               :to="`/product/${products[i].id}`"
               class="mr-n4"
@@ -97,8 +97,7 @@
                 class="text-body-2"></v-list-item-title>
               <v-list-item-subtitle
                 class="text-caption mt-1 mb-3">Stock disponible</v-list-item-subtitle>
-              <v-list-item-subtitle
-                class="text-caption">
+              <v-list-item-subtitle class="text-caption">
                 <v-row class="no-gutters">
                   <v-col cols="3" class="font-weight-light">Color</v-col>
                   <v-col cols="9">{{ products[i].options.color.name }}</v-col>
@@ -171,7 +170,7 @@
     </v-list>
 
     <v-list-item v-else>
-      <v-list-item-content class="mx-n1">
+      <v-list-item-content class="mx-n1 mt-12">
         <v-list-item-title class="text-h4 text-center text-uppercase ff-jomolhari mt-12">
           Tu Carrito<br>Está Vacío
         </v-list-item-title>
@@ -202,7 +201,7 @@ import { mapState } from 'vuex';
 export default {
   computed: {
     ...mapState({
-      drawer: state => state.cart.drawer,
+      drawer: state => state.cart.drawerOn,
       products: state => state.product.cartProducts,
       cartTotal: state => state.cart.total,
       cartAmount: state => state.cart.amount,
@@ -215,7 +214,7 @@ export default {
         return this.drawer;
       },
       set: function(value) {
-        this.$store.commit('cart/setDrawer', value);
+        this.$store.commit('cart/setDrawerOn', value);
 
         let elHtml = document.getElementsByTagName('html')[0];
         elHtml.style.overflowY = value ? 'hidden' : null;
@@ -239,7 +238,7 @@ export default {
   },
   methods: {
     closeCart() {
-      this.$store.commit('cart/setDrawer', false);
+      this.$store.commit('cart/setDrawerOn', false);
     },
     displayPrice(p) {
       var price = p;

@@ -14,7 +14,8 @@ export const state = () => ({
     cartItems: [],
     state: '',
     loading: false,
-    drawer: null
+    drawerOn: null,
+    drawerAddItemOn: null
 });
 
 export const mutations = {
@@ -54,8 +55,11 @@ export const mutations = {
     setState(state, payload) {
         state.state = payload;
     },
-    setDrawer(state, payload) {
-        state.drawer = payload;
+    setDrawerOn(state, payload) {
+        state.drawerOn = payload;
+    },
+    setDrawerAddItemOn(state, payload) {
+        state.drawerAddItemOn = payload;
     }
     /*setLoading(state, payload) {
         state.loading = payload;

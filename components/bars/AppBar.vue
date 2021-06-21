@@ -51,7 +51,7 @@
             <v-icon>mdi-account</v-icon>
           </v-btn>
 
-          <v-menu v-if="signedIn"
+          <v-menu v-else
             offset-y
             open-on-hover
             tile
@@ -82,6 +82,17 @@
           </v-menu>
 
           <v-btn
+            v-if="!signedIn"
+            icon
+            plain
+            small
+            class="mx-2"
+          >
+            <v-icon>mdi-shopping</v-icon>
+          </v-btn>
+
+          <v-btn
+            v-else
             icon
             plain
             small
@@ -304,7 +315,7 @@ export default {
   },
   methods: {
     showCart() {
-      this.$store.commit('cart/setDrawer', true);
+      this.$store.commit('cart/setDrawerOn', true);
     },
     handleLogout() {
       this.$store.commit('account/setAccountInfo', null);
