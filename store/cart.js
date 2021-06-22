@@ -15,7 +15,8 @@ export const state = () => ({
     state: '',
     loading: false,
     drawerOn: null,
-    drawerAddItemOn: null
+    drawerAddItemOn: null,
+    editOn: null
 });
 
 export const mutations = {
@@ -60,6 +61,9 @@ export const mutations = {
     },
     setDrawerAddItemOn(state, payload) {
         state.drawerAddItemOn = payload;
+    },
+    setEditOn(state, payload) {
+        state.editOn = payload;
     }
     /*setLoading(state, payload) {
         state.loading = payload;
@@ -93,12 +97,12 @@ export const actions = {
     },
     async removeProductFromCart({ commit, state }, payload) {
         const account = this.$cookies.get('account', { parseJSON: true });
-        const response = await client.cart.removeItem({ bearerToken: account.token }, payload.id, { include: 'line_items,variants,variants.images,variants.option_values,vendors' })
+        const response = await client.cart.removeItem({ bearerToken: account.token }, payload, { include: 'line_items,variants,variants.images,variants.option_values,vendors' })
             .then(response => {
                 const cartInfo = response.success();
 
                 // Returned cart after remove an item includes removed item, so it needs to be removed from the cart
-                var removeIndex = cartInfo.included.map(function(item) { return item.id; }).indexOf(payload.id);
+                var removeIndex = cartInfo.included.map(function(item) { return item.id; }).indexOf(payload);
                 cartInfo.included.splice(removeIndex, 1);
 
                 commit('setCart', cartInfo);

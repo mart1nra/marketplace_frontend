@@ -20,18 +20,18 @@
           <v-list-item-content class="item-info mt-5">
             <v-list-item-title v-text="product.vendor.name + ' ' + product.title"
               class="text-body-2 mb-3"></v-list-item-title>
-            <v-list-item-subtitle class="text-caption mb-3">
+            <v-list-item-subtitle class="text-caption black--text mb-3">
               <v-row class="no-gutters">
-                <v-col cols="2" class="font-weight-light">Color:</v-col>
-                <v-col cols="10">{{ options.color }}</v-col>
+                <v-col cols="2" class="font-weight-thin">Color:</v-col>
+                <v-col cols="10" class="font-weight-light">{{ options.color }}</v-col>
               </v-row>
               <v-row v-if="options.size" class="no-gutters">
-                <v-col cols="2" class="font-weight-light">Talle:</v-col>
-                <v-col cols="10">{{ options.size }}</v-col>
+                <v-col cols="2" class="font-weight-thin">Talle:</v-col>
+                <v-col cols="10" class="font-weight-light">{{ options.size }}</v-col>
               </v-row>
               <v-row v-if="options.length" class="no-gutters">
-                <v-col cols="2" class="font-weight-light">Largo:</v-col>
-                <v-col cols="10">{{ options.length }}</v-col>
+                <v-col cols="2" class="font-weight-thin">Largo:</v-col>
+                <v-col cols="10" class="font-weight-light">{{ options.length }}</v-col>
               </v-row>
             </v-list-item-subtitle>
           </v-list-item-content>

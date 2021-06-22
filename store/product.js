@@ -9,6 +9,7 @@ const client = makeClient({ host: baseUrl });
 export const state = () => ({
     product: null,
     products: null,
+    cartProduct: null,
     cartProducts: null,
     totalCount: 0,
     totalPages: 0,
@@ -37,6 +38,7 @@ export const mutations = {
         product.title = data.attributes.name;
         product.price = data.attributes.price;
         product.description = data.attributes.description;
+        product.slug = data.attributes.slug;
         product.variants = [];
         product.images = [];
         product.colors = [];
@@ -110,7 +112,13 @@ export const mutations = {
         product.vendor.name = vendor.attributes.name;
 
         product.currentVariant = data.relationships.default_variant.data.id;
-        state.product = product;
+
+        if (payload.type === 'detail') {
+            state.product = product;
+        } else if (payload.type === 'cart') {
+            state.cartProduct = product;
+        }
+
     },
     setProducts(state, payload) {
         const data = payload.data ? payload.data.data : payload.success().data;
@@ -230,8 +238,17 @@ export const mutations = {
     setProductCurrentVariant(state, payload) {
         state.product.currentVariant = payload;
     },
+    setCartProductCurrentVariant(state, payload) {
+        state.cartProduct.currentVariant = payload;
+    },
     setStockItem(state, payload) {
-        state.product.stock = payload.data.stock_items.length > 0 ? payload.data.stock_items[0].count_on_hand : 0;
+        var stock = payload.data.stock_items.length > 0 ? payload.data.stock_items[0].count_on_hand : 0;
+
+        if (payload.type === 'detail') {
+            state.product.stock = stock;
+        } else if (payload.type === 'cart') {
+            state.cartProduct.stock = stock;
+        }
     },
     setCurrentFilters(state, payload) {
         state.currentFilters = payload;
@@ -291,8 +308,9 @@ export const actions = {
     async getProductsById({ commit }, payload) {
         commit('setLoading', true);
 
-        const response = await client.products.show(payload, { include: 'images,variants.option_values,vendor' })
+        const response = await client.products.show(payload.id, { include: 'images,variants.option_values,vendor' })
             .then(response => {
+                response.type = payload.type;
                 commit('setProduct', response);
                 commit('setLoading', false);
                 return response.success();
@@ -305,6 +323,7 @@ export const actions = {
 
         const response = await repository.get(`${apiEndpointV1}/stock_locations/${parseInt(payload.vendor) + 1}/stock_items?token=2cb5b3b4e78b83df4fd0dfa0046cfa9de4da862103c60642&q[variant_id_eq]=${payload.item}`)
             .then(response => {
+                response.type = payload.type;
                 commit('setStockItem', response);
                 commit('setLoading', false);
                 return response.data;
@@ -337,6 +356,7 @@ export const actions = {
                     item.id = item.relationships.product.data.id;
                     item.title = lineItem.attributes.name;
                     item.price = lineItem.attributes.price;
+                    item.slug = lineItem.attributes.slug;
                     item.options = {};
                     item.options.color = null;
                     item.options.size = null;

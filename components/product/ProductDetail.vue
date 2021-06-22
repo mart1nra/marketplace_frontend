@@ -50,61 +50,6 @@
           mandatory
           class="ml-n1"
         >
-
-              <!--span v-for="(color, i) in product.colors" class="mx-2">
-                <v-hover v-slot="{ hover }">
-                  <v-btn v-if="color === product.selectedColor"
-                    class="ma-n1"
-                    max-width="23"
-                    max-height="23"
-                    elevation="0"
-                    fab
-                    outlined
-                  >
-                    <v-btn
-                      class="ma-n1"
-                      max-width="17"
-                      max-height="17"
-                      elevation="0"
-                      fab
-                      :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
-                      :outlined="color.presentation === '#FFFFFF'"
-                      @click="selectColor(product, color)"
-                    ></v-btn>
-                  </v-btn>
-                  <v-btn v-if="hover"
-                    class="ma-n1"
-                    min-width="33"
-                    min-height="33"
-                    small
-                    tile
-                    outlined
-                  >
-                    <v-btn
-                      class="ma-n1"
-                      min-width="30"
-                      min-height="30"
-                      depressed
-                      small
-                      tile
-                      :color="color.presentation"
-                      @click="selectColor(color)"
-                    ></v-btn>
-                  </v-btn>
-                  <v-btn v-else
-                    min-width="30"
-                    min-height="30"
-                    depressed
-                    small
-                    tile
-                    :color="color.presentation === '#FFFFFF' ? 'grey' : color.presentation"
-                    :outlined="color.presentation === '#FFFFFF'"
-                    @click="selectColor(color)"
-                  >
-                  </v-btn>
-                </v-hover>
-              </span-->
-
           <span v-for="color in product.colors">
             <v-btn v-if="color.presentation === '#FFFFFF'"
               class="mx-1"
@@ -165,14 +110,14 @@
         >
           <span v-for="length in product.lengths">
             <v-btn
-              class="mx-1 text-caption"
+              class="mx-1 text-caption text-capitalize"
               small
               outlined
               tile
-              min-width="33"
+              min-width="46"
               min-height="33"
-              max-width="33"
               max-height="33"
+              max-width="46"
               :disabled="checkLengthDisabled(length)"
             >{{ length.presentation }}</v-btn>
           </span>
@@ -339,7 +284,7 @@ export default {
   },
   async fetch() {
     if (this.product.sizes.length === 0 && this.product.lengths.length === 0) {
-      await this.$store.dispatch('product/getStockItem', { item: this.product.variants[0].id, vendor: this.product.vendor.id });
+      await this.$store.dispatch('product/getStockItem', { item: this.product.variants[0].id, vendor: this.product.vendor.id, type: 'detail' });
     }
   },
   methods: {
@@ -368,7 +313,7 @@ export default {
       this.$store.commit('product/setProductCurrentVariant', item.id);
 
       if (this.product.sizes.length === 0 && this.product.lengths.length === 0) {
-        await this.$store.dispatch('product/getStockItem', { item: item.id, vendor: this.product.vendor.id });
+        await this.$store.dispatch('product/getStockItem', { item: item.id, vendor: this.product.vendor.id, type: 'detail' });
       }
     },
     async selectSize() {
@@ -380,7 +325,7 @@ export default {
       var variant = this.findVariant();
 
       if (variant) {
-        await this.$store.dispatch('product/getStockItem', { item: variant.id, vendor: this.product.vendor.id });
+        await this.$store.dispatch('product/getStockItem', { item: variant.id, vendor: this.product.vendor.id, type: 'detail' });
       }
     },
     async selectLength() {
@@ -389,7 +334,7 @@ export default {
       var variant = this.findVariant();
 
       if (variant) {
-        await this.$store.dispatch('product/getStockItem', { item: variant.id, vendor: this.product.vendor.id });
+        await this.$store.dispatch('product/getStockItem', { item: variant.id, vendor: this.product.vendor.id, type: 'detail' });
       }
     },
     checkSize(size) {

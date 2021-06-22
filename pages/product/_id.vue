@@ -124,7 +124,7 @@ export default {
   async created() {
     this.loading = true;
 
-    const response = await this.$store.dispatch('product/getProductsById', this.productId)
+    const response = await this.$store.dispatch('product/getProductsById', { id: this.productId, type: 'detail' })
       .then((response) => {
         if (response.error) {
           this.$router.push('/');

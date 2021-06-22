@@ -61,69 +61,81 @@
 
       <div v-if="products && products !== undefined">
         <div v-for="(lineItem, i) in cart" :key="i" class="mb-2">
-          <v-progress-circular
+          <!--v-progress-circular
             v-if="loading && lineItem.id === deletedLineItemId"
             class="w-100 text-center"
             indeterminate
             color="primary"
           >
-          </v-progress-circular>
+          </v-progress-circular-->
 
-          <div v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)" class="item-close mr-2">
-            <v-icon
-              size="30"
-              @click.prevent="handleRemoveProductFromCart(lineItem, products[i])"
-            >mdi-close</v-icon>
+          <div v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)">
+            <div class="item-close mr-2">
+              <v-icon
+                size="30"
+                class="text--disabled"
+                @click.prevent="handleRemoveProductFromCart(lineItem.id)"
+              >mdi-close</v-icon>
+            </div>
+
+            <v-list-item>
+              <NuxtLink
+                :to="`/product/${products[i].slug}`"
+                class="mr-n4"
+              >
+                <v-img
+                  class="ml-n4 mb-4"
+                  :src="products[i].image ? products[i].image : emptyImage"
+                  style="width: 170px; height: 170px;"
+                ></v-img>
+              </NuxtLink>
+
+              <v-list-item-content class="item-info">
+                <NuxtLink
+                  :to="`/product/${products[i].slug}`"
+                >
+                  <v-list-item-title v-text="products[i].vendor.name"
+                    class="text-overline font-weight-light"></v-list-item-title>
+                  <v-list-item-title v-text="products[i].title"
+                    class="text-body-2"></v-list-item-title>
+                </NuxtLink>
+                <v-list-item-subtitle
+                  class="text-caption black--text font-weight-light mt-1 mb-3">Stock disponible</v-list-item-subtitle>
+                <v-list-item-subtitle class="text-caption black--text font-weight-light">
+                  <v-row class="no-gutters">
+                    <v-col cols="3" class="font-weight-thin">Color</v-col>
+                    <v-col cols="9">{{ products[i].options.color.name }}</v-col>
+                  </v-row>
+                  <v-row v-if="products[i].options.size" class="no-gutters">
+                    <v-col cols="3" class="font-weight-thin">Talle</v-col>
+                    <v-col cols="9">{{ products[i].options.size.presentation }}</v-col>
+                  </v-row>
+                  <v-row v-if="products[i].options.length" class="no-gutters">
+                    <v-col cols="3" class="font-weight-thin">Largo</v-col>
+                    <v-col cols="9">{{ products[i].options.length.presentation }}</v-col>
+                  </v-row>
+                  <v-row class="no-gutters">
+                    <v-col cols="3" class="font-weight-thin">Cant.</v-col>
+                    <v-col cols="9">{{ lineItem.quantity }}</v-col>
+                  </v-row>
+                </v-list-item-subtitle>
+                <v-hover class="black--text text-caption font-weight-medium text-uppercase mt-3 mb-1">
+                  <v-list-item-subtitle
+                    slot-scope="{ hover }"
+                    :class="`${hover ? 'edit-hover' : ''}`"
+                    @click.prevent="showEdit(i)"
+                    >
+                    Editar<v-icon size="14">mdi-chevron-right</v-icon>
+                  </v-list-item-subtitle>
+                </v-hover>
+                <v-list-item-subtitle>
+                  <span class="text-h6 font-weight-light black--text" v-html="displayPrice(products[i].price)"></span>
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider v-if="i < products.length - 1" class="mx-3 mt-3"></v-divider>
           </div>
-
-          <v-list-item>
-            <NuxtLink v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
-              :to="`/product/${products[i].id}`"
-              class="mr-n4"
-            >
-              <v-img
-                class="ml-n4 mb-4"
-                :src="products[i].image ? products[i].image : emptyImage"
-                style="width: 170px; height: 170px;"
-              ></v-img>
-            </NuxtLink>
-
-            <v-list-item-content v-if="products[i] && (!loading || lineItem.id !== deletedLineItemId)"
-              class="item-info"
-            >
-              <v-list-item-title v-text="products[i].vendor.name"
-                class="text-overline font-weight-light"></v-list-item-title>
-              <v-list-item-title v-text="products[i].title"
-                class="text-body-2"></v-list-item-title>
-              <v-list-item-subtitle
-                class="text-caption mt-1 mb-3">Stock disponible</v-list-item-subtitle>
-              <v-list-item-subtitle class="text-caption">
-                <v-row class="no-gutters">
-                  <v-col cols="3" class="font-weight-light">Color</v-col>
-                  <v-col cols="9">{{ products[i].options.color.name }}</v-col>
-                </v-row>
-                <v-row v-if="products[i].options.size" class="no-gutters">
-                  <v-col cols="3" class="font-weight-light">Talle</v-col>
-                  <v-col cols="9">{{ products[i].options.size.presentation }}</v-col>
-                </v-row>
-                <v-row v-if="products[i].options.length" class="no-gutters">
-                  <v-col cols="3" class="font-weight-light">Largo</v-col>
-                  <v-col cols="9">{{ products[i].options.length.presentation }}</v-col>
-                </v-row>
-                <v-row class="no-gutters">
-                  <v-col cols="3" class="font-weight-light">Cant.</v-col>
-                  <v-col cols="9">{{ lineItem.quantity }}</v-col>
-                </v-row>
-              </v-list-item-subtitle>
-              <v-list-item-subtitle
-                class="text-caption font-weight-bold text-uppercase mt-3 mb-2">Editar<v-icon size="14">mdi-chevron-right</v-icon></v-list-item-subtitle>
-              <v-list-item-subtitle>
-                <span class="text-h6 font-weight-light color-gold" v-html="displayPrice(products[i].price)"></span>
-              </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-
-          <v-divider v-if="i < products.length - 1" class="mx-3 mt-3"></v-divider>
         </div>        
 
         <div v-if="products.length > 2">
@@ -188,10 +200,17 @@
             :to="linkButton"
             exact
             nuxt
+            @click="drawerOn = false"
           >{{ textButton }}</v-btn>
         </v-list-item-icon>
       </v-list-item-content>
     </v-list-item>
+
+    <CartEdit
+      :line-item-id="lineItemId"
+      @update="handleRemoveProductFromCart(lineItemId)"
+    />
+
   </v-navigation-drawer>
 </template>
 
@@ -233,12 +252,19 @@ export default {
   data () {
     return {
       loading: false,
-      deletedLineItemId: null
+      deletedLineItemId: null,
+      lineItemId: null
     }
   },
   methods: {
     closeCart() {
       this.$store.commit('cart/setDrawerOn', false);
+    },
+    async showEdit(index) {
+      this.lineItemId = this.products[index].lineItemId;
+
+      await this.$store.dispatch('product/getProductsById',  { id: this.products[index].id, type: 'cart' });
+      this.$store.commit('cart/setEditOn', true);
     },
     displayPrice(p) {
       var price = p;
@@ -246,11 +272,11 @@ export default {
       p = price.substring(dec_pos + 1) === '00' || price.substring(dec_pos + 1) === '0' ? '$ ' + price.substring(0, dec_pos) : '$ ' + price.substring(0, dec_pos) + '<sup>' + price.substring(dec_pos + 1) + '</sup>';
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
-    async handleRemoveProductFromCart(lineItem, product) {
+    async handleRemoveProductFromCart(id) {
       this.loading = true;
-      this.deletedLineItemId = lineItem.id;
+      this.deletedLineItemId = id;
 
-      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', lineItem);
+      const cartItems = await this.$store.dispatch('cart/removeProductFromCart', id);
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
       }
@@ -305,5 +331,10 @@ export default {
   .item-info {
     align-self: baseline;
     padding: 0px;
+  }
+
+  .edit-hover {
+    cursor: pointer;
+    color: #D4AF37 !important;
   }
 </style>
