@@ -207,8 +207,8 @@
     </v-list-item>
 
     <CartEdit
-      :line-item-id="lineItemId"
-      @update="handleRemoveProductFromCart(lineItemId)"
+      :cartItem="itemToEdit"
+      @update="handleRemoveProductFromCart(itemToEdit.lineItemId)"
     />
 
   </v-navigation-drawer>
@@ -253,7 +253,7 @@ export default {
     return {
       loading: false,
       deletedLineItemId: null,
-      lineItemId: null
+      itemToEdit: null
     }
   },
   methods: {
@@ -261,9 +261,9 @@ export default {
       this.$store.commit('cart/setDrawerOn', false);
     },
     async showEdit(index) {
-      this.lineItemId = this.products[index].lineItemId;
+      this.itemToEdit = this.products[index];
 
-      await this.$store.dispatch('product/getProductsById',  { id: this.products[index].id, type: 'cart' });
+      await this.$store.dispatch('product/getProductsById',  { id: this.products[index].productId, type: 'cart' });
       this.$store.commit('cart/setEditOn', true);
     },
     displayPrice(p) {

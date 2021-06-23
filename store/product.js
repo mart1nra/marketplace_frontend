@@ -353,7 +353,7 @@ export const actions = {
                     const image = payload.find(i => i.type === 'image' && i.attributes.viewable_id.toString() === item.id )
                     item.image = image ? baseUrl + image.attributes.styles[2].url : '';
                     item.lineItemId = lineItem.id;
-                    item.id = item.relationships.product.data.id;
+                    item.productId = item.relationships.product.data.id;
                     item.title = lineItem.attributes.name;
                     item.price = lineItem.attributes.price;
                     item.slug = lineItem.attributes.slug;

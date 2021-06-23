@@ -88,7 +88,8 @@
 		          </span>
 		        </v-btn-toggle>
 		        <h5 v-if="product.sizes.length > 0" class="text--disabled text-caption mt-4 mb-1">
-		          <span v-if="!sizeChanged || selectedSize || selectedSize === 0">Talle</span><span v-else class="color-gold"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Por favor elegí un Talle</span>
+		          <span v-if="!sizeChanged || selectedSize || selectedSize === 0">Talle</span>
+		          <span v-else class="color-gold"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Por favor elegí un Talle</span>
 		          <span class="text--primary text-caption font-weight-light">{{ selectedSize || selectedSize === 0 ? product.sizes[selectedSize].name : '' }}</span>
 		        </h5>
 		        <v-btn-toggle
@@ -111,7 +112,8 @@
 		          </span>
 		        </v-btn-toggle>
 		        <h5 v-if="product.lengths.length > 0" class="text--disabled text-caption mt-4 mb-1">
-		          <span v-if="!lengthChanged || selectedLength || selectedLength === 0">Largo</span><span v-else class="color-gold"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Por favor elegí un Largo</span>
+		          <span v-if="!lengthChanged || selectedLength || selectedLength === 0">Largo</span>
+		          <span v-else class="color-gold"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Por favor elegí un Largo</span>
 		          <span class="text--primary text-caption font-weight-light">{{ selectedLength || selectedLength === 0 ? product.lengths[selectedLength].name : '' }}</span>
 		        </h5>
 		        <v-btn-toggle
@@ -177,9 +179,9 @@
 		          </template>
 		        </v-text-field>
 
-		        <div class="text-caption my-3">
-		          <span v-if="variantStock > 0" class="color-gold">Stock disponible ({{ variantStock }})</span>
-		          <span v-else-if="variantStock === 0" class="text--disabled">Sin stock</span>
+		        <div class="text-caption color-gold my-3">
+		          <span v-if="variantStock > 0">Stock disponible ({{ variantStock }})</span>
+		          <span v-else-if="variantStock === 0"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Sin stock</span>
 		        </div>
 
 		        <div class="mt-4">
@@ -206,8 +208,8 @@ import { mapState } from 'vuex';
 
 export default {
   props: {
-    lineItemId: {
-      type: String,
+    cartItem: {
+      type: Object,
       default: null
     }
   },
@@ -227,6 +229,9 @@ export default {
       set: function(value) {
       	this.selectedColor = 0;
       	this.selectedImage = 0;
+      	this.selectedSize = null;
+      	this.selectedLength = null;
+      	this.quantity = 1;
       	this.loading = false;
         this.$store.commit('cart/setEditOn', value);
       }
@@ -248,13 +253,8 @@ export default {
     variantStock() {
       var variant = this.findVariant();
 
-      if (variant) {
-        var cartItem = this.cart.find(item => item.variant_id === variant.id);
+      return variant ? this.product.stock : null;
 
-        return cartItem ? this.product.stock - cartItem.quantity : this.product.stock;
-      } else {
-        return null;
-      }
     }
   },
   data () {
@@ -266,8 +266,7 @@ export default {
       selectedSize: null,
       selectedLength: null,
       sizeChanged: false,
-      lengthChanged: false,
-      addToCartSubmited: false
+      lengthChanged: false
     }
   },
   methods: {
@@ -280,8 +279,11 @@ export default {
     closeEdit() {
     	this.selectedColor = 0;
     	this.selectedImage = 0;
+    	this.selectedSize = null;
+    	this.selectedLength = null;
+    	this.quantity = 1;
+    	this.loading = false;
       this.$store.commit('cart/setEditOn', false);
-      this.loading = false;
     },
     findVariant() {
     	if (this.product) {
@@ -298,7 +300,6 @@ export default {
       this.selectedLength = null;
       this.sizeChanged = false;
       this.lengthChanged = false;
-      this.addToCartSubmited = false;
 
       const item = this.product.variants.find(variant => variant.options.color.id === color.id);
 
@@ -312,7 +313,6 @@ export default {
       this.sizeChanged = !this.sizeChanged;
       this.lengthChanged = false;
       this.selectedLength = null;
-      this.addToCartSubmited = false;
 
       var variant = this.findVariant();
 
@@ -321,7 +321,6 @@ export default {
       }
     },
     async selectLength() {
-      this.addToCartSubmited = false;
 
       var variant = this.findVariant();
 
@@ -386,7 +385,6 @@ export default {
     },
     async updateCartItem() {
       this.loading = !this.loading;
-      this.addToCartSubmited = true;
 
       if (this.optionsValidated() && this.variantStock > 0) {
         const variantId = this.product.variants.find(variant =>
@@ -395,17 +393,21 @@ export default {
           (!variant.options.length || variant.options.length.id === this.product.lengths[this.selectedLength].id)
         ).id
 
-        let item = {
-          variant_id: variantId,
-          quantity: this.quantity
-        };
+        if (variantId === this.cartItem.id) {
+        	await this.$store.dispatch('cart/setCartItemQuantity', { line_item_id: this.cartItem.lineItemId, quantity: this.quantity });
+        } else {
+	        let item = {
+	          variant_id: variantId,
+	          quantity: this.quantity
+	        };
 
-	      var cartItems = await this.$store.dispatch('cart/addProductToCart', item);
-	      if (!cartItems.error) {
-	        this.$store.dispatch('product/getCartProducts', cartItems);
+		      var cartItems = await this.$store.dispatch('cart/addProductToCart', item);
+		      if (!cartItems.error) {
+		        this.$store.dispatch('product/getCartProducts', cartItems);
 
-		      this.$emit('update');
-	      }        
+			      this.$emit('update');
+		      }
+        }    
 
         this.closeEdit();
       } else {
@@ -434,4 +436,8 @@ export default {
   	border-style: solid;
   	border-width: 1px;
   }
+
+	.color-gold {
+	  color: #D4AF37;
+	}
 </style>
