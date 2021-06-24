@@ -231,7 +231,7 @@
               tile
               large
               elevation="0"
-            ><v-icon class="mdi-18px mr-1">mdi-chat</v-icon>Chatear Ahora</v-btn>
+            ><v-icon class="mdi-18px mr-1">mdi-chat</v-icon>Chat Online</v-btn>
           </div>
           <div class="text-caption mt-4">
             Servicio al Cliente<v-icon size="14" color="white">mdi-chevron-right</v-icon>
