@@ -6,7 +6,7 @@
     right
     width="360px"
   >
-    <v-list-item class="title-bar">
+    <v-list-item class="title-bar secondary darken-1">
       <v-list-item-content class="white--text">
         <span class="text-center text-overline pl-6">Carrito de compras ({{ cartTotal }}) <v-icon class="drawer-close mt-1" @click.stop="closeCart()">mdi-window-close</v-icon></span>
       </v-list-item-content>
@@ -129,7 +129,7 @@
                   </v-list-item-subtitle>
                 </v-hover>
                 <v-list-item-subtitle>
-                  <span class="text-h6 font-weight-light black--text" v-html="displayPrice(products[i].price)"></span>
+                  <span class="text-h6 font-weight-light color-gold" v-html="displayPrice(products[i].price)"></span>
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -205,6 +205,69 @@
         </v-list-item-icon>
       </v-list-item-content>
     </v-list-item>
+
+    <v-footer v-if="products"
+      padless
+      inset
+      :bottom="products.length < 2"
+      :fixed="products.length < 2"
+    >
+      <v-row
+        justify="center"
+        no-gutters
+      >
+        <v-col
+          class="secondary darken-1 py-4 text-center white--text"
+          cols="12"
+        >
+          <div class="text-overline font-weight-bold">
+            ¿Necesitás ayuda?
+          </div>
+          <div class="mx-9 my-3">
+            <v-btn
+              block
+              class="text-h6 font-weight-medium white--text ff-fira-condensed px-10"
+              color="black"
+              tile
+              large
+              elevation="0"
+            ><v-icon class="mdi-18px mr-1">mdi-chat</v-icon>Chatear Ahora</v-btn>
+          </div>
+          <div class="text-caption mt-4">
+            Servicio al Cliente<v-icon size="14" color="white">mdi-chevron-right</v-icon>
+          </div>
+        </v-col>
+      </v-row>
+    </v-footer>
+
+    <!--div v-else>
+      <v-row
+        justify="center"
+        no-gutters
+      >
+        <v-col
+          class="secondary darken-1 py-4 text-center white--text"
+          cols="12"
+        >
+          <div class="text-overline font-weight-bold">
+            ¿Necesitás ayuda?
+          </div>
+          <div class="mx-9 my-3">
+            <v-btn
+              block
+              class="text-h6 font-weight-medium white--text ff-fira-condensed px-10"
+              color="black"
+              tile
+              large
+              elevation="0"
+            ><v-icon class="mdi-18px mr-1">mdi-chat</v-icon>Chatear Ahora</v-btn>
+          </div>
+          <div class="text-caption mt-4">
+            Servicio al Cliente<v-icon size="14" color="white">mdi-chevron-right</v-icon>
+          </div>
+        </v-col>
+      </v-row>
+    </div-->
 
     <CartEdit
       :cartItem="itemToEdit"
@@ -299,7 +362,6 @@ export default {
   .title-bar {
     display: block;
     position: fixed;
-    background-color: #212121;
     height: 46px;
     width: 100%;
     z-index: 200;

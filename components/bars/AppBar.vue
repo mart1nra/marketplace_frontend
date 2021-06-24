@@ -91,18 +91,18 @@
             <v-icon>mdi-shopping</v-icon>
           </v-btn>
 
-          <v-btn
-            v-else
-            icon
-            plain
-            small
-            class="mx-2"
-            @click.stop="showCart()"
-          >
-            <v-icon>mdi-shopping</v-icon>
-          </v-btn>
-          <span v-if="cartTotal > 0" class="text-caption font-weight-medium ml-n1 pt-1">{{ cartTotal }}</span>
-
+          <div v-else>
+            <v-btn
+              icon
+              plain
+              small
+              class="ml-2"
+              @click.stop="showCart()"
+            >
+              <v-icon>mdi-shopping</v-icon>
+            </v-btn>
+            <span v-if="cartTotal > 0" class="text-caption font-weight-medium">{{ cartTotal }}</span>
+          </div>
         </div>
       </v-col>
     </v-row>

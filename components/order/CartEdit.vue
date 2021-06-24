@@ -48,10 +48,10 @@
 		        <div class="text-h5 font-weight-light text-capitalize">{{ product.title }}</div>
 		        <Stars />
 		        <div class="text-body-1 my-4" v-html="displayPrice(product.price)"></div>
-		        <div class="text-caption font-weight-light">
-		        	<NuxtLink :to="`/product/${product.slug}?from=women`">
-		        		Todos los detalles del producto<v-icon size="14">mdi-chevron-right</v-icon>
-		        	</NuxtLink>
+		        <div class="text-caption font-weight-light product-detail-link"
+		        	@click="$router.go({path: `/product/${product.slug}?from=women`, force: true})"
+		        >
+		        	Todos los detalles del producto<v-icon size="14">mdi-chevron-right</v-icon>
 		        </div>
 		        <div v-if="product.colors.length > 0" class="text--disabled text-caption mb-1">Color 
 		          <span class="text--primary text-caption font-weight-light">{{ product.colors[selectedColor].name }}</span>
@@ -181,7 +181,7 @@
 
 		        <div class="text-caption color-gold my-3">
 		          <span v-if="variantStock > 0">Stock disponible ({{ variantStock }})</span>
-		          <span v-else-if="variantStock === 0"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Sin stock</span>
+		          <span v-else-if="variantStock === 0 && colorSelected"><v-icon class="mdi-18px mr-1 mb-1 color-gold">mdi-alert-circle</v-icon>Sin stock</span>
 		        </div>
 
 		        <div class="mt-4">
@@ -224,15 +224,14 @@ export default {
     }),
     editOn: {
       get: function() {
+      	if (this.edit) {
+      		this.getDefaultVariantStock();
+      	}
+
         return this.edit;
       },
       set: function(value) {
-      	this.selectedColor = 0;
-      	this.selectedImage = 0;
-      	this.selectedSize = null;
-      	this.selectedLength = null;
-      	this.quantity = 1;
-      	this.loading = false;
+      	this.resetOptions();
         this.$store.commit('cart/setEditOn', value);
       }
     },
@@ -254,7 +253,6 @@ export default {
       var variant = this.findVariant();
 
       return variant ? this.product.stock : null;
-
     }
   },
   data () {
@@ -265,6 +263,7 @@ export default {
       selectedColor: 0,
       selectedSize: null,
       selectedLength: null,
+      colorSelected: false,
       sizeChanged: false,
       lengthChanged: false
     }
@@ -277,13 +276,24 @@ export default {
       return p.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     closeEdit() {
+    	this.resetOptions();
+      this.$store.commit('cart/setEditOn', false);
+    },
+    async getDefaultVariantStock() {
+	    if (this.product.sizes.length === 0 && this.product.lengths.length === 0) {
+	      await this.$store.dispatch('product/getStockItem', { item: this.product.variants[0].id, vendor: this.product.vendor.id, type: 'cart' });
+	    }
+    },
+    resetOptions() {
     	this.selectedColor = 0;
     	this.selectedImage = 0;
     	this.selectedSize = null;
     	this.selectedLength = null;
+    	this.colorSelected = false;
+    	this.sizeChanged = false;
+    	this.lengthChanged = false;
     	this.quantity = 1;
     	this.loading = false;
-      this.$store.commit('cart/setEditOn', false);
     },
     findVariant() {
     	if (this.product) {
@@ -298,6 +308,7 @@ export default {
     	this.selectedImage = 0;
       this.selectedSize = null;
       this.selectedLength = null;
+      this.colorSelected = true;
       this.sizeChanged = false;
       this.lengthChanged = false;
 
@@ -313,6 +324,7 @@ export default {
       this.sizeChanged = !this.sizeChanged;
       this.lengthChanged = false;
       this.selectedLength = null;
+      this.colorSelected = true;
 
       var variant = this.findVariant();
 
@@ -321,6 +333,7 @@ export default {
       }
     },
     async selectLength() {
+    	this.colorSelected = true;
 
       var variant = this.findVariant();
 
@@ -439,5 +452,9 @@ export default {
 
 	.color-gold {
 	  color: #D4AF37;
+	}
+
+	.product-detail-link {
+		cursor: pointer;
 	}
 </style>
