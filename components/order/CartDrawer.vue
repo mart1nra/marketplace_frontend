@@ -42,9 +42,7 @@
               color="#212121"
               large
               elevation="0"
-              to="/checkout"
-              exact
-              nuxt
+              @click.stop.prevent="mercadoPago.open()"
             >Pagar <span class="text-lowercase">con</span><span class="text-h6 font-weight-bold ml-1">mercado pago</span></v-btn>
           </v-list-item-icon>
         </v-list-item-content>
@@ -289,13 +287,24 @@ export default {
       cartAmount: state => state.cart.amount,
       cart: state => state.cart.cartItems,
       signedIn: state => state.auth.signedIn,
-      emptyImage: state => state.product.emptyImage
+      emptyImage: state => state.product.emptyImage,
+      preferenceId: state => state.payment.preferenceId,
     }),
     drawerOn: {
       get: function() {
         return this.drawer;
       },
       set: function(value) {
+        if (value) {
+          const mp = new MercadoPago('TEST-fe02f177-c10f-4ce2-b766-7eef91483a55', { locale: 'es-AR' });
+
+          this.mercadoPago = mp.checkout({
+            preference: {
+              id: this.preferenceId
+            }
+          });          
+        }
+
         this.$store.commit('cart/setDrawerOn', value);
 
         let elHtml = document.getElementsByTagName('html')[0];
@@ -316,7 +325,8 @@ export default {
     return {
       loading: false,
       deletedLineItemId: null,
-      itemToEdit: null
+      itemToEdit: null,
+      mercadoPago: null
     }
   },
   methods: {
@@ -342,6 +352,20 @@ export default {
       const cartItems = await this.$store.dispatch('cart/removeProductFromCart', id);
       if (cartItems) {
         this.$store.dispatch('product/getCartProducts', cartItems);
+
+        const preferenceId = await this.$store.dispatch('payment/getMercadoPago');
+
+        if (preferenceId) {
+          this.$store.commit('payment/setMercadoPago', preferenceId);
+
+          const mp = new MercadoPago('TEST-fe02f177-c10f-4ce2-b766-7eef91483a55', { locale: 'es-AR' });
+
+          this.mercadoPago = mp.checkout({
+            preference: {
+              id: this.preferenceId
+            }
+          });
+        }
       }
       this.loading = false;
     }

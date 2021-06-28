@@ -29,8 +29,9 @@ export const mutations = {
         const items = [];
         for (var i of payload.included) {
             if (i.type === 'line_item') {
-                const item = { id: '', quantity: 0, price: 0 };
+                const item = {};
                 item.id = i.id;
+                item.name = i.attributes.name;
                 item.quantity = i.attributes.quantity;
                 item.price = i.attributes.price;
                 item.total = i.attributes.total;

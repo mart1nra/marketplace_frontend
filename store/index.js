@@ -20,6 +20,12 @@ export const actions = {
             dispatch('product/getCartProducts', cartItems);
         }
 
+        const preferenceId = await dispatch('payment/getMercadoPago');
+
+        if (preferenceId) {
+            commit('payment/setMercadoPago', preferenceId);
+        }
+
         dispatch('product/getProductsOptions');
     }
 };

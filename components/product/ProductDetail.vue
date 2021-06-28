@@ -431,6 +431,12 @@ export default {
       if (!cartItems.error) {
         this.$store.dispatch('product/getCartProducts', cartItems);
 
+        const preferenceId = await this.$store.dispatch('payment/getMercadoPago');
+
+        if (preferenceId) {
+          this.$store.commit('payment/setMercadoPago', preferenceId);
+        }
+
         var variant = this.product.variants.find(variant => variant.id === payload.variant_id);
 
         this.addedProductOptions.quantity = payload.quantity;
